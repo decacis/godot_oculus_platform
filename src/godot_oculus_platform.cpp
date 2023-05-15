@@ -743,7 +743,7 @@ void GDOculusPlatform::_process_launch_unblock_flow(ovrMessageHandle p_message) 
 }
 
 /// Processes the result of the friend request flow. Returns a Dictionary.
-void GDOculusPlatform::_process_launch_unblock_flow(ovrMessageHandle p_message) {
+void GDOculusPlatform::_process_launch_friend_request_flow(ovrMessageHandle p_message) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 	Ref<GDOculusPlatformPromise> promise;
 
