@@ -40,3 +40,30 @@ Copy the AAR generated in `tools/godotoculusplatform-android-plugin/godotoculusp
 Also, copy `demo/android/plugins/godotoculusplatform-android-plugin.gdap` to your `android/plugins` folder.
 
 Finally, enable the `Godot Oculus Platform Android Plugin` in your export template and enable the `Godot Oculus Platform` plugin in your Project Settings.
+
+## Using this asset
+You can take a look at the [examples](/godot_oculus_platform/examples/) to get an idea of how to interact with the Oculus Platform.
+
+A concept we use is the use of promises or more specifically `GDOculusPlatformPromise`s. These promises basically help you perform actions in an asynchronous manner. Take a look at the following example:
+
+```
+print("Godot")
+
+GDOP.initialize()
+
+GDOculusPlatform.initialize_android_async("314159265358979")\
+.then(func(_initialization_resp):
+    print("Oculus")
+)
+
+print("Platform")
+```
+This will print:
+
+```
+Godot
+Platform
+Oculus
+```
+
+Since almost all functions in this platform are asynchronous, they don't block code execution allowing you to do other stuff while you wait for a response from the Oculus Platform.

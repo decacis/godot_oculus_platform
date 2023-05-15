@@ -1,0 +1,64 @@
+# Examples
+Here are some examples of using this asset. For more details make sure to check the documentation for each function you want to use.
+
+### Entitlement check
+An entitlement check allows you to quickly check if the user that launched the app actually is entitled to it.
+
+```
+GDOP.initialize(false) # We have to initialize this singleton
+
+# Initializing android platform with the APP_ID as a parameter
+GDOculusPlatform.initialize_android_async("314159265358979")\
+.then(func(_initialization_resp):
+    print("Oculus Platform initialized!")
+    
+    # Is the user entitled to this app?
+    GDOculusPlatform.get_is_viewer_entitled()\
+    .then(func(_is_viewer_entitled_resp):
+        print("User is entitled!")
+        
+    )\
+    .error(func(is_viewer_entitled_err):
+        print("User not entitled/error! ", is_viewer_entitled_err)
+    )
+    
+)\
+.error(func(initialization_err):
+    print("Oculus Platform initialization error: ", initialization_err)
+)
+```
+
+You may notice something odd on the first line:
+```
+GDOP.initialize(false) # We have to initialize this singleton
+```
+
+`GDOP` is different than the singleton we use for the other functions (`GDOculusPlatform`). `GDOP` is only used to initialize the plugin and the only parameter it takes is a boolean to initialize in `quiet mode` or not. Setting it to false will print unhandled messages sent from the Oculus Platform.
+
+### Getting logged in user information
+Since the promises (`then` and `error` functions) take a `Callable` you can do something like this:
+```
+GDOculusPlatform.initialize_android_async("6324217457624418")\
+.then(func(_initialization_resp):
+    print("Oculus Platform initialized")
+        
+    GDOculusPlatform.get_logged_in_user()\
+    .then(_process_logged_in_user_response)
+    
+)\
+.error(func(initialization_err):
+    print("Oculus Platform initialization error: ", initialization_err)
+)
+
+func _process_logged_in_user_response(resp : Dictionary):
+    print("LOGGED IN USER INFO:")
+    print("--------------------")
+
+    print("ID: ", resp.id)
+    print("OCULUS ID: ", resp.oculus_id)
+    print("DISPLAY NAME: ", resp.display_name)
+    print("IMAGE URL: ", resp.image_url)
+    print("SMALL IMAGE URL: ", resp.small_image_url)
+```
+
+You also may notice that we didn't add an `error` function call to the `get_logged_in_user()` function. Both the `then` and `error` functions are optional, and you can skip them if you don't care about their result.
