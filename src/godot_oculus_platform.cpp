@@ -323,7 +323,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::get_blocked_users() {
 }
 
 /// Requests the user IDs of the current user's friends.
-/// @return Promise that will contain user IDs as an Array of Strings if fulfilled
+/// @return Promise that will contain an Array of Dictionaries with information about each friend. Same format as the Dictionary returned by get_user()
 Ref<GDOculusPlatformPromise> GDOculusPlatform::get_logged_in_user_friends() {
 #ifdef __ANDROID__
 	ovrRequest req = ovr_User_GetLoggedInUserFriends();

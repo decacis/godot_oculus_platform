@@ -34,7 +34,7 @@ GDOculusPlatform.initialize_android_async("314159265358979")\
 
 We use a promise-based approach for every request that is asynchronous. The `then` `Callable` will only be called if the request was fulfilled (i.e. successful) and the `error` `Callable` will be called if there was an error with the request.
 
-You can read more in the documentation (WORK IN PROGRESS!).
+You can read more in the [Godot Oculus Platform documentation](https://decacis.github.io/godot_oculus_platform/).
 
 NOTE: The demo included in this repository won't work on its own. You still have to setup an app in the Oculus Dashboard, upload a release version and request all the required [Data Use Checkup](https://developer.oculus.com/resources/publish-data-use/) permissions to test, otherwise most fields will be empty/null. Also, it's missing the [OpenXR Loaders](https://github.com/GodotVR/godot_openxr_loaders).
 
@@ -48,7 +48,7 @@ Then, follow the [Godot documentation](https://docs.godotengine.org/en/stable/tu
 ```
 scons platform=PLATFORM_HERE -j4 custom_api_file=PATH_TO_FILE_HERE
 ```
-Replace `PLATFORM_HERE` with your platform and `PATH_TO_FILE_HERE` with the path to to `extension_api.json` file.
+Replace `PLATFORM_HERE` with your platform and `PATH_TO_FILE_HERE` with the path to to `extension_api.json` file. The `-j4` is the number of cores to use to build - you can change it to speed up the process.
 
 After that, go back to the root directory and run:
 
