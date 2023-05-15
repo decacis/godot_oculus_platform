@@ -1,0 +1,17 @@
+[configuration]
+
+entry_symbol = "gdoculusplatform_library_init"
+
+[libraries]
+
+windows.debug="res://addons/godot_oculus_platform/bin/libgodotoculusplatformWD.dll"
+windows.release="res://addons/godot_oculus_platform/bin/libgodotoculusplatformW.dll"
+macos.debug="res://addons/godot_oculus_platform/bin/libgodotoculusplatformMD.framework"
+macos.release="res://addons/godot_oculus_platform/bin/libgodotoculusplatformM.framework"
+linux.debug="res://addons/godot_oculus_platform/bin/libgodotoculusplatformLD.so"
+linux.release="res://addons/godot_oculus_platform/bin/libgodotoculusplatformL.so"
+android.arm64="res://addons/godot_oculus_platform/bin/libgodotoculusplatformA.so"
+
+[dependencies]
+
+android.arm64={"android/libs/arm64-v8a/libovrplatformloader.so": ""}

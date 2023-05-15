@@ -1,0 +1,50 @@
+[gd_scene load_steps=6 format=3 uid="uid://bmrdsf4mefv8p"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_0d6t3"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_m6wc7"]
+radius = 0.05
+height = 0.1
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_niilw"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_gkkmd"]
+sky_material = SubResource("ProceduralSkyMaterial_niilw")
+
+[sub_resource type="Environment" id="Environment_qmw2e"]
+background_mode = 2
+sky = SubResource("Sky_gkkmd")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_0d6t3")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+
+[node name="XRController3D" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
+tracker = &"left_hand"
+pose = &"aim"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRController3D"]
+mesh = SubResource("SphereMesh_m6wc7")
+
+[node name="XRController3D2" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+tracker = &"right_hand"
+pose = &"aim"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRController3D2"]
+mesh = SubResource("SphereMesh_m6wc7")
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -3)
+text = "test"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_qmw2e")

@@ -1,0 +1,11 @@
+[config]
+
+name="GodotOculusPlatformAndroidPlugin"
+binary_type="local"
+binary="godotoculusplatform/godotoculusplatform-android-plugin-release.aar"
+
+[dependencies]
+
+local=[]
+remote=[]
+custom_maven_repos=[]
