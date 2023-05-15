@@ -1,0 +1,17 @@
+site_name: Godot Oculus Platform
+site_url: https://decacis.github.io/godot_oculus_platform/index.html
+repo_url: https://github.com/decacis/godot_oculus_platform
+repo_name: Godot Oculus Platform
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Functions:
+    - Initialization: 'functions/initialization.md'
+    - Users: 'functions/users.md'
+theme: readthedocs
+markdown_extensions:
+  - markdown.extensions.toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details

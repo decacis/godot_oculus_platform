@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.godot.godotoculusplatform">
-
-    <application><meta-data
-        android:name="org.godotengine.plugin.v1.GodotOculusPlatform"
-        android:value="org.godot.godotoculusplatform.GodotOculusPlatform" /></application>
-</manifest>
