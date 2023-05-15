@@ -2,6 +2,7 @@ site_name: Godot Oculus Platform
 site_url: https://decacis.github.io/godot_oculus_platform/index.html
 repo_url: https://github.com/decacis/godot_oculus_platform
 repo_name: Godot Oculus Platform
+edit_uri: https://github.com/decacis/godot_oculus_platform/tree/gh-pages-source/docs
 nav:
   - Home: index.md
   - Getting started: getting-started.md
@@ -13,5 +14,6 @@ markdown_extensions:
   - markdown.extensions.toc:
       permalink: true
   - pymdownx.superfences
+  - pymdownx.tasklist
   - pymdownx.blocks.admonition
   - pymdownx.blocks.details
