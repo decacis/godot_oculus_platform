@@ -91,7 +91,7 @@ The AAR of the Android plugin is located in `tools/godotoculusplatform-android-p
 
 Also copy `demo/android/plugins/godotoculusplatform-android-plugin.gdap` to `android/plugins` in your project.
 
-Make sure to enable the plugin in your export template.
+Make sure to enable the `Godot Oculus Platform Android Plugin` in your export template. Also, make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.
 
 A more automated way of doing this will come soon.
 
