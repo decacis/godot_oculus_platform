@@ -6,6 +6,7 @@ edit_uri: https://github.com/decacis/godot_oculus_platform/tree/gh-pages-source/
 nav:
   - Home: index.md
   - Getting started: getting-started.md
+  - Build: build.md
   - Functions:
     - Initialization: 'functions/initialization.md'
     - Users: 'functions/users.md'
