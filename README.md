@@ -8,7 +8,7 @@ Please note you have to be familiarized with the documentation of the [Oculus Pl
 
 After you have everything setup, you can start interacting with the Oculus Platform with the singleton `GDOculusPlatform`. Here's an example of an [Entitlement Check](https://developer.oculus.com/documentation/native/ps-entitlement-check/):
 
-```
+```python
 GDOP.initialize(false) # We have to initialize this singleton
 
 # Initializing android platform with the APP_ID as a parameter
