@@ -33,11 +33,9 @@ Depending on what functions you use, you have to request different Data Use Chec
 As long as you are in development (haven't published your app yet), you can request all the permissions you need and they will be approved automatically to ease development. Once you want to publish your app, you will have to re-request these permissions.
 
 ## Add this asset to your project
-For now, there is no easy way of adding this asset to your project, but after you [build this asset](/godot_oculus_platform/build/), just copy the `demo/addons/godot_oculus_platform` folder into your project's folder.
+You can download the precompiled stable version from the [releases](https://github.com/decacis/godot_oculus_platform/releases) page or an in-development version from the [actions page](https://github.com/decacis/godot_oculus_platform/actions). In the case of the actions, look for an artifact with a name similar to `OculusPlatformSDK-51-for-godot-4.0.2-stable-0.0.1-alpha`.
 
-Copy the AAR generated in `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar` to `android/plugins/godotoculusplatform` in your project (create the `godotoculusplatform` folder).
-
-Also, copy `demo/android/plugins/godotoculusplatform-android-plugin.gdap` to your `android/plugins` folder.
+**NOTE:** only in-development (artifact) versions are available at the moment.
 
 Finally, enable the `Godot Oculus Platform Android Plugin` in your export template and enable the `Godot Oculus Platform` plugin in your Project Settings.
 

@@ -33,7 +33,7 @@ You may notice something odd on the first line:
 GDOP.initialize(false) # We have to initialize this singleton
 ```
 
-`GDOP` is different than the singleton we use for the other functions (`GDOculusPlatform`). `GDOP` is only used to initialize the plugin and the only parameter it takes is a boolean to initialize in `quiet mode` or not. Setting it to false will print unhandled messages sent from the Oculus Platform.
+`GDOP` is different from the singleton we use for the other functions (`GDOculusPlatform`). `GDOP` is only used to initialize the plugin and the only parameter it takes is a boolean to initialize in `quiet mode` or not. Setting it to false will print unhandled messages sent from the Oculus Platform.
 
 ### Getting logged in user information
 Since the promises (`then` and `error` functions) take a `Callable` you can do something like this:

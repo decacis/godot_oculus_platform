@@ -4,16 +4,9 @@ After cloning this repository, initialize the submodules by running:
 git submodule update --init --recursive
 ```
 
-Then, follow the [Godot documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/gdextension_cpp_example.html#building-the-c-bindings) to generate `extension_api.json` for your Godot version, then go to `godot-cpp` directory and run:
+Then run:
 ```
-scons platform=PLATFORM_HERE -j4 custom_api_file=PATH_TO_FILE_HERE
-```
-Replace `PLATFORM_HERE` with your platform and `PATH_TO_FILE_HERE` with the path to to `extension_api.json` file. The `-j4` is the number of cores to use to build - you can change it to speed up the process.
-
-After that, go back to the root directory and run:
-
-```
-scons platform=PLATFORM_HERE target=TARGET_HERE
+scons platform=PLATFORM_HERE target=TARGET_HERE generate_bindings=yes 
 ```
 
 The required compilation parameters are:
@@ -22,6 +15,8 @@ The required compilation parameters are:
 - target: `template_debug` or `template_release`
 
 For android, you also have to add: `arch=arm64v8`
+
+You can optionally add `-j<cores>` to use a set number of cores to build this asset. For example: `-j4`
 
 The files will be placed in: `demo/addons/godot_oculus_platform/bin`
 
@@ -37,3 +32,5 @@ On linux:
 ```
 ./gradlew build
 ```
+
+The result ARR will be placed in `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` and you'll find the `gdap` file in `demo/android/plugins`
