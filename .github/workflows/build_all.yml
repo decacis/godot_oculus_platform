@@ -154,20 +154,20 @@ jobs:
           mkdir -p addons/godot_oculus_platform/bin
           fi
           if [ -d windows ]; then
-            mv *.lib addons/godot_oculus_platform/bin/
-            rm -r *.lib
+            mv windows/* addons/godot_oculus_platform/bin/
+            rm -r windows
           fi
           if [ -d macos ]; then
-            mv *.framework addons/godot_oculus_platform/bin/
-            rm -r *.framework
+            mv macos/* addons/godot_oculus_platform/bin/
+            rm -r macos
           fi
           if [ -d linux ]; then
-            mv *.so addons/godot_oculus_platform/bin/
-            rm -r *.so
+            mv linux/* addons/godot_oculus_platform/bin/
+            rm -r linux
           fi
           if [ -d android-lib ]; then
-            mv *.so addons/godot_oculus_platform/bin/
-            rm -r *.so
+            mv android-lib/* addons/godot_oculus_platform/bin/
+            rm -r android-lib
           fi
           if [ ! -d "android/plugins/godotoculusplatform" ]; then
           mkdir -p android/plugins/godotoculusplatform
