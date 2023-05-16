@@ -6,7 +6,7 @@ git submodule update --init --recursive
 
 Then run:
 ```
-scons platform=PLATFORM_HERE target=TARGET_HERE generate_bindings=yes 
+scons platform=PLATFORM_HERE target=TARGET_HERE
 ```
 
 The required compilation parameters are:

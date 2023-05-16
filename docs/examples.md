@@ -3,7 +3,6 @@ Here are some examples of using this asset. For more details make sure to check 
 
 ### Entitlement check
 An entitlement check allows you to quickly check if the user that launched the app actually is entitled to it.
-
 ```
 GDOP.initialize(false) # We have to initialize this singleton
 
@@ -61,4 +60,4 @@ func _process_logged_in_user_response(resp : Dictionary):
     print("SMALL IMAGE URL: ", resp.small_image_url)
 ```
 
-You also may notice that we didn't add an `error` function call to the `get_logged_in_user()` function. Both the `then` and `error` functions are optional, and you can skip them if you don't care about their result.
+You may have noticed that we didn't add an `error` function call to the `get_logged_in_user()` function. Both the `then` and `error` functions are optional, and you can skip them if you don't care about their result.
