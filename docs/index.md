@@ -26,3 +26,11 @@ The following list tracks the supported functions from the Oculus Platform SDK:
     * [x] [launch_block_flow](/godot_oculus_platform/functions/users/#launch_block_flow)
     * [x] [launch_unblock_flow](/godot_oculus_platform/functions/users/#launch_unblock_flow)
     * [x] [launch_friend_request_flow](/godot_oculus_platform/functions/users/#launch_friend_request_flow)
+- [ ] Achievements
+    * [ ] achievements_add_count
+    * [ ] achievements_add_fields
+    * [ ] achievements_get_all_definitions
+    * [ ] achievements_get_all_progress
+    * [ ] achievements_get_definitions_by_name
+    * [ ] achievements_get_progress_by_name
+    * [ ] achievements_unlock

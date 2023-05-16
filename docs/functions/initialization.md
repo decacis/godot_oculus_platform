@@ -12,7 +12,7 @@ With either `false` or `true` (no argument). Passing `false` will initialize the
 ## initialize_android
 //// admonition | initialize_android(app_id : `String`)
 
-Requests the Oculus Platform initialization asynchronously
+Requests the Oculus Platform initialization.
 
 **Returs:** A `bool` that is `true` if the platform was initialized correctly or `false` otherwise.
 
