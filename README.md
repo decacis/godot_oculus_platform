@@ -4,6 +4,11 @@ An open-source implementation of the Oculus Platform SDK intended to be used wit
 
 Please note you have to be familiarized with the documentation of the [Oculus Platform](https://developer.oculus.com/documentation/native/ps-platform-intro/), because there are many requirements to be able to use this asset.
 
+Quick links:
+
+- [Documentation](https://decacis.github.io/godot_oculus_platform/)
+- [Oculus Platform Documentation](https://developer.oculus.com/documentation/native/ps-platform-intro/)
+
 ## Quick start
 
 After you have everything setup, you can start interacting with the Oculus Platform with the singleton `GDOculusPlatform`. Here's an example of an [Entitlement Check](https://developer.oculus.com/documentation/native/ps-entitlement-check/):
@@ -44,16 +49,10 @@ After cloning this repository, initialize the submodules by running:
 ```
 git submodule update --init --recursive
 ```
-Then, follow the [Godot documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/gdextension_cpp_example.html#building-the-c-bindings) to generate `extension_api.json` for your Godot version, then go to `godot-cpp` directory and run:
-```
-scons platform=PLATFORM_HERE -j4 custom_api_file=PATH_TO_FILE_HERE
-```
-Replace `PLATFORM_HERE` with your platform and `PATH_TO_FILE_HERE` with the path to to `extension_api.json` file. The `-j4` is the number of cores to use to build - you can change it to speed up the process.
 
-After that, go back to the root directory and run:
-
+Then run:
 ```
-scons platform=PLATFORM_HERE target=TARGET_HERE
+scons platform=PLATFORM_HERE target=TARGET_HERE generate_bindings=yes -j4
 ```
 
 The required compilation parameters are:
@@ -61,6 +60,8 @@ The required compilation parameters are:
 - target: `template_debug` or `template_release`
 
 For android, you also have to add: `arch=arm64v8`
+
+You can optionally add `-j<cores>` to use a set number of cores to build this asset. For example: `-j4`
 
 The files will be placed in: `demo/addons/godot_oculus_platform/bin`
 
@@ -77,9 +78,17 @@ On linux:
 ./gradlew build
 ```
 
+The result ARR will be placed in `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` and you'll find the `gdap` file in `demo/android/plugins`
+
 ## Using this asset
 
-It is assumed that you already have a working project that deploys to the Oculus Quest. You also have to have proper [Data Use Checkup](https://developer.oculus.com/resources/publish-data-use/) permissions approved, depending on your needs.
+It is assumed that you already have a working project that deploys to the Oculus Quest. You also have to have proper [Data Use Checkup](https://developer.oculus.com/resources/publish-data-use/) permissions approved, depending on your needs. Take a look at the [getting started](https://decacis.github.io/godot_oculus_platform/getting-started/) from the documentation to see a list of requirements.
+
+You can download the precompiled stable version from the [releases](https://github.com/decacis/godot_oculus_platform/releases) page or an in-development version from the [actions page](https://github.com/decacis/godot_oculus_platform/actions). In the case of the actions, look for an artifact with a name similar to `OculusPlatformSDK-51-for-godot-4.0.2-stable-0.0.1-alpha`.
+
+**NOTE:** only in-development (artifact) versions are available at the moment.
+
+If you instead decided to build this asset, you'll have to copy the files into place yourself.
 
 ### Copying the addon into place
 
@@ -91,9 +100,7 @@ The AAR of the Android plugin is located in `tools/godotoculusplatform-android-p
 
 Also copy `demo/android/plugins/godotoculusplatform-android-plugin.gdap` to `android/plugins` in your project.
 
-Make sure to enable the `Godot Oculus Platform Android Plugin` in your export template. Also, make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.
-
-A more automated way of doing this will come soon.
+**Make sure to enable the `Godot Oculus Platform Android Plugin` in your export template. Also, make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.**
 
 ## License
 

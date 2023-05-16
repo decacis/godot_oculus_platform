@@ -197,5 +197,5 @@ jobs:
       - name: Upload final artifact
         uses: actions/upload-artifact@v3
         with:
-          name: gdop-${{ env.OCULUS_VERSION }}-for-godot-${{ env.GODOT_ENGINE_VERSION }}-${{ env.GODOT_ENGINE_STAGE }}-${{ env.INTEGRATION_VERSION }}
+          name: OculusPlatformSDK-${{ env.OCULUS_VERSION }}-for-godot-${{ env.GODOT_ENGINE_VERSION }}-${{ env.GODOT_ENGINE_STAGE }}_${{ env.INTEGRATION_VERSION }}
           path: ./
