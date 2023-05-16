@@ -10,7 +10,7 @@ env:
   OCULUS_VERSION: 51
   GODOT_ENGINE_VERSION: "4.0.2"
   GODOT_ENGINE_STAGE: "stable"
-  INTEGRATION_VERSION: "0.0.1-alpha"
+  INTEGRATION_VERSION: "v0.0.1-alpha"
 
 jobs:
   build-all:
@@ -152,7 +152,8 @@ jobs:
           ls
           shopt -s dotglob
           if [ ! -d "addons/godot_oculus_platform" ]; then
-          mkdir -p addons/godot_oculus_platform
+            mkdir -p addons/godot_oculus_platform
+            cp ./LICENSE addons/godot_oculus_platform
           fi
           if [ -d windows ]; then
             cp -r windows/* addons/godot_oculus_platform/
@@ -186,7 +187,6 @@ jobs:
           rm -r ./tools
           rm -r ./demo
           rm ./SConstruct
-          rm ./LICENSE
           rm ./README.md
           rm .gitignore
           rm .gitmodules
