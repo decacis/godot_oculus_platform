@@ -42,7 +42,7 @@ You can take a look at the [examples](/godot_oculus_platform/examples/) to get a
 
 A concept we use is the use of promises or more specifically `GDOculusPlatformPromise`s. These promises basically help you perform actions in an asynchronous manner. Take a look at the following example:
 
-```
+``` gdscript linenums="1"
 print("Godot")
 
 GDOP.initialize()

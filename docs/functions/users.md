@@ -8,7 +8,8 @@ Checks if the user that launched the app is entitled to the application/game.
 **Returs:** A `GDOculusPlatformPromise` that will be fulfilled if the user is entitled. The promise will error if the user is not entitled or if the check fails.
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_is_viewer_entitled()\
 .then(func(_viewer_entitled_resp):
     print("User is entitled!")
@@ -19,7 +20,7 @@ GDOculusPlatform.get_is_viewer_entitled()\
 ```
 ///
 ////
----
+
 ## get_user
 //// admonition | get_user(user_id : `String`)
 
@@ -28,7 +29,7 @@ Requests information about a single user by ID.
 **Returs:** A `GDOculusPlatformPromise` that will contain a `Dictionary` as a response if fulfilled. An error message will be available if rejected.
 
 Example response:
-```
+``` json linenums="1"
 {
     "id": "31415926535",
     "oculus_id": "some_id",
@@ -46,7 +47,8 @@ Example response:
 ```
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_user("31415926535")\
 .then(func(get_user_resp : Dictionary):
     print("User info: ", get_user_resp)
@@ -57,7 +59,7 @@ GDOculusPlatform.get_user("31415926535")\
 ```
 ///
 ////
----
+
 ## get_logged_in_user
 //// admonition | get_logged_in_user()
 
@@ -66,7 +68,7 @@ Requests information about the user that launched the app.
 **Returs:** A `GDOculusPlatformPromise` that will contain a `Dictionary` as a response if fulfilled. An error message will be available if rejected.
 
 Example response:
-```
+``` json linenums="1"
 {
     "id": "89793238462",
     "oculus_id": "some_other_id",
@@ -83,13 +85,14 @@ Example response:
 }
 ```
 /// admonition | Note
-    type: attention
+    type: warning
 
 Even though the `Dictionary` includes a `presence` key, it will not contain information other than "UNKNOWN" for the status. The current user should be 'online' for your application.
 ///
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_logged_in_user()\
 .then(func(get_user_resp : Dictionary):
     print("User info: ", get_user_resp)
@@ -100,7 +103,7 @@ GDOculusPlatform.get_logged_in_user()\
 ```
 ///
 ////
----
+
 ## get_user_proof
 //// admonition | get_user_proof()
 
@@ -109,13 +112,14 @@ Requests a nonce used to verify the current user. Check the [official Oculus Pla
 **Returs:** A `GDOculusPlatformPromise` that will be fulfilled with the nonce as a `String` parameter. The function will error with a message if an error occured.
 
 /// admonition | Note
-    type: attention
+    type: warning
 
 A nonce is only valid once. After you use it to verify the user it becomes invalid.
 ///
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_user_proof()\
 .then(func(user_proof_resp : String):
     print("Nonce: ", user_proof_resp)
@@ -126,7 +130,7 @@ GDOculusPlatform.get_user_proof()\
 ```
 ///
 ////
----
+
 ## get_user_access_token
 //// admonition | get_user_access_token()
 
@@ -135,7 +139,8 @@ Requests a token of the current user suitable to make REST calls against graph.o
 **Returs:** A `GDOculusPlatformPromise` that will be fulfilled with the access token as a `String` parameter. The function will error with a message if an error occured.
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_user_access_token()\
 .then(func(user_access_token : String):
     print("Access token: ", user_access_token)
@@ -146,16 +151,17 @@ GDOculusPlatform.get_user_access_token()\
 ```
 ///
 ////
----
+
 ## get_blocked_users
 //// admonition | get_blocked_users()
 
 Requests the user IDs of users blocked by the current user.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an array of user IDs as `String`s. The function will error with a message if an error occured.
+**Returs:** A `GDOculusPlatformPromise` that will contain an `Array` of user IDs as `String`s. The function will error with a message if an error occured.
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_blocked_users()\
 .then(func(blocked_users : Array):
     for user_id in blocked_users:
@@ -167,7 +173,7 @@ GDOculusPlatform.get_blocked_users()\
 ```
 ///
 ////
----
+
 ## get_logged_in_user_friends
 //// admonition | get_logged_in_user_friends()
 
@@ -176,7 +182,8 @@ Requests the user IDs of the current user's friends.
 **Returs:** A `GDOculusPlatformPromise` will contain an `Array` of `Dictionaries` with information about each friend. Same format as the `Dictionary` returned by [get_user()](#get_user). The function will error with a message if an error occured.
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_logged_in_user_friends()\
 .then(func(friends : Array):
     for friend_info in friends:
@@ -189,7 +196,7 @@ GDOculusPlatform.get_logged_in_user_friends()\
 ```
 ///
 ////
----
+
 ## get_org_scoped_id
 //// admonition | get_org_scoped_id(user_id : `String`)
 
@@ -198,7 +205,8 @@ Requests an ID which is unique per org. Allows different apps within the same or
 **Returs:** A `GDOculusPlatformPromise` will contain the given user's scoped org ID as a `String`. The function will error with a message if an error occured.
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_org_scoped_id("31415926535")\
 .then(func(org_scoped_id : String):
     print("Org scoped ID: ", org_scoped_id)
@@ -209,7 +217,7 @@ GDOculusPlatform.get_org_scoped_id("31415926535")\
 ```
 ///
 ////
----
+
 ## get_sdk_accounts
 //// admonition | get_sdk_accounts()
 
@@ -218,15 +226,16 @@ Requests all the accounts belonging to the current user.
 **Returs:** A `GDOculusPlatformPromise` will contain an `Array` of `Dictionaries` with the type of account and its ID, if fulfilled. The function will error with a message if an error occured.
 
 Example response:
-```
+``` json linenums="1"
 {
-    "account_type": "oculus",
+    "account_type": "OCULUS",
     "account_id": "31415926535",
 }
 ```
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.get_sdk_accounts()\
 .then(func(sdk_accounts : Array):
     for sdk_account in sdk_accounts:
@@ -239,7 +248,7 @@ GDOculusPlatform.get_sdk_accounts()\
 ```
 ///
 ////
----
+
 ## launch_block_flow
 //// admonition | launch_block_flow(user_id : `String`)
 
@@ -248,7 +257,7 @@ Launches a block flow to block the user associated with the given `user_id`. The
 **Returs:** A `GDOculusPlatformPromise` will contain an `Dictionary` reflecting the choices of the user/player. The function will error with a message if an error occured.
 
 Example response:
-```
+``` json linenums="1"
 {
     "did_block": true,
     "did_cancel": false,
@@ -256,7 +265,8 @@ Example response:
 ```
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.launch_block_flow("89793238462")\
 .then(func(block_flow_resp : Dictionary):
     if block_flow_resp.did_block:
@@ -270,7 +280,7 @@ GDOculusPlatform.launch_block_flow("89793238462")\
 ```
 ///
 ////
----
+
 ## launch_unblock_flow
 //// admonition | launch_unblock_flow(user_id : `String`)
 
@@ -279,7 +289,7 @@ Launches an unblock flow to unblock the user associated with the given `user_id`
 **Returs:** A `GDOculusPlatformPromise` will contain an `Dictionary` reflecting the choices of the user/player. The function will error with a message if an error occured.
 
 Example response:
-```
+``` json linenums="1"
 {
     "did_unblock": true,
     "did_cancel": false,
@@ -287,7 +297,8 @@ Example response:
 ```
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.launch_unblock_flow("89793238462")\
 .then(func(unblock_flow_resp : Dictionary):
     if unblock_flow_resp.did_unblock:
@@ -301,7 +312,7 @@ GDOculusPlatform.launch_unblock_flow("89793238462")\
 ```
 ///
 ////
----
+
 ## launch_friend_request_flow
 //// admonition | launch_friend_request_flow(user_id : `String`)
 
@@ -310,7 +321,7 @@ Launches a friend request flow to add the user associated with the given `user_i
 **Returs:** A `GDOculusPlatformPromise` will contain an `Dictionary` reflecting the choices of the user/player. The function will error with a message if an error occured.
 
 Example response:
-```
+``` json linenums="1"
 {
     "did_send_request": true,
     "did_cancel": false,
@@ -318,7 +329,8 @@ Example response:
 ```
 
 /// details | Example
-```
+    type: tip
+``` gdscript linenums="1"
 GDOculusPlatform.launch_friend_request_flow("89793238462")\
 .then(func(friend_req_flow_resp : Dictionary):
     if friend_req_flow_resp.did_send_request:

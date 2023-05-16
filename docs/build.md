@@ -20,7 +20,7 @@ You can optionally add `-j<cores>` to use a set number of cores to build this as
 
 The files will be placed in: `demo/addons/godot_oculus_platform/bin`
 
-### Android Plugin
+## Android Plugin
 This plugin also requires an Android plugin to work with the Quest platform. To build the android plugin you have to navigate to `tools/godotoculusplatform-android-plugin` and run:
 
 On windows:
@@ -33,4 +33,15 @@ On linux:
 ./gradlew build
 ```
 
-The result ARR will be placed in `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` and you'll find the `gdap` file in `demo/android/plugins`
+Finally, you have to copy the files into place:
+
+| Source                              | Destination                |
+|-------------------------------------|----------------------------|
+| `demo/addons/godot_oculus_platform` | Your projet's addon folder |
+| `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` | `android/plugins/godotoculusplatform` |
+| `demo/android/plugins/godotoculusplatform-android-plugin.gdap` | `android/plugins` |
+
+/// admonition | Note
+    type: warning
+Make sure to enable the `Godot Oculus Platform Android Plugin` in your export template. Also, make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.
+///

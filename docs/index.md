@@ -4,9 +4,16 @@
 
 This is the documentation site for the Godot Oculus Platform, an implementation of the Oculus Platform SDK for the [Godot Engine](https://godotengine.org).
 
-Please note that both the documentation and the plugin itself are in development and may be incomplete. 
+Please note that both the documentation and the plugin itself are in development and may be incomplete.
+
+Quick links:
+
+- [Downloads](https://github.com/decacis/godot_oculus_platform/releases)
+- [Oculus Platform documentation](https://developer.oculus.com/documentation/native/ps-platform-intro/)
 
 If you find an issue, please report it on the [GitHub issues page](https://github.com/decacis/godot_oculus_platform/issues).
+
+-----
 
 The following list tracks the supported functions from the Oculus Platform SDK:
 
