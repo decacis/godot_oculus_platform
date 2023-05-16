@@ -120,6 +120,7 @@ jobs:
         run: |
           cd tools/godotoculusplatform-android-plugin/
           chmod +x ./gradlew
+          cd ../../
 
       - name: Build Android plugin
         run: |
@@ -133,7 +134,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: android-plugin
-          path: demo/android/plugins
+          path: demo/android
 
   upload-addon:
     runs-on: "ubuntu-20.04"
@@ -173,10 +174,10 @@ jobs:
           mkdir -p android/plugins/godotoculusplatform
           fi
           if [ -d android-plugin ]; then
-            mv android-plugin/demo/plugins/godotoculusplatform/godotoculusplatform-android-plugin-release.aar android/plugins/godotoculusplatform/
+            mv android-plugin/plugins/godotoculusplatform/godotoculusplatform-android-plugin-release.aar android/plugins/godotoculusplatform/
             rm -r android-plugin
+            cp demo/android/plugins/godotoculusplatform-android-plugin.gdap android/plugins
           fi
-          cp demo/android/plugins/godotoculusplatform-android-plugin.gdap android/plugins/godotoculusplatform-android-plugin.gdap
 
       - name: Clean up addon
         run: |
