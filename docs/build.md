@@ -1,5 +1,5 @@
 # Build
-After cloning this repository, initialize the submodules by running:
+After cloning [the repository](https://github.com/decacis/godot_oculus_platform), initialize the submodules by running:
 ```
 git submodule update --init --recursive
 ```

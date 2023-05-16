@@ -1,0 +1,4 @@
+[submodule "godot_oculus_platform"]
+	path = godot_oculus_platform
+	url = https://github.com/decacis/godot_oculus_platform.git
+	branch = gh-pages

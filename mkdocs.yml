@@ -1,8 +1,9 @@
 site_name: Godot Oculus Platform
 site_url: https://decacis.github.io/godot_oculus_platform
 site_description: An implementation of the Oculus Platform SDK for the Godot Engine.
+copyright: Copyright &copy; 2023-present Daniel Castellanos and contributors (CC BY 3.0)
 repo_url: https://github.com/decacis/godot_oculus_platform
-edit_uri: https://github.com/decacis/godot_oculus_platform/tree/gh-pages-source/docs
+edit_uri: edit/gh-pages-source/docs/
 nav:
   - Home: index.md
   - Getting started: getting-started.md
@@ -30,8 +31,11 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   features:
+    - content.action.view
+    - content.action.edit
     - content.code.copy
     - content.code.annotate
+    - navigation.footer
 markdown_extensions:
   - markdown.extensions.toc:
       permalink: true
@@ -45,3 +49,6 @@ markdown_extensions:
   - pymdownx.tasklist
   - pymdownx.blocks.admonition
   - pymdownx.blocks.details
+plugins:
+  - git-revision-date-localized:
+      enable_creation_date: true
