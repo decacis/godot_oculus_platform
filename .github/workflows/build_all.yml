@@ -117,7 +117,9 @@ jobs:
           architecture: x64
         
       - name: Change wrapper permissions
-        run: chmod +x ./gradlew
+        run: |
+          cd tools/godotoculusplatform-android-plugin/
+          chmod +x ./gradlew
 
       - name: Build Android plugin
         run: |
