@@ -150,23 +150,23 @@ jobs:
         run: |
           ls
           shopt -s dotglob
-          if [ ! -d "addons/godot_oculus_platform/bin" ]; then
-          mkdir -p addons/godot_oculus_platform/bin
+          if [ ! -d "addons/godot_oculus_platform" ]; then
+          mkdir -p addons/godot_oculus_platform
           fi
           if [ -d windows ]; then
-            mv windows/* addons/godot_oculus_platform/bin/
+            cp -r windows/* addons/godot_oculus_platform/
             rm -r windows
           fi
           if [ -d macos ]; then
-            mv macos/* addons/godot_oculus_platform/bin/
+            cp -r macos/* addons/godot_oculus_platform/
             rm -r macos
           fi
           if [ -d linux ]; then
-            mv linux/* addons/godot_oculus_platform/bin/
+            cp -r linux/* addons/godot_oculus_platform/
             rm -r linux
           fi
           if [ -d android-lib ]; then
-            mv android-lib/* addons/godot_oculus_platform/bin/
+            cp -r android-lib/* addons/godot_oculus_platform/
             rm -r android-lib
           fi
           if [ ! -d "android/plugins/godotoculusplatform" ]; then
@@ -176,19 +176,20 @@ jobs:
             mv android-plugin/demo/plugins/godotoculusplatform/godotoculusplatform-android-plugin-release.aar android/plugins/godotoculusplatform/
             rm -r android-plugin
           fi
+          cp demo/android/plugins/godotoculusplatform-android-plugin.gdap android/plugins/godotoculusplatform-android-plugin.gdap
 
       - name: Clean up addon
         run: |
           rm -r ./godot-cpp
           rm -r ./src
           rm -r ./tools
+          rm -r ./demo
           rm ./SConstruct
           rm ./LICENSE
           rm ./README.md
           rm .gitignore
           rm .gitmodules
           rm .clang-format
-          rm -r ./addons/FMOD/tests
           rm -r ./.git
           rm -r ./.github
 
