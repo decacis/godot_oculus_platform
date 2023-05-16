@@ -187,6 +187,7 @@ jobs:
           rm -r ./tools
           rm -r ./demo
           rm ./SConstruct
+          rm ./LICENSE
           rm ./README.md
           rm .gitignore
           rm .gitmodules
