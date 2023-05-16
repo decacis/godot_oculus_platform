@@ -1,9 +1,8 @@
 # Godot Oculus Platform
-
 An open-source implementation of the Oculus Platform SDK intended to be used with the Quest platform.
 Currently, **Oculus Platform SDK v51** and **Godot Engine 4.0.2** are supported.
 
-Please note you have to be familiarized with the documentation of the [Oculus Platform](https://developer.oculus.com/documentation/native/ps-platform-intro/), as there are some prerequisites to be able to use this asset.
+**NOTE:** This project is still a work in progress, you should expect usage API changes in the future.
 
 Quick links:
 
@@ -12,7 +11,6 @@ Quick links:
 - [Oculus Platform Documentation](https://developer.oculus.com/documentation/native/ps-platform-intro/)
 
 ## Quick start
-
 After you have everything [setup](https://decacis.github.io/godot_oculus_platform/getting-started/), you can start interacting with the Oculus Platform with the singleton `GDOculusPlatform`. Here's an example of an [Entitlement Check](https://developer.oculus.com/documentation/native/ps-entitlement-check/):
 
 ```python
@@ -41,12 +39,14 @@ GDOculusPlatform.initialize_android_async("314159265358979")\
 
 We use a promise-based approach for every request that is asynchronous. The `then` `Callable` will only be called if the request was fulfilled (i.e. successful) and the `error` `Callable` will be called if there was an error with the request.
 
-You can read more in the [Godot Oculus Platform documentation](https://decacis.github.io/godot_oculus_platform/).
-
 **NOTE:** The demo included in this repository won't work on its own. You still have to setup an app in the Oculus Dashboard, upload a release version and request all the required [Data Use Checkup](https://developer.oculus.com/resources/publish-data-use/) permissions to test, otherwise most fields will be empty/null. Also, it's missing the [OpenXR Loaders](https://github.com/GodotVR/godot_openxr_loaders).
 
-## Building this asset
+## Getting this asset
+You can download the precompiled stable version from the [releases](https://github.com/decacis/godot_oculus_platform/releases) page or an in-development version from the [actions page](https://github.com/decacis/godot_oculus_platform/actions). 
 
+In the case of the actions, look for an artifact with a name similar to `OculusPlatformSDK-51-for-godot-4.0.2-stable_v0.0.1-alpha`
+
+## Building this asset
 After cloning this repository, initialize the submodules by running:
 ```
 git submodule update --init --recursive
@@ -80,30 +80,26 @@ On linux:
 ./gradlew build
 ```
 
-The result ARR will be placed in `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` and you'll find the `gdap` file in `demo/android/plugins`
+Finally, you have to copy the files into place:
 
-## Using this asset
-
-It is assumed that you already have a working project that deploys to the Oculus Quest. You also have to have proper [Data Use Checkup](https://developer.oculus.com/resources/publish-data-use/) permissions approved, depending on your needs. Take a look at the [getting started](https://decacis.github.io/godot_oculus_platform/getting-started/) from the documentation to see a list of requirements.
-
-You can download the precompiled stable version from the [releases](https://github.com/decacis/godot_oculus_platform/releases) page or an in-development version from the [actions page](https://github.com/decacis/godot_oculus_platform/actions). In the case of the actions, look for an artifact with a name similar to `OculusPlatformSDK-51-for-godot-4.0.2-stable_v0.0.1-alpha`.
-
-If you instead decided to build this asset, you'll have to copy the files into place yourself.
-
-### Copying files into place
-
-- Copy the `demo/addons/godot_oculus_platform` folder to your project's addon folder.
-- Copy the AAR of the android plugin located in `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` to `android/plugins/godotoculusplatform` in your project.
-- Also copy `demo/android/plugins/godotoculusplatform-android-plugin.gdap` to `android/plugins` in your project.
+| Source                              | Destination                |
+|-------------------------------------|----------------------------|
+| `demo/addons/godot_oculus_platform` | Your projet's addon folder |
+| `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` | `android/plugins/godotoculusplatform` |
+| `demo/android/plugins/godotoculusplatform-android-plugin.gdap` | `android/plugins` |
 
 **Make sure to enable the `Godot Oculus Platform Android Plugin` in your export template. Also, make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.**
 
 ## License
-
 Unless specified otherwise, sources in this repository are licensed under MIT, see `LICENSE` for more information.
 
-Note that some vendor-specific (Meta Platform Technologies, LLC) components are licensed under separate license terms, which are listed in their corresponding folders.
+Note that some vendor-specific components are licensed under separate license terms, which are listed in their corresponding folders.
 
 ## About this repository
-
 This repository was created and maintained by Daniel Castellanos (decacis).
+
+Inspiration and code examples were taken from the following projects:
+
+- [Godot XR Reference plugin by Bastiaan "Mux213" Olij](https://github.com/GodotVR/godot_xr_reference)
+- [FMOD for Godot by Alessandro Famà](https://github.com/alessandrofama/fmod-for-godot)
+- [GDMP by j20001970](https://github.com/j20001970/GDMP)
