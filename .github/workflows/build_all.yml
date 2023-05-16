@@ -1,4 +1,4 @@
-name: CMake
+name: Build
 
 on:
   push:
@@ -115,6 +115,9 @@ jobs:
           java-version: "11"
           distribution: "adopt"
           architecture: x64
+        
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
 
       - name: Build Android plugin
         run: |
