@@ -86,8 +86,6 @@ It is assumed that you already have a working project that deploys to the Oculus
 
 You can download the precompiled stable version from the [releases](https://github.com/decacis/godot_oculus_platform/releases) page or an in-development version from the [actions page](https://github.com/decacis/godot_oculus_platform/actions). In the case of the actions, look for an artifact with a name similar to `OculusPlatformSDK-51-for-godot-4.0.2-stable-0.0.1-alpha`.
 
-**NOTE:** only in-development (artifact) versions are available at the moment.
-
 If you instead decided to build this asset, you'll have to copy the files into place yourself.
 
 ### Copying the addon into place
