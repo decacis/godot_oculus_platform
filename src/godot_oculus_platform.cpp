@@ -259,18 +259,28 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(String p
 /// Requests the current user's id
 /// @return The logged-in user's id as a String
 String GDOculusPlatform::user_get_logged_in_user_id() {
+#ifdef __ANDROID__
 	char native_id[21];
 	ovrID u_id = ovr_GetLoggedInUserID();
 	ovrID_ToString(native_id, sizeof(native_id), u_id);
 
 	return String(native_id);
+#else
+	String empty_str = "";
+	return empty_str;
+#endif
 }
 
 /// Requests the current user's locale
 /// @return The logged-in user's locale as a String
 String GDOculusPlatform::user_get_logged_in_user_locale() {
+#ifdef __ANDROID__
 	const char *user_locale = ovr_GetLoggedInUserLocale();
 	return String(user_locale);
+#else
+	String empty_str = "";
+	return empty_str;
+#endif
 }
 
 /// Checks if the user is entitled to the current application.
