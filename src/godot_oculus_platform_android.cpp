@@ -1,10 +1,8 @@
 #include "godot_oculus_platform.h"
 #include <godot_cpp/core/class_db.hpp>
 
-#ifdef __ANDROID__
 static JavaVM *jvm;
 static jobject jactivity;
-#endif
 
 using namespace godot;
 
@@ -95,7 +93,6 @@ uint64_t GDOculusPlatform::_get_reject_promise_id() {
 void GDOculusPlatform::pump_messages() {
 	_reject_promises();
 
-#ifdef __ANDROID__
 	ovrMessageHandle message = nullptr;
 
 	// Process messages
@@ -203,7 +200,6 @@ void GDOculusPlatform::pump_messages() {
 
 		ovr_FreeMessage(message);
 	}
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -213,7 +209,6 @@ void GDOculusPlatform::pump_messages() {
 
 /// Initialize Android Oculus Platform synchronously.
 bool GDOculusPlatform::initialize_android(String p_app_id) {
-#ifdef __ANDROID__
 	if (!ovr_IsPlatformInitialized()) {
 		JNIEnv *gdjenv;
 		_get_env(&gdjenv);
@@ -225,16 +220,12 @@ bool GDOculusPlatform::initialize_android(String p_app_id) {
 	} else {
 		return true;
 	}
-#endif
-
-	return false;
 }
 
 /// Initialize Android Oculus Platform asynchronously.
 /// @param p_app_id App ID
 /// @return Promise to be resolved when the platform finishes initializing
 Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(String p_app_id) {
-#ifdef __ANDROID__
 	JNIEnv *gdjenv;
 	_get_env(&gdjenv);
 
@@ -244,11 +235,6 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(String p
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -259,68 +245,45 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(String p
 /// Requests the current user's id
 /// @return The logged-in user's id as a String
 String GDOculusPlatform::user_get_logged_in_user_id() {
-#ifdef __ANDROID__
 	char native_id[21];
 	ovrID u_id = ovr_GetLoggedInUserID();
 	ovrID_ToString(native_id, sizeof(native_id), u_id);
 
 	return String(native_id);
-#else
-	String empty_str = "";
-	return empty_str;
-#endif
 }
 
 /// Requests the current user's locale
 /// @return The logged-in user's locale as a String
 String GDOculusPlatform::user_get_logged_in_user_locale() {
-#ifdef __ANDROID__
 	const char *user_locale = ovr_GetLoggedInUserLocale();
 	return String(user_locale);
-#else
-	String empty_str = "";
-	return empty_str;
-#endif
 }
 
 /// Checks if the user is entitled to the current application.
 /// @return Promise that will be fulfilled if the user is entitled to the app. It will be rejected (error) if the user is not entitled
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_is_viewer_entitled() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_Entitlement_GetIsViewerEntitled();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests information about the current user.
 /// @return Promise that will be fulfilled with the user's id, oculus_id, display_name, image_url, small_image_url and various Presence related information.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_logged_in_user() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_User_GetLoggedInUser();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests information about an user from its ID.
 /// @return Promise that will be fulfilled with the user's id, oculus_id, display_name, image_url, small_image_url and various Presence related information.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user(String p_user_id) {
-#ifdef __ANDROID__
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_Get(u_id);
@@ -338,85 +301,55 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user(String p_user_id) {
 
 		return return_promise;
 	}
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests a nonce used to verify the user.
 /// @return Promise that will be fulfilled with the a nonce that can be used to verify the user.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user_proof() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_User_GetUserProof();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests the user access token suitable to make REST calls against graph.oculus.com.
 /// @return Promise that will be contain a String token if fulfilled
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user_access_token() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_User_GetAccessToken();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests the user IDs of users blocked by the current user.
 /// @return Promise that will contain user IDs as an Array of Strings if fulfilled
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_blocked_users() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_User_GetBlockedUsers();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests the user IDs of the current user's friends.
 /// @return Promise that will contain an Array of Dictionaries with information about each friend. Same format as the Dictionary returned by get_user()
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_logged_in_user_friends() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_User_GetLoggedInUserFriends();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests the scoped org ID of a given user
 /// @return Promise that will contain the org scoped ID of the given user as a String if fulfilled
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_org_scoped_id(String p_user_id) {
-#ifdef __ANDROID__
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_GetOrgScopedID(u_id);
@@ -434,34 +367,22 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_org_scoped_id(String p_u
 
 		return return_promise;
 	}
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests all the accounts belonging to this user.
 /// @return Promise that will contain an Array of Dictionaries with the type of account and its ID, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_sdk_accounts() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_User_GetSdkAccounts();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests a block flow to block an user by its ID.
 /// @return Promise that will contain a Dictionary with information if the user blocked or cancelled the request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_block_flow(String p_user_id) {
-#ifdef __ANDROID__
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_LaunchBlockFlow(u_id);
@@ -479,17 +400,11 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_block_flow(String p_u
 
 		return return_promise;
 	}
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests an unblock flow to unblock an user by its ID.
 /// @return Promise that will contain a Dictionary with information if the user unblocked or cancelled the request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_unblock_flow(String p_user_id) {
-#ifdef __ANDROID__
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_LaunchUnblockFlow(u_id);
@@ -507,17 +422,11 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_unblock_flow(String p
 
 		return return_promise;
 	}
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests a friend request flow to send a friend request to a user with a given ID.
 /// @return Promise that will contain a Dictionary with information if the user sent the friend request or cancelled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_friend_request_flow(String p_user_id) {
-#ifdef __ANDROID__
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_LaunchFriendRequestFlow(u_id);
@@ -535,11 +444,6 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_friend_request_flow(S
 
 		return return_promise;
 	}
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -550,93 +454,61 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_friend_request_flow(S
 /// Requests an update for an achievement of type COUNT.
 /// @return Promise that will contain a Dictionary with info about the result of the update request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_count(String p_achievement_name, uint64_t p_count) {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_Achievements_AddCount(p_achievement_name.utf8().get_data(), p_count);
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests an update for an achievement of type BITFIELD.
 /// @return Promise that will contain a Dictionary with info about the result of the update request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_fields(String p_achievement_name, String p_fields) {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_Achievements_AddFields(p_achievement_name.utf8().get_data(), p_fields.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests an update for an achievement of type SIMPLE.
 /// @return Promise that will contain a Dictionary with info about the result of the update request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_unlock(String p_achievement_name) {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_Achievements_Unlock(p_achievement_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests all the achievement definitions.
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_definitions() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_Achievements_GetAllDefinitions();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests all the achievement definitions.
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_progress() {
-#ifdef __ANDROID__
 	ovrRequest req = ovr_Achievements_GetAllProgress();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
 
 	return return_promise;
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests achievements definitions by name
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_name(Array p_achievement_names) {
-#ifdef __ANDROID__
-
 	int64_t achiev_arr_s = p_achievement_names.size();
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
 		const char **char_arr = new const char *[achiev_arr_s];
@@ -679,18 +551,11 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 
 		return return_promise;
 	}
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
 /// Requests achievements progress by name
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name(Array p_achievement_names) {
-#ifdef __ANDROID__
-
 	int64_t achiev_arr_s = p_achievement_names.size();
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
 		const char **char_arr = new const char *[achiev_arr_s];
@@ -733,14 +598,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 
 		return return_promise;
 	}
-
-#else
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
-#endif
 }
 
-#ifdef __ANDROID__
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 ///// INTERNAL PROCESSING METHODS
@@ -1235,4 +1094,3 @@ JNIEXPORT void JNICALL Java_org_godot_godotoculusplatform_GodotOculusPlatform_in
 	jactivity = reinterpret_cast<jobject>(env->NewGlobalRef(activity));
 }
 }
-#endif

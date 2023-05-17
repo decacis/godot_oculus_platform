@@ -17,6 +17,7 @@ protected:
 	static GDOculusPlatform *singleton;
 	static void _bind_methods();
 
+#ifdef __ANDROID__
 private:
 	Vector<Ref<GDOculusPlatformPromise>> _promises;
 	Vector<Ref<GDOculusPlatformPromise>> _promises_to_reject;
@@ -27,7 +28,6 @@ private:
 
 	uint64_t _last_promise_rejected_id = 0;
 
-#ifdef __ANDROID__
 	bool _get_env(JNIEnv **p_env);
 
 	void _handle_default_process_error(ovrMessageHandle p_message, ovrRequest p_msg_id, Ref<GDOculusPlatformPromise> &p_promise);
@@ -56,7 +56,6 @@ private:
 	Dictionary _get_user_information(ovrUserHandle p_user_handle);
 
 	void _handle_unhandled_message(ovrMessageHandle p_message);
-
 #endif
 
 public:

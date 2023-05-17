@@ -14,45 +14,49 @@ env = SConscript("godot-cpp/SConstruct")
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/", "src/include/"])
-sources = Glob("src/*.cpp")
 
-if env["platform"] == "macos":
-    if env["target"] != "template_debug":
-        library = env.SharedLibrary(
-            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformM",
-            source=sources,
-        )
-    else:
-        library = env.SharedLibrary(
-            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformMD",
-            source=sources,
-        )
+if env["platform"] != "android":
+    sources = Glob("src/*.cpp", exclude=["src/*android.cpp"])
 
-elif env["platform"] == "windows":
-    if env["target"] != "template_debug":
-        library = env.SharedLibrary(
-            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformW",
-            source=sources,
-        )
-    else:
-        library = env.SharedLibrary(
-            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformWD",
-            source=sources,
-        )
-    
-elif env["platform"] == "linux":
-    if env["target"] != "template_debug":
-        library = env.SharedLibrary(
-            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformL",
-            source=sources,
-        )
-    else:
-        library = env.SharedLibrary(
-            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformLD",
-            source=sources,
-        )
-    
-elif env["platform"] == "android":
+    if env["platform"] == "macos":
+        if env["target"] != "template_debug":
+            library = env.SharedLibrary(
+                "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformM",
+                source=sources,
+            )
+        else:
+            library = env.SharedLibrary(
+                "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformMD",
+                source=sources,
+            )
+
+    elif env["platform"] == "windows":
+        if env["target"] != "template_debug":
+            library = env.SharedLibrary(
+                "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformW",
+                source=sources,
+            )
+        else:
+            library = env.SharedLibrary(
+                "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformWD",
+                source=sources,
+            )
+        
+    elif env["platform"] == "linux":
+        if env["target"] != "template_debug":
+            library = env.SharedLibrary(
+                "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformL",
+                source=sources,
+            )
+        else:
+            library = env.SharedLibrary(
+                "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformLD",
+                source=sources,
+            )
+
+else:
+    sources = Glob("src/*.cpp", exclude=["src/*editor.cpp"])
+
     env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/android/libs/arm64-v8a/"])
     env.Append(LIBS=["libovrplatformloader"])
 
