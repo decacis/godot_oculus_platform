@@ -6,7 +6,7 @@ This file is basically empty. Here, we only define the functions that you can ca
 because this plugin only works on Android.
 
 When adding a new function that can be called from GDScript, you have to add it
-to this file and to godot_oculus_platform_gdopandroid.cpp as well. Here you can
+to this file and to godot_oculus_platform_android.cpp as well. Here you can
 skip the body of the function if it returns void, and return a default
 value if it should return something.
 */

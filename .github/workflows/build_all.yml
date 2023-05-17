@@ -71,7 +71,7 @@ jobs:
         id: cache-oculus-lib
         uses: actions/cache@v3
         env:
-          cache-name: cache-fmod-lib
+          cache-name: cache-oculus-lib
         with:
           path: src
           key: ${{ matrix.api-platform }}-build-${{ env.cache-name }}-${{ env.OCULUS_VERSION }}
