@@ -8,7 +8,7 @@ Please note that both the documentation and the plugin itself are in development
 
 Quick links:
 
-- [Downloads](https://github.com/decacis/godot_oculus_platform/releases)
+- [Downloads](/godot_oculus_platform/download/)
 - [Oculus Platform documentation](https://developer.oculus.com/documentation/native/ps-platform-intro/)
 
 If you find an issue, please report it on the [GitHub issues page](https://github.com/decacis/godot_oculus_platform/issues).
