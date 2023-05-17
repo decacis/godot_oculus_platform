@@ -37,6 +37,8 @@ GDOP.initialize(false) # We have to initialize this plugin first
 ### Getting logged in user information
 Since the promises (`then` and `error` functions) take a `Callable` you can do something like this:
 ``` gdscript linenums="1"
+GDOP.initialize()
+
 GDOculusPlatform.initialize_android_async("6324217457624418")\
 .then(func(_initialization_resp):
     print("Oculus Platform initialized")

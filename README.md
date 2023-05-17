@@ -6,7 +6,7 @@ We use [MkDocs](https://www.mkdocs.org/) and [Material for MkDocs](https://squid
 ## Deploy a local version of these docs
 We advise you develop locally to make sure everything works and looks good before submitting a pull request. To deploy a local version of the docs, you have to install the following packages:
 ```
-pip install mkdocs-material mkdocs-git-revision-date-localized-plugin
+pip install mkdocs-material
 ```
 
 Also, make sure to initialize the submodules:

@@ -197,6 +197,15 @@ Requests the user IDs of users blocked by the current user.
 
 **Returs:** A `GDOculusPlatformPromise` that will contain an `Array` of user IDs as `String`s. The function will error with a message if an error occured.
 
+Example response:
+``` json linenums="1"
+[
+    "3141592653589",
+    "7932384626433",
+    "8327950288419"
+]
+```
+
 /// details | Example
     type: tip
 ``` gdscript linenums="1"

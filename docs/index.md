@@ -15,7 +15,7 @@ If you find an issue, please report it on the [GitHub issues page](https://githu
 
 -----
 
-The following list tracks the supported functions from the Oculus Platform SDK:
+The following table tracks the supported functions from the Oculus Platform SDK:
 ```
 ✔️ = Fully implemented
 ➖ = Partially implemented
@@ -27,6 +27,6 @@ The following list tracks the supported functions from the Oculus Platform SDK:
 | [Platform initialization](/godot_oculus_platform/functions/initialization/) |   ✔️   |
 | [User](/godot_oculus_platform/functions/user/)                              |   ✔️   |
 | [Achievements](/godot_oculus_platform/functions/achievements/)              |   ✔️   |
-| In-App Purchases                                                            |   ❌   |
+| [In-App Purchases](/godot_oculus_platform/functions/in-app-purchases/)      |   ✔️   |
 | Asset File                                                                  |   ❌   |
 | Leaderboard                                                                 |   ❌   |

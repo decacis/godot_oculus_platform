@@ -2,7 +2,7 @@
 There are several steps to follow before using this asset. We assume you already have an app/game even if you have not published to the AppLab or the Quest Store.
 
 ## Create a release version
-You have to create release version of your app (i.e. with Deploy With Debug disabled) to upload it to AppLab of the Quest Store. This app doesn't have to be the final version of your app, but it should be signed with a release keystore.
+You have to create release version of your app (i.e. with Deploy With Debug disabled) to upload it to AppLab or the Quest Store. This app doesn't have to be the final version of your app, but it should be signed with a release keystore.
 
 The [Exporting for Google Play Store](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_android.html#exporting-for-google-play-store) section on the Godot documentation explains this process (it's the same for the Quest Store).
 

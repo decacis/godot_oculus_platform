@@ -15,6 +15,7 @@ nav:
     - Initialization: 'functions/initialization.md'
     - User: 'functions/user.md'
     - Achievements: 'functions/achievements.md'
+    - In-App Purchases: 'functions/in-app-purchases.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg
