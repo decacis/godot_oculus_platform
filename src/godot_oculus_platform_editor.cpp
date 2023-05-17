@@ -46,6 +46,13 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("achievements_get_definitions_by_name", "achievement_names"), &GDOculusPlatform::achievements_get_definitions_by_name);
 	ClassDB::bind_method(D_METHOD("achievements_get_progress_by_name", "achievement_names"), &GDOculusPlatform::achievements_get_progress_by_name);
 
+	// IAP
+	ClassDB::bind_method(D_METHOD("iap_get_viewer_purchases"), &GDOculusPlatform::iap_get_viewer_purchases);
+	ClassDB::bind_method(D_METHOD("iap_get_viewer_purchases_durable_cache"), &GDOculusPlatform::iap_get_viewer_purchases_durable_cache);
+	ClassDB::bind_method(D_METHOD("iap_get_products_by_sku", "sku_list"), &GDOculusPlatform::iap_get_products_by_sku);
+	ClassDB::bind_method(D_METHOD("iap_consume_purchase", "sku"), &GDOculusPlatform::iap_consume_purchase);
+	ClassDB::bind_method(D_METHOD("iap_launch_checkout_flow", "sku"), &GDOculusPlatform::iap_launch_checkout_flow);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 }
 
@@ -188,6 +195,36 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name(Array p_achievement_names) {
+	Ref<GDOculusPlatformPromise> promise;
+	return promise;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// IAP
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases() {
+	Ref<GDOculusPlatformPromise> promise;
+	return promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases_durable_cache() {
+	Ref<GDOculusPlatformPromise> promise;
+	return promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_products_by_sku(Array p_sku_list) {
+	Ref<GDOculusPlatformPromise> promise;
+	return promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_consume_purchase(String p_sku) {
+	Ref<GDOculusPlatformPromise> promise;
+	return promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_launch_checkout_flow(String p_sku) {
 	Ref<GDOculusPlatformPromise> promise;
 	return promise;
 }

@@ -52,6 +52,12 @@ private:
 	void _process_achievements_definitions(ovrMessageHandle p_message);
 	void _process_achievements_progress(ovrMessageHandle p_message);
 
+	// IAP
+	void _process_iap_viewer_purchases(ovrMessageHandle p_message);
+	void _process_iap_products(ovrMessageHandle p_message);
+	void _process_iap_consume_purchase(ovrMessageHandle p_message);
+	void _process_iap_launch_checkout_flow(ovrMessageHandle p_message);
+
 	// USER HELPERS
 	Dictionary _get_user_information(ovrUserHandle p_user_handle);
 
@@ -90,6 +96,13 @@ public:
 	Ref<GDOculusPlatformPromise> achievements_get_all_progress();
 	Ref<GDOculusPlatformPromise> achievements_get_definitions_by_name(Array p_achievement_names);
 	Ref<GDOculusPlatformPromise> achievements_get_progress_by_name(Array p_achievement_names);
+
+	//IAP
+	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases();
+	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases_durable_cache();
+	Ref<GDOculusPlatformPromise> iap_get_products_by_sku(Array p_sku_list);
+	Ref<GDOculusPlatformPromise> iap_consume_purchase(String p_sku);
+	Ref<GDOculusPlatformPromise> iap_launch_checkout_flow(String p_sku);
 
 	void pump_messages();
 };

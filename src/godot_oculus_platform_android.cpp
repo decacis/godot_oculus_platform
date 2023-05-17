@@ -39,6 +39,13 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("achievements_get_definitions_by_name", "achievement_names"), &GDOculusPlatform::achievements_get_definitions_by_name);
 	ClassDB::bind_method(D_METHOD("achievements_get_progress_by_name", "achievement_names"), &GDOculusPlatform::achievements_get_progress_by_name);
 
+	// IAP
+	ClassDB::bind_method(D_METHOD("iap_get_viewer_purchases"), &GDOculusPlatform::iap_get_viewer_purchases);
+	ClassDB::bind_method(D_METHOD("iap_get_viewer_purchases_durable_cache"), &GDOculusPlatform::iap_get_viewer_purchases_durable_cache);
+	ClassDB::bind_method(D_METHOD("iap_get_products_by_sku", "sku_list"), &GDOculusPlatform::iap_get_products_by_sku);
+	ClassDB::bind_method(D_METHOD("iap_consume_purchase", "sku"), &GDOculusPlatform::iap_consume_purchase);
+	ClassDB::bind_method(D_METHOD("iap_launch_checkout_flow", "sku"), &GDOculusPlatform::iap_launch_checkout_flow);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 }
 
@@ -192,6 +199,34 @@ void GDOculusPlatform::pump_messages() {
 
 			case ovrMessage_Achievements_GetNextAchievementProgressArrayPage:
 				_process_achievements_progress(message);
+				break;
+
+			case ovrMessage_IAP_GetViewerPurchases:
+				_process_iap_viewer_purchases(message);
+				break;
+
+			case ovrMessage_IAP_GetViewerPurchasesDurableCache:
+				_process_iap_viewer_purchases(message);
+				break;
+
+			case ovrMessage_IAP_GetNextPurchaseArrayPage:
+				_process_iap_viewer_purchases(message);
+				break;
+
+			case ovrMessage_IAP_GetProductsBySKU:
+				_process_iap_products(message);
+				break;
+
+			case ovrMessage_IAP_GetNextProductArrayPage:
+				_process_iap_products(message);
+				break;
+
+			case ovrMessage_IAP_ConsumePurchase:
+				_process_iap_consume_purchase(message);
+				break;
+
+			case ovrMessage_IAP_LaunchCheckoutFlow:
+				_process_iap_launch_checkout_flow(message);
 				break;
 
 			default:
@@ -519,7 +554,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 			} else {
 				delete[] char_arr;
 				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-				String rejection_msg = "Invalid achievement name found in array. All achievement names must be Strings";
+				String rejection_msg = "Invalid achievement name found in array. All achievement names must be Strings.";
 				return_promise->saved_rejection_response = Array::make(rejection_msg);
 				_promises_to_reject.push_back(return_promise);
 
@@ -557,6 +592,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name(Array p_achievement_names) {
 	int64_t achiev_arr_s = p_achievement_names.size();
+
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
 		const char **char_arr = new const char *[achiev_arr_s];
 		for (size_t i = 0; i < p_achievement_names.size(); i++) {
@@ -566,7 +602,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 			} else {
 				delete[] char_arr;
 				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-				String rejection_msg = "Invalid achievement name found in array. All achievement names must be Strings";
+				String rejection_msg = "Invalid achievement name found in array. All achievement names must be Strings.";
 				return_promise->saved_rejection_response = Array::make(rejection_msg);
 				_promises_to_reject.push_back(return_promise);
 
@@ -598,6 +634,103 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 
 		return return_promise;
 	}
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// IAP
+/////////////////////////////////////////////////
+
+/// Requests the current user's purchases. They include consumable items and durable items.
+/// @return Promise that contains an Array of Dictionaries with information about each purchase.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases() {
+	ovrRequest req = ovr_IAP_GetViewerPurchases();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests the current user's purchases. Includes only durable purchases.
+/// @return Promise that contains an Array of Dictionaries with information about each purchase.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases_durable_cache() {
+	ovrRequest req = ovr_IAP_GetViewerPurchasesDurableCache();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests a list of products by their SKU
+/// @return Promise that contains an Array of Dictionaries with information about each product
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_products_by_sku(Array p_sku_list) {
+	int64_t skus_arr_s = p_sku_list.size();
+
+	if (skus_arr_s > 0 && skus_arr_s <= INT_MAX) {
+		const char **char_arr = new const char *[skus_arr_s];
+		for (size_t i = 0; i < p_sku_list.size(); i++) {
+			if (p_sku_list[i].get_type() == Variant::STRING) {
+				char_arr[i] = ((String)p_sku_list[i]).utf8().get_data();
+
+			} else {
+				delete[] char_arr;
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid SKU found in array. All SKUs must be Strings.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		ovrRequest req = ovr_IAP_GetProductsBySKU(char_arr, skus_arr_s);
+		delete[] char_arr;
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else if (skus_arr_s >= INT_MAX) {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Too many SKUs... How do you have more than 2147483647 SKUs?";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "SKU array is empty.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+/// Consumes a consumable item
+/// @return Promise that contains true if the request was successful. It will error if unable to consume
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_consume_purchase(String p_sku) {
+	ovrRequest req = ovr_IAP_ConsumePurchase(p_sku.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Launches the checkout flow
+/// @return Promise that contains a Dictionary with information about the product. purchase_str_id will be empty if the user did not complete the purchase
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_launch_checkout_flow(String p_sku) {
+	ovrRequest req = ovr_IAP_LaunchCheckoutFlow(p_sku.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
 }
 
 /////////////////////////////////////////////////
@@ -999,6 +1132,134 @@ void GDOculusPlatform::_process_achievements_progress(ovrMessageHandle p_message
 				promise->add_id(new_req);
 				_promises.push_back(promise);
 			}
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+///// IAP
+/////////////////////////////////////////////////
+
+/// Processes the response from a request to get the viewer purchases. Used for both durable cache only and all purchases
+void GDOculusPlatform::_process_iap_viewer_purchases(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrPurchaseArrayHandle v_purchases_arr_handle = ovr_Message_GetPurchaseArray(p_message);
+		size_t v_purchases_arr_s = ovr_PurchaseArray_GetSize(v_purchases_arr_handle);
+
+		if (_get_promise(msg_id, promise)) {
+			if (promise->get_ids().size() == 1 && promise->saved_fulfill_response.is_empty()) { // Only the first time
+				promise->saved_fulfill_response = Array::make(Array());
+			}
+
+			for (size_t i = 0; i < v_purchases_arr_s; i++) {
+				ovrPurchaseHandle v_purchase_handle = ovr_PurchaseArray_GetElement(v_purchases_arr_handle, i);
+				Dictionary v_purchase;
+
+				v_purchase["sku"] = String(ovr_Purchase_GetSKU(v_purchase_handle));
+				v_purchase["reporting_id"] = String(ovr_Purchase_GetReportingId(v_purchase_handle));
+				v_purchase["purchase_str_id"] = String(ovr_Purchase_GetPurchaseStrID(v_purchase_handle));
+				v_purchase["grant_time"] = (uint64_t)ovr_Purchase_GetGrantTime(v_purchase_handle);
+				v_purchase["expiration_time"] = (uint64_t)ovr_Purchase_GetExpirationTime(v_purchase_handle);
+				v_purchase["developer_payload"] = String(ovr_Purchase_GetDeveloperPayload(v_purchase_handle));
+
+				((Array)promise->saved_fulfill_response[0]).push_back(v_purchase);
+			}
+
+			if (!ovr_PurchaseArray_HasNextPage(v_purchases_arr_handle)) {
+				promise->fulfill(promise->saved_fulfill_response);
+
+			} else {
+				ovrRequest new_req = ovr_IAP_GetNextPurchaseArrayPage(v_purchases_arr_handle);
+				promise->add_id(new_req);
+				_promises.push_back(promise);
+			}
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the response from a request to get products by SKU
+void GDOculusPlatform::_process_iap_products(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrProductArrayHandle products_arr_handle = ovr_Message_GetProductArray(p_message);
+		size_t products_arr_s = ovr_ProductArray_GetSize(products_arr_handle);
+
+		if (_get_promise(msg_id, promise)) {
+			if (promise->get_ids().size() == 1 && promise->saved_fulfill_response.is_empty()) { // Only the first time
+				promise->saved_fulfill_response = Array::make(Array());
+			}
+
+			for (size_t i = 0; i < products_arr_s; i++) {
+				ovrProductHandle product_handle = ovr_ProductArray_GetElement(products_arr_handle, i);
+				Dictionary product;
+
+				product["sku"] = String(ovr_Product_GetSKU(product_handle));
+				product["name"] = String(ovr_Product_GetName(product_handle));
+				product["formatted_price"] = String(ovr_Product_GetFormattedPrice(product_handle));
+				product["description"] = String(ovr_Product_GetDescription(product_handle));
+
+				((Array)promise->saved_fulfill_response[0]).push_back(product);
+			}
+
+			if (!ovr_ProductArray_HasNextPage(products_arr_handle)) {
+				promise->fulfill(promise->saved_fulfill_response);
+
+			} else {
+				ovrRequest new_req = ovr_IAP_GetNextProductArrayPage(products_arr_handle);
+				promise->add_id(new_req);
+				_promises.push_back(promise);
+			}
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the result of a request to consume a consumable item
+void GDOculusPlatform::_process_iap_consume_purchase(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		if (_get_promise(msg_id, promise)) {
+			promise->fulfill(Array::make(true));
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the result of the block flow. Returns a Dictionary with purchase_str_id empty if the user did not complete the purchase.
+void GDOculusPlatform::_process_iap_launch_checkout_flow(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrPurchaseHandle purchase_handle = ovr_Message_GetPurchase(p_message);
+
+		Dictionary purchase;
+
+		purchase["sku"] = String(ovr_Purchase_GetSKU(purchase_handle));
+		purchase["reporting_id"] = String(ovr_Purchase_GetReportingId(purchase_handle));
+		purchase["purchase_str_id"] = String(ovr_Purchase_GetPurchaseStrID(purchase_handle));
+		purchase["grant_time"] = (uint64_t)ovr_Purchase_GetGrantTime(purchase_handle);
+		purchase["expiration_time"] = (uint64_t)ovr_Purchase_GetExpirationTime(purchase_handle);
+		purchase["developer_payload"] = String(ovr_Purchase_GetDeveloperPayload(purchase_handle));
+
+		if (_get_promise(msg_id, promise)) {
+			promise->fulfill(Array::make(purchase));
 		}
 
 	} else {
