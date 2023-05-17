@@ -1,12 +1,14 @@
 # Functions - Initialization
 
 -----
-/// admonition | Note
-    type: warning
+/// admonition | Important
+    type: danger
 
 Before initializing the Oculus Platform, you must initialize the plugin like this:
 ``` gdscript linenums="1"
 GDOP.initialize(false)
+# or
+GDOP.initialize()
 ```
 With either `false` or `true` (no argument). Passing `false` will initialize the plugin with `quiet_mode=false` meaning that it will print unhandled Oculus Platform messages.
 ///

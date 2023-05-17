@@ -6,6 +6,38 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-blockingsdk/](https://developer.oculus.com/documentation/native/ps-blockingsdk/)
 
 ------
+## user_get_logged_in_user_id
+//// admonition | user_get_logged_in_user_id()
+
+Requests the logged-in user ID.
+
+**Returs:** A `String` with the user ID. The `String` will be "0" if there's no ID.
+
+/// details | Example
+    type: tip
+``` gdscript linenums="1"
+var user_id : String = user_get_logged_in_user_id()
+# user_id = "314159265358979" for example
+```
+///
+////
+
+## user_get_logged_in_user_locale
+//// admonition | user_get_logged_in_user_locale()
+
+Requests the logged-in user's locale'.
+
+**Returs:** A `String` with the user's locale that conforms to BCP47: [https://tools.ietf.org/html/bcp47](https://tools.ietf.org/html/bcp47)
+
+/// details | Example
+    type: tip
+``` gdscript linenums="1"
+var user_locale : String = user_get_logged_in_user_locale()
+# user_locale = "en-US" for example
+```
+///
+////
+
 ## user_get_is_viewer_entitled
 //// admonition | user_get_is_viewer_entitled()
 

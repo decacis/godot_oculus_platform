@@ -21,6 +21,8 @@ The following list tracks the supported functions from the Oculus Platform SDK:
     * [x] [initialize_android](/godot_oculus_platform/functions/initialization/#initialize_android)
     * [x] [initialize_android_async](/godot_oculus_platform/functions/initialization/#initialize_android_async)
 - [x] [User](/godot_oculus_platform/functions/user/)
+    * [x] [user_get_logged_in_user_id](/godot_oculus_platform/functions/user/#user_get_logged_in_user_id)
+    * [x] [user_get_logged_in_user_locale](/godot_oculus_platform/functions/user/#user_get_logged_in_user_locale)
     * [x] [user_get_is_viewer_entitled](/godot_oculus_platform/functions/user/#user_get_is_viewer_entitled)
     * [x] [user_get_user](/godot_oculus_platform/functions/user/#user_get_user)
     * [x] [user_get_logged_in_user](/godot_oculus_platform/functions/user/#user_get_logged_in_user)
@@ -47,3 +49,17 @@ The following list tracks the supported functions from the Oculus Platform SDK:
     * [ ] iap_get_viewer_purchases
     * [ ] iap_get_viewer_purchases_durable_cache
     * [ ] iap_launch_checkout_flow
+- [ ] Asset File
+    * [ ] assetfile_get_list
+    * [ ] assetfile_status
+    * [ ] assetfile_status_by_id
+    * [ ] assetfile_status_by_name
+    * [ ] assetfile_download
+    * [ ] assetfile_download_by_id
+    * [ ] assetfile_download_by_name
+    * [ ] assetfile_download_cancel
+    * [ ] assetfile_download_cancel_by_id
+    * [ ] assetfile_download_cancel_by_name
+    * [ ] assetfile_delete
+    * [ ] assetfile_delete_by_id
+    * [ ] assetfile_delete_by_name
