@@ -17,6 +17,8 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
 
 	// USER
+	ClassDB::bind_method(D_METHOD("user_get_logged_in_user_id"), &GDOculusPlatform::user_get_logged_in_user_id);
+	ClassDB::bind_method(D_METHOD("user_get_logged_in_user_locale"), &GDOculusPlatform::user_get_logged_in_user_locale);
 	ClassDB::bind_method(D_METHOD("user_get_is_viewer_entitled"), &GDOculusPlatform::user_get_is_viewer_entitled);
 	ClassDB::bind_method(D_METHOD("user_get_logged_in_user"), &GDOculusPlatform::user_get_logged_in_user);
 	ClassDB::bind_method(D_METHOD("user_get_user", "user_id"), &GDOculusPlatform::user_get_user);
@@ -158,23 +160,23 @@ void GDOculusPlatform::pump_messages() {
 			case ovrMessage_User_LaunchFriendRequestFlow:
 				_process_user_launch_friend_request_flow(message);
 				break;
-			
+
 			case ovrMessage_Achievements_AddCount:
 				_process_achievements_update(message);
 				break;
-			
+
 			case ovrMessage_Achievements_AddFields:
 				_process_achievements_update(message);
 				break;
-			
+
 			case ovrMessage_Achievements_Unlock:
 				_process_achievements_update(message);
 				break;
-			
+
 			case ovrMessage_Achievements_GetAllDefinitions:
 				_process_achievements_definitions(message);
 				break;
-			
+
 			case ovrMessage_Achievements_GetDefinitionsByName:
 				_process_achievements_definitions(message);
 				break;
@@ -182,11 +184,11 @@ void GDOculusPlatform::pump_messages() {
 			case ovrMessage_Achievements_GetNextAchievementDefinitionArrayPage:
 				_process_achievements_definitions(message);
 				break;
-			
+
 			case ovrMessage_Achievements_GetAllProgress:
 				_process_achievements_progress(message);
 				break;
-			
+
 			case ovrMessage_Achievements_GetProgressByName:
 				_process_achievements_progress(message);
 				break;
@@ -253,6 +255,23 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(String p
 /////////////////////////////////////////////////
 ///// USER
 /////////////////////////////////////////////////
+
+/// Requests the current user's id
+/// @return The logged-in user's id as a String
+String GDOculusPlatform::user_get_logged_in_user_id() {
+	char native_id[21];
+	ovrID u_id = ovr_GetLoggedInUserID();
+	ovrID_ToString(native_id, sizeof(native_id), u_id);
+
+	return String(native_id);
+}
+
+/// Requests the current user's locale
+/// @return The logged-in user's locale as a String
+String GDOculusPlatform::user_get_logged_in_user_locale() {
+	const char *user_locale = ovr_GetLoggedInUserLocale();
+	return String(user_locale);
+}
 
 /// Checks if the user is entitled to the current application.
 /// @return Promise that will be fulfilled if the user is entitled to the app. It will be rejected (error) if the user is not entitled
@@ -610,8 +629,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 
 	int64_t achiev_arr_s = p_achievement_names.size();
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
-
-		const char** char_arr = new const char*[achiev_arr_s];
+		const char **char_arr = new const char *[achiev_arr_s];
 		for (size_t i = 0; i < p_achievement_names.size(); i++) {
 			if (p_achievement_names[i].get_type() == Variant::STRING) {
 				char_arr[i] = ((String)p_achievement_names[i]).utf8().get_data();
@@ -626,7 +644,6 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 				return return_promise;
 			}
 		}
-		
 
 		ovrRequest req = ovr_Achievements_GetDefinitionsByName(char_arr, achiev_arr_s);
 		delete[] char_arr;
@@ -636,8 +653,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 
 		return return_promise;
 
-	} else if(achiev_arr_s >= INT_MAX) {
-
+	} else if (achiev_arr_s >= INT_MAX) {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 		String rejection_msg = "Too many achievement names... How do you have more than 2147483647 achievements?";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);
@@ -667,8 +683,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 
 	int64_t achiev_arr_s = p_achievement_names.size();
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
-
-		const char** char_arr = new const char*[achiev_arr_s];
+		const char **char_arr = new const char *[achiev_arr_s];
 		for (size_t i = 0; i < p_achievement_names.size(); i++) {
 			if (p_achievement_names[i].get_type() == Variant::STRING) {
 				char_arr[i] = ((String)p_achievement_names[i]).utf8().get_data();
@@ -683,7 +698,6 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 				return return_promise;
 			}
 		}
-		
 
 		ovrRequest req = ovr_Achievements_GetProgressByName(char_arr, achiev_arr_s);
 		delete[] char_arr;
@@ -693,8 +707,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 
 		return return_promise;
 
-	} else if(achiev_arr_s >= INT_MAX) {
-
+	} else if (achiev_arr_s >= INT_MAX) {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 		String rejection_msg = "Too many achievement names... How do you have more than 2147483647 achievements?";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);

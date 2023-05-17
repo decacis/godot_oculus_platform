@@ -68,6 +68,8 @@ public:
 	Ref<GDOculusPlatformPromise> initialize_android_async(String p_app_id);
 
 	// USER
+	String user_get_logged_in_user_id();
+	String user_get_logged_in_user_locale();
 	Ref<GDOculusPlatformPromise> user_get_is_viewer_entitled();
 	Ref<GDOculusPlatformPromise> user_get_user(String p_user_id);
 	Ref<GDOculusPlatformPromise> user_get_logged_in_user();
