@@ -51,6 +51,3 @@ markdown_extensions:
   - pymdownx.tasklist
   - pymdownx.blocks.admonition
   - pymdownx.blocks.details
-plugins:
-  - git-revision-date-localized:
-      enable_creation_date: true
