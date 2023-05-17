@@ -22,15 +22,15 @@ func _ready():
 		.then(func(_initialization_resp):
 			print("Oculus Platform initialized")
 			
-			GDOculusPlatform.get_is_viewer_entitled()\
+			GDOculusPlatform.user_get_is_viewer_entitled()\
 			.then(func(_is_viewer_entitled_resp):
 				print("User is entitled!")
 				
-				GDOculusPlatform.get_logged_in_user()\
+				GDOculusPlatform.user_get_logged_in_user()\
 				.then(func(user_info):
 					print("User info: ", user_info)
 					
-#					GDOculusPlatform.get_user("USER_ID_HERE")\
+#					GDOculusPlatform.user_get_user("USER_ID_HERE")\
 #					.then(func(get_user_resp):
 #						print("Get user fulfilled! ", get_user_resp)
 #					)\
@@ -38,7 +38,7 @@ func _ready():
 #						print("Get user error: ", get_user_err)
 #					)
 
-#					GDOculusPlatform.get_user_access_token()\
+#					GDOculusPlatform.user_get_user_access_token()\
 #					.then(func(user_access_token):
 #						print("User access token: ", user_access_token)
 #					)\
@@ -46,12 +46,20 @@ func _ready():
 #						print("User access token error: ", user_access_token_err)
 #					)
 					
-					GDOculusPlatform.get_blocked_users()\
+					GDOculusPlatform.user_get_blocked_users()\
 					.then(func(blocked_user_ids):
 						print("Blocked user ids: ", blocked_user_ids)
 					)\
 					.error(func(blocked_users_error):
 						print("Blocked users error: ", blocked_users_error)
+					)
+					
+					GDOculusPlatform.achievements_get_all_definitions()\
+					.then(func(achiev_defs : Array):
+						print("Achievement definitions: ", achiev_defs)
+					)\
+					.error(func(achiev_defs_err):
+						print("Achievement definitions error: ", achiev_defs_err)
 					)
 					
 				)\
