@@ -9,6 +9,11 @@ We advise you develop locally to make sure everything works and looks good befor
 pip install mkdocs-material mkdocs-git-revision-date-localized-plugin
 ```
 
+Also, make sure to initialize the submodules:
+```
+git submodule update --init --recursive
+```
+
 Then run:
 ```
 mkdocs serve

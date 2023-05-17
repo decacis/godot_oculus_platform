@@ -1,7 +1,13 @@
-# Functions - Users
+# Functions - User
+Related Oculus Platform documentation:
+
+- [https://developer.oculus.com/documentation/native/ps-presence/](https://developer.oculus.com/documentation/native/ps-presence/)
+- [https://developer.oculus.com/documentation/native/ps-entitlement-check/](https://developer.oculus.com/documentation/native/ps-entitlement-check/)
+- [https://developer.oculus.com/documentation/native/ps-blockingsdk/](https://developer.oculus.com/documentation/native/ps-blockingsdk/)
+
 ------
-## get_is_viewer_entitled
-//// admonition | get_is_viewer_entitled()
+## user_get_is_viewer_entitled
+//// admonition | user_get_is_viewer_entitled()
 
 Checks if the user that launched the app is entitled to the application/game.
 
@@ -10,7 +16,7 @@ Checks if the user that launched the app is entitled to the application/game.
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_is_viewer_entitled()\
+GDOculusPlatform.user_get_is_viewer_entitled()\
 .then(func(_viewer_entitled_resp):
     print("User is entitled!")
 )\
@@ -21,8 +27,8 @@ GDOculusPlatform.get_is_viewer_entitled()\
 ///
 ////
 
-## get_user
-//// admonition | get_user(user_id : `String`)
+## user_get_user
+//// admonition | user_get_user(user_id : `String`)
 
 Requests information about a single user by ID.
 
@@ -49,7 +55,7 @@ Example response:
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_user("31415926535")\
+GDOculusPlatform.user_get_user("31415926535")\
 .then(func(get_user_resp : Dictionary):
     print("User info: ", get_user_resp)
 )\
@@ -60,8 +66,8 @@ GDOculusPlatform.get_user("31415926535")\
 ///
 ////
 
-## get_logged_in_user
-//// admonition | get_logged_in_user()
+## user_get_logged_in_user
+//// admonition | user_get_logged_in_user()
 
 Requests information about the user that launched the app.
 
@@ -74,7 +80,7 @@ Example response:
     "oculus_id": "some_other_id",
     "display_name": "steven",
     "image_url": "https://example.org/some-image.png",
-    "small_image_url": "https://example.org/some-smaller-image.png",
+    "small_image_url": "",
     "presence": {
         "presence_status": "UNKNOWN",
         "presence_deeplink_message": "",
@@ -93,7 +99,7 @@ Even though the `Dictionary` includes a `presence` key, it will not contain info
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_logged_in_user()\
+GDOculusPlatform.user_get_logged_in_user()\
 .then(func(get_user_resp : Dictionary):
     print("User info: ", get_user_resp)
 )\
@@ -104,8 +110,8 @@ GDOculusPlatform.get_logged_in_user()\
 ///
 ////
 
-## get_user_proof
-//// admonition | get_user_proof()
+## user_get_user_proof
+//// admonition | user_get_user_proof()
 
 Requests a nonce used to verify the current user. Check the [official Oculus Platform documentation](https://developer.oculus.com/documentation/native/ps-ownership/) for more details.
 
@@ -120,7 +126,7 @@ A nonce is only valid once. After you use it to verify the user it becomes inval
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_user_proof()\
+GDOculusPlatform.user_get_user_proof()\
 .then(func(user_proof_resp : String):
     print("Nonce: ", user_proof_resp)
 )\
@@ -131,8 +137,8 @@ GDOculusPlatform.get_user_proof()\
 ///
 ////
 
-## get_user_access_token
-//// admonition | get_user_access_token()
+## user_get_user_access_token
+//// admonition | user_get_user_access_token()
 
 Requests a token of the current user suitable to make REST calls against graph.oculus.com
 
@@ -141,7 +147,7 @@ Requests a token of the current user suitable to make REST calls against graph.o
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_user_access_token()\
+GDOculusPlatform.user_get_user_access_token()\
 .then(func(user_access_token : String):
     print("Access token: ", user_access_token)
 )\
@@ -152,8 +158,8 @@ GDOculusPlatform.get_user_access_token()\
 ///
 ////
 
-## get_blocked_users
-//// admonition | get_blocked_users()
+## user_get_blocked_users
+//// admonition | user_get_blocked_users()
 
 Requests the user IDs of users blocked by the current user.
 
@@ -162,7 +168,7 @@ Requests the user IDs of users blocked by the current user.
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_blocked_users()\
+GDOculusPlatform.user_get_blocked_users()\
 .then(func(blocked_users : Array):
     for user_id in blocked_users:
         print("Blocked user ID: ", user_id)
@@ -174,17 +180,17 @@ GDOculusPlatform.get_blocked_users()\
 ///
 ////
 
-## get_logged_in_user_friends
-//// admonition | get_logged_in_user_friends()
+## user_get_logged_in_user_friends
+//// admonition | user_get_logged_in_user_friends()
 
 Requests the user IDs of the current user's friends.
 
-**Returs:** A `GDOculusPlatformPromise` will contain an `Array` of `Dictionaries` with information about each friend. Same format as the `Dictionary` returned by [get_user()](#get_user). The function will error with a message if an error occured.
+**Returs:** A `GDOculusPlatformPromise` will contain an `Array` of `Dictionaries` with information about each friend. Same format as the `Dictionary` returned by [user_get_user()](#user_get_user). The function will error with a message if an error occured.
 
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_logged_in_user_friends()\
+GDOculusPlatform.user_get_logged_in_user_friends()\
 .then(func(friends : Array):
     for friend_info in friends:
         print("Friend ID: ", friend_info.id)
@@ -197,8 +203,8 @@ GDOculusPlatform.get_logged_in_user_friends()\
 ///
 ////
 
-## get_org_scoped_id
-//// admonition | get_org_scoped_id(user_id : `String`)
+## user_get_org_scoped_id
+//// admonition | user_get_org_scoped_id(user_id : `String`)
 
 Requests an ID which is unique per org. Allows different apps within the same org to identify the user.
 
@@ -207,7 +213,7 @@ Requests an ID which is unique per org. Allows different apps within the same or
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_org_scoped_id("31415926535")\
+GDOculusPlatform.user_get_org_scoped_id("31415926535")\
 .then(func(org_scoped_id : String):
     print("Org scoped ID: ", org_scoped_id)
 )\
@@ -218,8 +224,8 @@ GDOculusPlatform.get_org_scoped_id("31415926535")\
 ///
 ////
 
-## get_sdk_accounts
-//// admonition | get_sdk_accounts()
+## user_get_sdk_accounts
+//// admonition | user_get_sdk_accounts()
 
 Requests all the accounts belonging to the current user.
 
@@ -227,16 +233,18 @@ Requests all the accounts belonging to the current user.
 
 Example response:
 ``` json linenums="1"
-{
-    "account_type": "OCULUS",
-    "account_id": "31415926535",
-}
+[
+    {
+        "account_type": "OCULUS",
+        "account_id": "31415926535",
+    }
+]
 ```
 
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.get_sdk_accounts()\
+GDOculusPlatform.user_get_sdk_accounts()\
 .then(func(sdk_accounts : Array):
     for sdk_account in sdk_accounts:
         print("Account type: ", sdk_account.account_type)
@@ -249,8 +257,8 @@ GDOculusPlatform.get_sdk_accounts()\
 ///
 ////
 
-## launch_block_flow
-//// admonition | launch_block_flow(user_id : `String`)
+## user_launch_block_flow
+//// admonition | user_launch_block_flow(user_id : `String`)
 
 Launches a block flow to block the user associated with the given `user_id`. The user/player can then decide to block or cancel the request.
 
@@ -267,7 +275,7 @@ Example response:
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.launch_block_flow("89793238462")\
+GDOculusPlatform.user_launch_block_flow("89793238462")\
 .then(func(block_flow_resp : Dictionary):
     if block_flow_resp.did_block:
         print("User blocked!")
@@ -281,8 +289,8 @@ GDOculusPlatform.launch_block_flow("89793238462")\
 ///
 ////
 
-## launch_unblock_flow
-//// admonition | launch_unblock_flow(user_id : `String`)
+## user_launch_unblock_flow
+//// admonition | user_launch_unblock_flow(user_id : `String`)
 
 Launches an unblock flow to unblock the user associated with the given `user_id`. The user/player can then decide to unblock or cancel the request.
 
@@ -299,7 +307,7 @@ Example response:
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.launch_unblock_flow("89793238462")\
+GDOculusPlatform.user_launch_unblock_flow("89793238462")\
 .then(func(unblock_flow_resp : Dictionary):
     if unblock_flow_resp.did_unblock:
         print("User unblocked!")
@@ -313,8 +321,8 @@ GDOculusPlatform.launch_unblock_flow("89793238462")\
 ///
 ////
 
-## launch_friend_request_flow
-//// admonition | launch_friend_request_flow(user_id : `String`)
+## user_launch_friend_request_flow
+//// admonition | user_launch_friend_request_flow(user_id : `String`)
 
 Launches a friend request flow to add the user associated with the given `user_id` as a friend. The user/player can then decide to send the request or cancel it.
 
@@ -331,7 +339,7 @@ Example response:
 /// details | Example
     type: tip
 ``` gdscript linenums="1"
-GDOculusPlatform.launch_friend_request_flow("89793238462")\
+GDOculusPlatform.user_launch_friend_request_flow("89793238462")\
 .then(func(friend_req_flow_resp : Dictionary):
     if friend_req_flow_resp.did_send_request:
         print("Friend request sent!")

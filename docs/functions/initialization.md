@@ -1,4 +1,5 @@
 # Functions - Initialization
+
 -----
 /// admonition | Note
     type: warning

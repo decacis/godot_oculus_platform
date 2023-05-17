@@ -20,24 +20,30 @@ The following list tracks the supported functions from the Oculus Platform SDK:
 - [x] [Platform initialization](/godot_oculus_platform/functions/initialization/)
     * [x] [initialize_android](/godot_oculus_platform/functions/initialization/#initialize_android)
     * [x] [initialize_android_async](/godot_oculus_platform/functions/initialization/#initialize_android_async)
-- [x] [Users](/godot_oculus_platform/functions/users/)
-    * [x] [get_is_viewer_entitled](/godot_oculus_platform/functions/users/#get_is_viewer_entitled)
-    * [x] [get_user](/godot_oculus_platform/functions/users/#get_user)
-    * [x] [get_logged_in_user](/godot_oculus_platform/functions/users/#get_logged_in_user)
-    * [x] [get_user_proof](/godot_oculus_platform/functions/users/#get_user_proof)
-    * [x] [get_user_access_token](/godot_oculus_platform/functions/users/#get_user_access_token)
-    * [x] [get_blocked_users](/godot_oculus_platform/functions/users/#get_blocked_users)
-    * [x] [get_logged_in_user_friends](/godot_oculus_platform/functions/users/#get_logged_in_user_friends)
-    * [x] [get_org_scoped_id](/godot_oculus_platform/functions/users/#get_org_scoped_id)
-    * [x] [get_sdk_accounts](/godot_oculus_platform/functions/users/#get_sdk_accounts)
-    * [x] [launch_block_flow](/godot_oculus_platform/functions/users/#launch_block_flow)
-    * [x] [launch_unblock_flow](/godot_oculus_platform/functions/users/#launch_unblock_flow)
-    * [x] [launch_friend_request_flow](/godot_oculus_platform/functions/users/#launch_friend_request_flow)
-- [ ] Achievements
-    * [ ] achievements_add_count
-    * [ ] achievements_add_fields
-    * [ ] achievements_get_all_definitions
-    * [ ] achievements_get_all_progress
-    * [ ] achievements_get_definitions_by_name
-    * [ ] achievements_get_progress_by_name
-    * [ ] achievements_unlock
+- [x] [User](/godot_oculus_platform/functions/user/)
+    * [x] [user_get_is_viewer_entitled](/godot_oculus_platform/functions/user/#user_get_is_viewer_entitled)
+    * [x] [user_get_user](/godot_oculus_platform/functions/user/#user_get_user)
+    * [x] [user_get_logged_in_user](/godot_oculus_platform/functions/user/#user_get_logged_in_user)
+    * [x] [user_get_user_proof](/godot_oculus_platform/functions/user/#user_get_user_proof)
+    * [x] [user_get_user_access_token](/godot_oculus_platform/functions/user/#user_get_user_access_token)
+    * [x] [user_get_blocked_users](/godot_oculus_platform/functions/user/#user_get_blocked_users)
+    * [x] [user_get_logged_in_user_friends](/godot_oculus_platform/functions/user/#user_get_logged_in_user_friends)
+    * [x] [user_get_org_scoped_id](/godot_oculus_platform/functions/user/#user_get_org_scoped_id)
+    * [x] [user_get_sdk_accounts](/godot_oculus_platform/functions/user/#user_get_sdk_accounts)
+    * [x] [user_launch_block_flow](/godot_oculus_platform/functions/user/#user_launch_block_flow)
+    * [x] [user_launch_unblock_flow](/godot_oculus_platform/functions/user/#user_launch_unblock_flow)
+    * [x] [user_launch_friend_request_flow](/godot_oculus_platform/functions/user/#user_launch_friend_request_flow)
+- [x] [Achievements](/godot_oculus_platform/functions/achievements/)
+    * [x] [achievements_add_count](/godot_oculus_platform/functions/achievements/#achievements_add_count)
+    * [x] [achievements_add_fields](/godot_oculus_platform/functions/achievements/#achievements_add_fields)
+    * [x] [achievements_unlock](/godot_oculus_platform/functions/achievements/#achievements_unlock)
+    * [x] [achievements_get_all_definitions](/godot_oculus_platform/functions/achievements/#achievements_get_all_definitions)
+    * [x] [achievements_get_all_progress](/godot_oculus_platform/functions/achievements/#achievements_get_all_progress)
+    * [x] [achievements_get_definitions_by_name](/godot_oculus_platform/functions/achievements/#achievements_get_definitions_by_name)
+    * [x] [achievements_get_progress_by_name](/godot_oculus_platform/functions/achievements/#achievements_get_progress_by_name)
+- [ ] In-App Purchases
+    * [ ] iap_consume_purchase
+    * [ ] iap_get_products_by_sku
+    * [ ] iap_get_viewer_purchases
+    * [ ] iap_get_viewer_purchases_durable_cache
+    * [ ] iap_launch_checkout_flow

@@ -1,6 +1,7 @@
 site_name: Godot Oculus Platform
 site_url: https://decacis.github.io/godot_oculus_platform
 site_description: An implementation of the Oculus Platform SDK for the Godot Engine.
+site_dir: godot_oculus_platform
 copyright: Copyright &copy; 2023-present Daniel Castellanos and contributors (CC BY 3.0)
 repo_url: https://github.com/decacis/godot_oculus_platform
 edit_uri: edit/gh-pages-source/docs/
@@ -11,7 +12,8 @@ nav:
   - Build: build.md
   - Functions:
     - Initialization: 'functions/initialization.md'
-    - Users: 'functions/users.md'
+    - User: 'functions/user.md'
+    - Achievements: 'functions/achievements.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg
