@@ -32,12 +32,9 @@ Depending on what functions you use, you have to request different Data Use Chec
 
 As long as you are in development (haven't published your app yet), you can request all the permissions you need and they will be approved automatically to ease development. Once you want to publish your app, you will have to re-request these permissions.
 
-## Add this asset to your project
-You can download the precompiled stable version from the [releases](https://github.com/decacis/godot_oculus_platform/releases) page or an in-development version from the [actions page](https://github.com/decacis/godot_oculus_platform/actions). In the case of the actions, look for an artifact with a name similar to `OculusPlatformSDK-51-for-godot-4.0.2-stable_v0.0.1-alpha`.
-
-Finally, enable the `Godot Oculus Platform Android Plugin` in your export template and enable the `Godot Oculus Platform` plugin in your Project Settings.
-
 ## Using this asset
+First, [download this asset](/godot_oculus_platform/download/) and place the addon inside your addons folder and the android plugin inside your android plugins folder. You should be able to just drag and drop the contents of the ZIP file inside your project.
+
 You can take a look at the [examples](/godot_oculus_platform/examples/) to get an idea of how to interact with the Oculus Platform.
 
 A concept we use is the use of promises or more specifically `GDOculusPlatformPromise`s. These promises basically help you perform actions in an asynchronous manner. Take a look at the following example:

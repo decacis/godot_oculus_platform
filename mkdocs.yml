@@ -9,6 +9,7 @@ nav:
   - Home: index.md
   - Getting started: getting-started.md
   - Examples: examples.md
+  - Download: download.md
   - Build: build.md
   - Functions:
     - Initialization: 'functions/initialization.md'
