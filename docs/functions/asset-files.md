@@ -11,7 +11,7 @@ Related Oculus Platform documentation:
 
 Requests a list of asset files associated with this app.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each asset file. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each asset file. The promise will error if the request couldn't be fulfilled.
 
 If the asset file is of type `language_pack`, the "tag" key will be in BCP47 format.
 
@@ -94,7 +94,7 @@ GDOculusPlatform.assetfile_get_list()\
 
 Requests information about a single asset file by its ID.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the asset file. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the asset file. The promise will error if the request couldn't be fulfilled.
 
 See the example response from [assetfile_get_list](#assetfile_get_list) to get an idea of the response. `assetfile_get_list()` returns an `Array` because it can return multiple asset files, but this function returns a single asset file (and thus a `Dictionary` instead of an `Array`).
 
@@ -121,7 +121,7 @@ GDOculusPlatform.assetfile_status_by_id("151548188744")\
 
 Requests information about a single asset file by its name.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the asset file. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the asset file. The promise will error if the request couldn't be fulfilled.
 
 See the example response from [assetfile_get_list](#assetfile_get_list) to get an idea of the response. `assetfile_get_list()` returns an `Array` because it can return multiple asset files, but this function returns a single asset file (and thus a `Dictionary` instead of an `Array`).
 
@@ -146,7 +146,7 @@ GDOculusPlatform.assetfile_status_by_name("my_asset_file")\
 
 Sends a request to download an asset file with the given ID.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
 
 Example response:
 
@@ -214,7 +214,7 @@ func call_me_when_finished(asset_file_id : String):
 
 Sends a request to download an asset file with the given name.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
 
 Please look at the response from [assetfile_download_by_id](#assetfile_download_by_id) - both this function and `assetfile_download_by_id` return the same data and can be used interchangeably, apart from using an ID for the other function and a name for this one.
 
@@ -243,7 +243,7 @@ func call_me_when_finished(asset_file_id : String):
 
 Sends a request to cancel a download of the asset file with the given ID.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
 
 Example response:
 
@@ -283,7 +283,7 @@ GDOculusPlatform.assetfile_download_cancel_by_id("244752684352")\
 
 Sends a request to cancel a download of the asset file with the given name.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
 
 Take a look at the example response from [assetfile_download_cancel_by_id](#assetfile_download_cancel_by_id) because both that function and this one return the same data.
 
@@ -309,7 +309,7 @@ GDOculusPlatform.assetfile_download_cancel_by_name("my_asset_name")\
 
 Sends a request to delete an asset file with the given ID.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
 
 Example response:
 
@@ -349,7 +349,7 @@ GDOculusPlatform.assetfile_delete_by_id("774568224174")\
 
 Sends a request to delete an asset file with the given name.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
 
 Take a look at the example response from [assetfile_delete_by_id](#assetfile_delete_by_id) because both that function and this one return the same data.
 

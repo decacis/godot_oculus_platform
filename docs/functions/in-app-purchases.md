@@ -10,7 +10,7 @@ Related Oculus Platform documentation:
 
 Requests all of the logged-in user purchases.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each purchase (both consumable and durable). The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each purchase (both consumable and durable). The promise will error if the request couldn't be fulfilled.
 
 Example response:
 ``` json linenums="1"
@@ -61,7 +61,7 @@ GDOculusPlatform.iap_get_viewer_purchases()\
 
 Requests all of the logged-in user purchases that are **durable**. This is taken from the cache, so it is recommended to first call [iap_get_viewer_purchases](#iap_get_viewer_purchases) to update the cache and use this function for subsequent calls.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each durable cached purchase. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each durable cached purchase. The promise will error if the request couldn't be fulfilled.
 
 Example response:
 ``` json linenums="1"
@@ -112,7 +112,7 @@ GDOculusPlatform.iap_get_viewer_purchases_durable_cache()\
 
 Requests product information of a list of SKUs. The `sku_list` `Array` must only contain `String`s.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each requested product. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each requested product. The promise will error if the request couldn't be fulfilled.
 
 Example response:
 ``` json linenums="1"
@@ -155,7 +155,7 @@ GDOculusPlatform.iap_get_products_by_sku(sku_list)\
 
 Consumes a product with the given SKU.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain `true` as an argument if the request was successful. The promise will error if the product couldn't be consumed.
+**Returns:** A `GDOculusPlatformPromise` that will contain `true` as an argument if the request was successful. The promise will error if the product couldn't be consumed.
 
 /// details | Example
     type: example
@@ -177,7 +177,7 @@ GDOculusPlatform.iap_consume_purchase("my_product_sku")\
 
 Launches a checkout flow for the product with the given SKU. The user will be able to complete the purchase or cancel it.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with the product information if fulfilled. The promise will error if we couldn't launch the checkout flow.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with the product information if fulfilled. The promise will error if we couldn't launch the checkout flow.
 
 Example response:
 ``` json linenums="1"

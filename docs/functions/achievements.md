@@ -10,7 +10,7 @@ Related Oculus Platform documentation:
 
 Adds `count` to the achievement with the given name. The achievement must be of type COUNT.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain `Dictionary` with information about the achievement's state if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain `Dictionary` with information about the achievement's state if fulfilled. The promise will error if the request couldn't be completed.
 
 Example response:
 ``` json linenums="1"
@@ -41,7 +41,7 @@ GDOculusPlatform.achievements_add_count("my_count_achievement", 5)\
 
 Unlocks fields of an achievement of type BITFIELD. The `fields` argument must be a `String` containing either "0" or "1" characters. Every "1" will unlock the field in the corresponding position. For example, if the bitfield is `10011` and you call this function with `fields = 00110`, the result will be `10111`.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain `Dictionary` with information about the achievement's state if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain `Dictionary` with information about the achievement's state if fulfilled. The promise will error if the request couldn't be completed.
 
 Example response:
 ``` json linenums="1"
@@ -72,7 +72,7 @@ GDOculusPlatform.achievements_add_fields("my_bitfield_achievement", "0011")\
 
 Unlocks the achievement with the given `achievement_name`. The achievement can be of any type.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain `Dictionary` with information about the achievement's state if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain `Dictionary` with information about the achievement's state if fulfilled. The promise will error if the request couldn't be completed.
 
 Example response:
 ``` json linenums="1"
@@ -103,7 +103,7 @@ GDOculusPlatform.achievements_unlock("my_simple_achievement")\
 
 Requests all achievement definitions of this app.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain  an `Array` of `Dictionaries` with information about all the achievements if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain  an `Array` of `Dictionaries` with information about all the achievements if fulfilled. The promise will error if the request couldn't be completed.
 
 Example response:
 ``` json linenums="1"
@@ -150,7 +150,7 @@ GDOculusPlatform.achievements_get_all_definitions()\
 
 Requests all the progress of the achievements of this app.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain  an `Array` of `Dictionaries` with information about progress of all the achievements if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain  an `Array` of `Dictionaries` with information about progress of all the achievements if fulfilled. The promise will error if the request couldn't be completed.
 
 Example response:
 ``` json linenums="1"
@@ -207,7 +207,7 @@ GDOculusPlatform.achievements_get_all_progress()\
 
 Requests achievement definitions by name of this app. The `achievement_names` argument must contain `String`s only.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain  an `Array` of `Dictionaries` with information about the requested achievements if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain  an `Array` of `Dictionaries` with information about the requested achievements if fulfilled. The promise will error if the request couldn't be completed.
 
 Example response:
 ``` json linenums="1"
@@ -256,7 +256,7 @@ GDOculusPlatform.achievements_get_definitions_by_name(achievements)\
 
 Requests progress information of achievements by their name. The `achievement_names` argument must contain `String`s only.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain  an `Array` of `Dictionaries` with information about progress of the requested achievements if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain  an `Array` of `Dictionaries` with information about progress of the requested achievements if fulfilled. The promise will error if the request couldn't be completed.
 
 Example response:
 ``` json linenums="1"

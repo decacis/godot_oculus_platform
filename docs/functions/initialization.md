@@ -19,7 +19,7 @@ With either `false` or `true` (no argument). Passing `false` will initialize the
 
 Requests the Oculus Platform initialization.
 
-**Returs:** A `bool` that is `true` if the platform was initialized correctly or `false` otherwise.
+**Returns:** A `bool` that is `true` if the platform was initialized correctly or `false` otherwise.
 
 /// details | Example
     type: example
@@ -35,7 +35,7 @@ var platform_initialized : bool = GDOculusPlatform.initialize_android("314159265
 
 Requests the Oculus Platform initialization asynchronously. This is the preferred way of initializing the platform.
 
-**Returs:** A `GDOculusPlatformPromise` that will contain a true `bool` as a response if fulfilled. An error message will be available if rejected/couldn't initialize.
+**Returns:** A `GDOculusPlatformPromise` that will contain a true `bool` as a response if fulfilled. An error message will be available if rejected/couldn't initialize.
 
 /// details | Example
     type: example
