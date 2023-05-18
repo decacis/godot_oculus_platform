@@ -6,6 +6,7 @@ Related Oculus Platform documentation:
 ------
 ## achievements_add_count
 //// admonition | achievements_add_count(achievement_name : `String`, count : `int`)
+    type: abstract
 
 Adds `count` to the achievement with the given name. The achievement must be of type COUNT.
 
@@ -20,7 +21,7 @@ Example response:
 ```
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.achievements_add_count("my_count_achievement", 5)\
 .then(func(add_count_resp : Dictionary):
@@ -36,6 +37,7 @@ GDOculusPlatform.achievements_add_count("my_count_achievement", 5)\
 
 ## achievements_add_fields
 //// admonition | achievements_add_fields(achievement_name : `String`, fields : `String`)
+    type: abstract
 
 Unlocks fields of an achievement of type BITFIELD. The `fields` argument must be a `String` containing either "0" or "1" characters. Every "1" will unlock the field in the corresponding position. For example, if the bitfield is `10011` and you call this function with `fields = 00110`, the result will be `10111`.
 
@@ -50,7 +52,7 @@ Example response:
 ```
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.achievements_add_fields("my_bitfield_achievement", "0011")\
 .then(func(add_fields_resp : Dictionary):
@@ -66,6 +68,7 @@ GDOculusPlatform.achievements_add_fields("my_bitfield_achievement", "0011")\
 
 ## achievements_unlock
 //// admonition | achievements_unlock(achievement_name : `String`)
+    type: abstract
 
 Unlocks the achievement with the given `achievement_name`. The achievement can be of any type.
 
@@ -80,7 +83,7 @@ Example response:
 ```
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.achievements_unlock("my_simple_achievement")\
 .then(func(unlock_achievement_resp : Dictionary):
@@ -96,6 +99,7 @@ GDOculusPlatform.achievements_unlock("my_simple_achievement")\
 
 ## achievements_get_all_definitions
 //// admonition | achievements_get_all_definitions()
+    type: abstract
 
 Requests all achievement definitions of this app.
 
@@ -126,7 +130,7 @@ Example response:
 ```
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.achievements_get_all_definitions()\
 .then(func(achievements : Array):
@@ -142,6 +146,7 @@ GDOculusPlatform.achievements_get_all_definitions()\
 
 ## achievements_get_all_progress
 //// admonition | achievements_get_all_progress()
+    type: abstract
 
 Requests all the progress of the achievements of this app.
 
@@ -181,7 +186,7 @@ Example response:
 ///
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.achievements_get_all_progress()\
 .then(func(achievements_progress : Array):
@@ -198,6 +203,7 @@ GDOculusPlatform.achievements_get_all_progress()\
 
 ## achievements_get_definitions_by_name
 //// admonition | achievements_get_definitions_by_name(achievement_names : `Array`)
+    type: abstract
 
 Requests achievement definitions by name of this app. The `achievement_names` argument must contain `String`s only.
 
@@ -228,7 +234,7 @@ Example response:
 ```
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 var achievements : Array = ["my_achievement", "my_bitfield_achievement"]
 
@@ -246,6 +252,7 @@ GDOculusPlatform.achievements_get_definitions_by_name(achievements)\
 
 ## achievements_get_progress_by_name
 //// admonition | achievements_get_progress_by_name(achievement_names : `Array`)
+    type: abstract
 
 Requests progress information of achievements by their name. The `achievement_names` argument must contain `String`s only.
 
@@ -285,7 +292,7 @@ Example response:
 ///
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 var achievements : Array = ["my_count_achievement"]
 

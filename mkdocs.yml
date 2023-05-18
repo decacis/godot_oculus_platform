@@ -8,14 +8,15 @@ edit_uri: edit/gh-pages-source/docs/
 nav:
   - Home: index.md
   - Getting started: getting-started.md
-  - Examples: examples.md
   - Download: download.md
+  - Examples: examples.md
   - Build: build.md
   - Functions:
     - Initialization: 'functions/initialization.md'
     - User: 'functions/user.md'
     - Achievements: 'functions/achievements.md'
     - In-App Purchases: 'functions/in-app-purchases.md'
+    - Asset Files: 'functions/asset-files.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg

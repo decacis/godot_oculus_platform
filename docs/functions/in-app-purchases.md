@@ -6,6 +6,7 @@ Related Oculus Platform documentation:
 ------
 ## iap_get_viewer_purchases
 //// admonition | iap_get_viewer_purchases()
+    type: abstract
 
 Requests all of the logged-in user purchases.
 
@@ -40,7 +41,7 @@ Keys ending with `_time` like `grant_time` are in seconds. They are UNIX timesta
 ///
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.iap_get_viewer_purchases()\
 .then(func(user_purchases : Array):
@@ -56,8 +57,9 @@ GDOculusPlatform.iap_get_viewer_purchases()\
 
 ## iap_get_viewer_purchases_durable_cache
 //// admonition | iap_get_viewer_purchases_durable_cache()
+    type: abstract
 
-Requests all of the logged-in user purchases that are **durable**. This is taken from the cache, so it is recommended to first call [iap_get_viewer_purchases()](#iap_get_viewer_purchases) first to update the cache and use this function for subsequent calls.
+Requests all of the logged-in user purchases that are **durable**. This is taken from the cache, so it is recommended to first call [iap_get_viewer_purchases](#iap_get_viewer_purchases) to update the cache and use this function for subsequent calls.
 
 **Returs:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each durable cached purchase. The promise will error if the request couldn't be fulfilled.
 
@@ -90,7 +92,7 @@ Example response:
 ///
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.iap_get_viewer_purchases_durable_cache()\
 .then(func(user_durable_purchases : Array):
@@ -106,6 +108,7 @@ GDOculusPlatform.iap_get_viewer_purchases_durable_cache()\
 
 ## iap_get_products_by_sku
 //// admonition | iap_get_products_by_sku(sku_list : `Array`)
+    type: abstract
 
 Requests product information of a list of SKUs. The `sku_list` `Array` must only contain `String`s.
 
@@ -130,7 +133,7 @@ Example response:
 ```
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 var sku_list : Array = ["gems_pack_10", "gems_pack_50"]
 
@@ -148,13 +151,14 @@ GDOculusPlatform.iap_get_products_by_sku(sku_list)\
 
 ## iap_consume_purchase
 //// admonition | iap_consume_purchase(sku : `String`)
+    type: abstract
 
 Consumes a product with the given SKU.
 
 **Returs:** A `GDOculusPlatformPromise` that will contain `true` as an argument if the request was successful. The promise will error if the product couldn't be consumed.
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.iap_consume_purchase("my_product_sku")\
 .then(func(consumed : bool):
@@ -169,6 +173,7 @@ GDOculusPlatform.iap_consume_purchase("my_product_sku")\
 
 ## iap_launch_checkout_flow
 //// admonition | iap_launch_checkout_flow(sku : `String`)
+    type: abstract
 
 Launches a checkout flow for the product with the given SKU. The user will be able to complete the purchase or cancel it.
 
@@ -193,7 +198,7 @@ If the user doesn't purchase the product, the function **will not error**, inste
 ///
 
 /// details | Example
-    type: tip
+    type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.iap_launch_checkout_flow("my_product_sku")\
 .then(func(product : Dictionaty):
