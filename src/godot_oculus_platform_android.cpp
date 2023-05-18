@@ -1,6 +1,8 @@
 #include <godot_oculus_platform.h>
 #include <godot_cpp/core/class_db.hpp>
 
+#define OVRID_SIZE 21
+
 static JavaVM *jvm;
 static jobject jactivity;
 
@@ -331,7 +333,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(String p
 /// Requests the current user's id
 /// @return The logged-in user's id as a String
 String GDOculusPlatform::user_get_logged_in_user_id() {
-	char native_id[21];
+	char native_id[OVRID_SIZE];
 	ovrID u_id = ovr_GetLoggedInUserID();
 	ovrID_ToString(native_id, sizeof(native_id), u_id);
 
@@ -341,8 +343,7 @@ String GDOculusPlatform::user_get_logged_in_user_id() {
 /// Requests the current user's locale
 /// @return The logged-in user's locale as a String
 String GDOculusPlatform::user_get_logged_in_user_locale() {
-	const char *user_locale = ovr_GetLoggedInUserLocale();
-	return String(user_locale);
+	return String(ovr_GetLoggedInUserLocale());
 }
 
 /// Checks if the user is entitled to the current application.
@@ -559,7 +560,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_fields(String p_
 	return return_promise;
 }
 
-/// Requests an update for an achievement of type SIMPLE.
+/// Requests an update (to unlock) for an achievement of any type.
 /// @return Promise that will contain a Dictionary with info about the result of the update request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_unlock(String p_achievement_name) {
 	ovrRequest req = ovr_Achievements_Unlock(p_achievement_name.utf8().get_data());
@@ -581,7 +582,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_definitions(
 	return return_promise;
 }
 
-/// Requests all the achievement definitions.
+/// Requests all the achievement progress.
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_progress() {
 	ovrRequest req = ovr_Achievements_GetAllProgress();
@@ -639,7 +640,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 	}
 }
 
-/// Requests achievements progress by name
+/// Requests achievements progress by name.
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name(Array p_achievement_names) {
 	int64_t achiev_arr_s = p_achievement_names.size();
@@ -804,13 +805,22 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_get_list() {
 /// @return Promise that contains a Dictionary with information about the assetfile. Language packs have extra information.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_id(String p_asset_id) {
 	ovrID n_asset_id;
-	ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data());
-	ovrRequest req = ovr_AssetFile_StatusById(n_asset_id);
+	if (ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data())) {
+		ovrRequest req = ovr_AssetFile_StatusById(n_asset_id);
 
-	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
-	_promises.push_back(return_promise);
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
 
-	return return_promise;
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid asset file id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
 }
 
 /// Requests information about a single asset file by name.
@@ -828,13 +838,22 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_name(String p
 /// @return Promise that contains the result of the request as a Dictionary.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_id(String p_asset_id) {
 	ovrID n_asset_id;
-	ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data());
-	ovrRequest req = ovr_AssetFile_DownloadById(n_asset_id);
+	if (ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data())) {
+		ovrRequest req = ovr_AssetFile_DownloadById(n_asset_id);
 
-	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
-	_promises.push_back(return_promise);
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
 
-	return return_promise;
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid asset file id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
 }
 
 /// Requests to download an asset file by name.
@@ -852,13 +871,22 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_name(String
 /// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_id(String p_asset_id) {
 	ovrID n_asset_id;
-	ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data());
-	ovrRequest req = ovr_AssetFile_DownloadCancelById(n_asset_id);
+	if (ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data())) {
+		ovrRequest req = ovr_AssetFile_DownloadCancelById(n_asset_id);
 
-	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
-	_promises.push_back(return_promise);
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
 
-	return return_promise;
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid asset file id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
 }
 
 /// Requests to cancel a download of an assetfile by name.
@@ -876,13 +904,22 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_name
 /// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_id(String p_asset_id) {
 	ovrID n_asset_id;
-	ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data());
-	ovrRequest req = ovr_AssetFile_DeleteById(n_asset_id);
+	if (ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data())) {
+		ovrRequest req = ovr_AssetFile_DeleteById(n_asset_id);
 
-	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
-	_promises.push_back(return_promise);
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
 
-	return return_promise;
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid asset file id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
 }
 
 /// Requests to delete an assetfile by name.
@@ -1016,7 +1053,7 @@ void GDOculusPlatform::_process_user_get_blocked_users(ovrMessageHandle p_messag
 			for (size_t i = 0; i < blocked_users_array_size; i++) {
 				ovrBlockedUserHandle blocked_user_handle = ovr_BlockedUserArray_GetElement(blocked_users_handle, i);
 
-				char native_id[21];
+				char native_id[OVRID_SIZE];
 				ovrID blocked_user_id = ovr_BlockedUser_GetId(blocked_user_handle);
 				ovrID_ToString(native_id, sizeof(native_id), blocked_user_id);
 				((Array)promise->saved_fulfill_response[0]).push_back(String(native_id));
@@ -1081,7 +1118,7 @@ void GDOculusPlatform::_process_user_get_org_scoped_id(ovrMessageHandle p_messag
 	if (!ovr_Message_IsError(p_message)) {
 		ovrOrgScopedIDHandle org_scoped_id_handle = ovr_Message_GetOrgScopedID(p_message);
 
-		char native_id[21];
+		char native_id[OVRID_SIZE];
 		ovrID org_scoped_id = ovr_OrgScopedID_GetID(org_scoped_id_handle);
 		ovrID_ToString(native_id, sizeof(native_id), org_scoped_id);
 
@@ -1111,7 +1148,7 @@ void GDOculusPlatform::_process_user_get_sdk_accounts(ovrMessageHandle p_message
 
 			String gd_sdk_account_type = ovrSdkAccountType_ToString(sdk_account_type);
 
-			char native_id[21];
+			char native_id[OVRID_SIZE];
 			ovrID_ToString(native_id, sizeof(native_id), sdk_user_id);
 
 			Dictionary sdk_account_info;
@@ -1235,12 +1272,12 @@ void GDOculusPlatform::_process_achievements_definitions(ovrMessageHandle p_mess
 				ovrAchievementDefinitionHandle achiev_def_handle = ovr_AchievementDefinitionArray_GetElement(achiev_defs_handle, i);
 				Dictionary achiev_def;
 
-				achiev_def["name"] = String(ovr_AchievementDefinition_GetName(achiev_def_handle));
+				achiev_def["name"] = ovr_AchievementDefinition_GetName(achiev_def_handle);
 				achiev_def["bitfield_length"] = ovr_AchievementDefinition_GetBitfieldLength(achiev_def_handle);
 				achiev_def["target"] = (uint64_t)ovr_AchievementDefinition_GetTarget(achiev_def_handle);
 
 				ovrAchievementType achiev_type = ovr_AchievementDefinition_GetType(achiev_def_handle);
-				achiev_def["type"] = String(ovrAchievementType_ToString(achiev_type));
+				achiev_def["type"] = ovrAchievementType_ToString(achiev_type);
 
 				((Array)promise->saved_fulfill_response[0]).push_back(achiev_def);
 			}
@@ -1278,9 +1315,9 @@ void GDOculusPlatform::_process_achievements_progress(ovrMessageHandle p_message
 				ovrAchievementProgressHandle achiev_prog_handle = ovr_AchievementProgressArray_GetElement(achievs_prog_handle, i);
 				Dictionary achiev_prog;
 
-				achiev_prog["name"] = String(ovr_AchievementProgress_GetName(achiev_prog_handle));
+				achiev_prog["name"] = ovr_AchievementProgress_GetName(achiev_prog_handle);
 				achiev_prog["current_count"] = (uint64_t)ovr_AchievementProgress_GetCount(achiev_prog_handle);
-				achiev_prog["current_bitfield"] = String(ovr_AchievementProgress_GetBitfield(achiev_prog_handle));
+				achiev_prog["current_bitfield"] = ovr_AchievementProgress_GetBitfield(achiev_prog_handle);
 				achiev_prog["is_unlocked"] = ovr_AchievementProgress_GetIsUnlocked(achiev_prog_handle);
 				achiev_prog["unlock_time"] = (uint64_t)ovr_AchievementProgress_GetUnlockTime(achiev_prog_handle);
 
@@ -1323,12 +1360,12 @@ void GDOculusPlatform::_process_iap_viewer_purchases(ovrMessageHandle p_message)
 				ovrPurchaseHandle v_purchase_handle = ovr_PurchaseArray_GetElement(v_purchases_arr_handle, i);
 				Dictionary v_purchase;
 
-				v_purchase["sku"] = String(ovr_Purchase_GetSKU(v_purchase_handle));
-				v_purchase["reporting_id"] = String(ovr_Purchase_GetReportingId(v_purchase_handle));
-				v_purchase["purchase_str_id"] = String(ovr_Purchase_GetPurchaseStrID(v_purchase_handle));
+				v_purchase["sku"] = ovr_Purchase_GetSKU(v_purchase_handle);
+				v_purchase["reporting_id"] = ovr_Purchase_GetReportingId(v_purchase_handle);
+				v_purchase["purchase_str_id"] = ovr_Purchase_GetPurchaseStrID(v_purchase_handle);
 				v_purchase["grant_time"] = (uint64_t)ovr_Purchase_GetGrantTime(v_purchase_handle);
 				v_purchase["expiration_time"] = (uint64_t)ovr_Purchase_GetExpirationTime(v_purchase_handle);
-				v_purchase["developer_payload"] = String(ovr_Purchase_GetDeveloperPayload(v_purchase_handle));
+				v_purchase["developer_payload"] = ovr_Purchase_GetDeveloperPayload(v_purchase_handle);
 
 				((Array)promise->saved_fulfill_response[0]).push_back(v_purchase);
 			}
@@ -1366,10 +1403,10 @@ void GDOculusPlatform::_process_iap_products(ovrMessageHandle p_message) {
 				ovrProductHandle product_handle = ovr_ProductArray_GetElement(products_arr_handle, i);
 				Dictionary product;
 
-				product["sku"] = String(ovr_Product_GetSKU(product_handle));
-				product["name"] = String(ovr_Product_GetName(product_handle));
-				product["formatted_price"] = String(ovr_Product_GetFormattedPrice(product_handle));
-				product["description"] = String(ovr_Product_GetDescription(product_handle));
+				product["sku"] = ovr_Product_GetSKU(product_handle);
+				product["name"] = ovr_Product_GetName(product_handle);
+				product["formatted_price"] = ovr_Product_GetFormattedPrice(product_handle);
+				product["description"] = ovr_Product_GetDescription(product_handle);
 
 				((Array)promise->saved_fulfill_response[0]).push_back(product);
 			}
@@ -1414,12 +1451,12 @@ void GDOculusPlatform::_process_iap_launch_checkout_flow(ovrMessageHandle p_mess
 
 		Dictionary purchase;
 
-		purchase["sku"] = String(ovr_Purchase_GetSKU(purchase_handle));
-		purchase["reporting_id"] = String(ovr_Purchase_GetReportingId(purchase_handle));
-		purchase["purchase_str_id"] = String(ovr_Purchase_GetPurchaseStrID(purchase_handle));
+		purchase["sku"] = ovr_Purchase_GetSKU(purchase_handle);
+		purchase["reporting_id"] = ovr_Purchase_GetReportingId(purchase_handle);
+		purchase["purchase_str_id"] = ovr_Purchase_GetPurchaseStrID(purchase_handle);
 		purchase["grant_time"] = (uint64_t)ovr_Purchase_GetGrantTime(purchase_handle);
 		purchase["expiration_time"] = (uint64_t)ovr_Purchase_GetExpirationTime(purchase_handle);
-		purchase["developer_payload"] = String(ovr_Purchase_GetDeveloperPayload(purchase_handle));
+		purchase["developer_payload"] = ovr_Purchase_GetDeveloperPayload(purchase_handle);
 
 		if (_get_promise(msg_id, promise)) {
 			promise->fulfill(Array::make(purchase));
@@ -1449,25 +1486,25 @@ void GDOculusPlatform::_process_assetfile_get_list(ovrMessageHandle p_message) {
 			Dictionary assetfile;
 
 			ovrID assetfile_id = ovr_AssetDetails_GetAssetId(assetfile_handle);
-			char native_id[21];
+			char native_id[OVRID_SIZE];
 			ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
 
 			String assetfile_type = ovr_AssetDetails_GetAssetType(assetfile_handle);
 
 			assetfile["id"] = String(native_id);
 			assetfile["type"] = assetfile_type;
-			assetfile["download_status"] = String(ovr_AssetDetails_GetDownloadStatus(assetfile_handle));
-			assetfile["file_path"] = String(ovr_AssetDetails_GetFilepath(assetfile_handle));
-			assetfile["iap_status"] = String(ovr_AssetDetails_GetIapStatus(assetfile_handle));
-			assetfile["metadata"] = String(ovr_AssetDetails_GetMetadata(assetfile_handle));
+			assetfile["download_status"] = ovr_AssetDetails_GetDownloadStatus(assetfile_handle);
+			assetfile["file_path"] = ovr_AssetDetails_GetFilepath(assetfile_handle);
+			assetfile["iap_status"] = ovr_AssetDetails_GetIapStatus(assetfile_handle);
+			assetfile["metadata"] = ovr_AssetDetails_GetMetadata(assetfile_handle);
 
 			if (assetfile_type == "language_pack") {
 				ovrLanguagePackInfoHandle language_handle = ovr_AssetDetails_GetLanguage(assetfile_handle);
 				Dictionary language_info;
 
-				language_info["english_name"] = String(ovr_LanguagePackInfo_GetEnglishName(language_handle));
-				language_info["native_name"] = String(ovr_LanguagePackInfo_GetNativeName(language_handle));
-				language_info["tag"] = String(ovr_LanguagePackInfo_GetTag(language_handle)); // BCP47 format
+				language_info["english_name"] = ovr_LanguagePackInfo_GetEnglishName(language_handle);
+				language_info["native_name"] = ovr_LanguagePackInfo_GetNativeName(language_handle);
+				language_info["tag"] = ovr_LanguagePackInfo_GetTag(language_handle); // BCP47 format
 
 				assetfile["language_info"] = language_info;
 			}
@@ -1494,25 +1531,25 @@ void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message)
 		Dictionary assetfile;
 
 		ovrID assetfile_id = ovr_AssetDetails_GetAssetId(assetfile_handle);
-		char native_id[21];
+		char native_id[OVRID_SIZE];
 		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
 
 		String assetfile_type = ovr_AssetDetails_GetAssetType(assetfile_handle);
 
 		assetfile["id"] = String(native_id);
 		assetfile["type"] = assetfile_type;
-		assetfile["download_status"] = String(ovr_AssetDetails_GetDownloadStatus(assetfile_handle));
-		assetfile["file_path"] = String(ovr_AssetDetails_GetFilepath(assetfile_handle));
-		assetfile["iap_status"] = String(ovr_AssetDetails_GetIapStatus(assetfile_handle));
-		assetfile["metadata"] = String(ovr_AssetDetails_GetMetadata(assetfile_handle));
+		assetfile["download_status"] = ovr_AssetDetails_GetDownloadStatus(assetfile_handle);
+		assetfile["file_path"] = ovr_AssetDetails_GetFilepath(assetfile_handle);
+		assetfile["iap_status"] = ovr_AssetDetails_GetIapStatus(assetfile_handle);
+		assetfile["metadata"] = ovr_AssetDetails_GetMetadata(assetfile_handle);
 
 		if (assetfile_type == "language_pack") {
 			ovrLanguagePackInfoHandle language_handle = ovr_AssetDetails_GetLanguage(assetfile_handle);
 			Dictionary language_info;
 
-			language_info["english_name"] = String(ovr_LanguagePackInfo_GetEnglishName(language_handle));
-			language_info["native_name"] = String(ovr_LanguagePackInfo_GetNativeName(language_handle));
-			language_info["tag"] = String(ovr_LanguagePackInfo_GetTag(language_handle)); // BCP47 format
+			language_info["english_name"] = ovr_LanguagePackInfo_GetEnglishName(language_handle);
+			language_info["native_name"] = ovr_LanguagePackInfo_GetNativeName(language_handle);
+			language_info["tag"] = ovr_LanguagePackInfo_GetTag(language_handle); // BCP47 format
 
 			assetfile["language_info"] = language_info;
 		}
@@ -1536,11 +1573,11 @@ void GDOculusPlatform::_process_assetfile_download(ovrMessageHandle p_message) {
 		Dictionary assetfile_download_resp;
 
 		ovrID assetfile_id = ovr_AssetFileDownloadResult_GetAssetId(assetfile_download_handle);
-		char native_id[21];
+		char native_id[OVRID_SIZE];
 		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
 
 		assetfile_download_resp["id"] = String(native_id);
-		assetfile_download_resp["file_path"] = String(ovr_AssetFileDownloadResult_GetFilepath(assetfile_download_handle));
+		assetfile_download_resp["file_path"] = ovr_AssetFileDownloadResult_GetFilepath(assetfile_download_handle);
 
 		if (_get_promise(msg_id, promise)) {
 			promise->fulfill(Array::make(assetfile_download_resp));
@@ -1561,11 +1598,11 @@ void GDOculusPlatform::_process_assetfile_download_cancel(ovrMessageHandle p_mes
 		Dictionary assetfile_download_c_resp;
 
 		ovrID assetfile_id = ovr_AssetFileDownloadCancelResult_GetAssetId(assetfile_download_c_handle);
-		char native_id[21];
+		char native_id[OVRID_SIZE];
 		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
 
 		assetfile_download_c_resp["id"] = String(native_id);
-		assetfile_download_c_resp["file_path"] = String(ovr_AssetFileDownloadCancelResult_GetFilepath(assetfile_download_c_handle));
+		assetfile_download_c_resp["file_path"] = ovr_AssetFileDownloadCancelResult_GetFilepath(assetfile_download_c_handle);
 		assetfile_download_c_resp["success"] = ovr_AssetFileDownloadCancelResult_GetSuccess(assetfile_download_c_handle);
 
 		if (_get_promise(msg_id, promise)) {
@@ -1587,11 +1624,11 @@ void GDOculusPlatform::_process_assetfile_delete(ovrMessageHandle p_message) {
 		Dictionary assetfile_delete_resp;
 
 		ovrID assetfile_id = ovr_AssetFileDeleteResult_GetAssetId(assetfile_delete_handle);
-		char native_id[21];
+		char native_id[OVRID_SIZE];
 		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
 
 		assetfile_delete_resp["id"] = String(native_id);
-		assetfile_delete_resp["file_path"] = String(ovr_AssetFileDeleteResult_GetFilepath(assetfile_delete_handle));
+		assetfile_delete_resp["file_path"] = ovr_AssetFileDeleteResult_GetFilepath(assetfile_delete_handle);
 		assetfile_delete_resp["success"] = ovr_AssetFileDeleteResult_GetSuccess(assetfile_delete_handle);
 
 		if (_get_promise(msg_id, promise)) {
@@ -1637,7 +1674,7 @@ Dictionary GDOculusPlatform::_get_user_information(ovrUserHandle p_user_handle) 
 
 	user_info_resp["display_name"] = ovr_User_GetDisplayName(p_user_handle);
 
-	char native_id[21];
+	char native_id[OVRID_SIZE];
 	ovrID u_id = ovr_User_GetID(p_user_handle);
 	ovrID_ToString(native_id, sizeof(native_id), u_id);
 	user_info_resp["id"] = String(native_id);
@@ -1660,7 +1697,7 @@ void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
 	if (!ovr_Message_IsError(p_message)) {
 		ovrAssetFileDownloadUpdateHandle download_update_handle = ovr_Message_GetAssetFileDownloadUpdate(p_message);
 
-		char native_id[21];
+		char native_id[OVRID_SIZE];
 		ovrID asset_id = ovr_AssetFileDownloadUpdate_GetAssetId(download_update_handle);
 		ovrID_ToString(native_id, sizeof(native_id), asset_id);
 

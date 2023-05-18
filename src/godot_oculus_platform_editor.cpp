@@ -2,8 +2,8 @@
 #include <godot_cpp/core/class_db.hpp>
 
 /*
-This file is basically empty. Here, we only define the functions that you can call from GDScript
-because this plugin only works on Android.
+This file is basically empty. Here, we only define the functions and signals
+that you can call from GDScript because this plugin only works on Android.
 
 When adding a new function that can be called from GDScript, you have to add it
 to this file and to godot_oculus_platform_android.cpp as well. Here you can
