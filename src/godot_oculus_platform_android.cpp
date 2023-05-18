@@ -46,7 +46,19 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("iap_consume_purchase", "sku"), &GDOculusPlatform::iap_consume_purchase);
 	ClassDB::bind_method(D_METHOD("iap_launch_checkout_flow", "sku"), &GDOculusPlatform::iap_launch_checkout_flow);
 
+	// ASSET FILE
+	ClassDB::bind_method(D_METHOD("assetfile_get_list"), &GDOculusPlatform::assetfile_get_list);
+	ClassDB::bind_method(D_METHOD("assetfile_status_by_id", "asset_id"), &GDOculusPlatform::assetfile_status_by_id);
+	ClassDB::bind_method(D_METHOD("assetfile_status_by_name", "asset_name"), &GDOculusPlatform::assetfile_status_by_name);
+	ClassDB::bind_method(D_METHOD("assetfile_download_by_id", "asset_id"), &GDOculusPlatform::assetfile_download_by_id);
+	ClassDB::bind_method(D_METHOD("assetfile_download_by_name", "asset_name"), &GDOculusPlatform::assetfile_download_by_name);
+	ClassDB::bind_method(D_METHOD("assetfile_download_cancel_by_id", "asset_id"), &GDOculusPlatform::assetfile_download_cancel_by_id);
+	ClassDB::bind_method(D_METHOD("assetfile_download_cancel_by_name", "asset_name"), &GDOculusPlatform::assetfile_download_cancel_by_name);
+	ClassDB::bind_method(D_METHOD("assetfile_delete_by_id", "asset_id"), &GDOculusPlatform::assetfile_delete_by_id);
+	ClassDB::bind_method(D_METHOD("assetfile_delete_by_name", "asset_name"), &GDOculusPlatform::assetfile_delete_by_name);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
+	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -227,6 +239,44 @@ void GDOculusPlatform::pump_messages() {
 
 			case ovrMessage_IAP_LaunchCheckoutFlow:
 				_process_iap_launch_checkout_flow(message);
+				break;
+
+			case ovrMessage_AssetFile_GetList:
+				_process_assetfile_get_list(message);
+				break;
+			
+			case ovrMessage_AssetFile_StatusById:
+				_process_assetfile_get_status(message);
+			
+			case ovrMessage_AssetFile_StatusByName:
+				_process_assetfile_get_status(message);
+
+			case ovrMessage_AssetFile_DownloadById:
+				_process_assetfile_download(message);
+				break;
+			
+			case ovrMessage_AssetFile_DownloadByName:
+				_process_assetfile_download(message);
+				break;
+			
+			case ovrMessage_AssetFile_DownloadCancelById:
+				_process_assetfile_download_cancel(message);
+				break;
+			
+			case ovrMessage_AssetFile_DownloadCancelByName:
+				_process_assetfile_download_cancel(message);
+				break;
+			
+			case ovrMessage_AssetFile_DeleteById:
+				_process_assetfile_delete(message);
+				break;
+			
+			case ovrMessage_AssetFile_DeleteByName:
+				_process_assetfile_delete(message);
+				break;
+			
+			case ovrMessage_Notification_AssetFile_DownloadUpdate:
+				_handle_download_update(message);
 				break;
 
 			default:
@@ -726,6 +776,118 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_consume_purchase(String p_sku
 /// @return Promise that contains a Dictionary with information about the product. purchase_str_id will be empty if the user did not complete the purchase
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_launch_checkout_flow(String p_sku) {
 	ovrRequest req = ovr_IAP_LaunchCheckoutFlow(p_sku.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// ASSET FILE
+/////////////////////////////////////////////////
+
+/// Requests a list of asset files associated with the app.
+/// @return Promise that contains an Array of Dictionaries with information about each assetfile. Language packs have extra information.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_get_list() {
+	ovrRequest req = ovr_AssetFile_GetList();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests information about a single asset file by ID.
+/// @return Promise that contains a Dictionary with information about the assetfile. Language packs have extra information.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_id(String p_asset_id) {
+	ovrID n_asset_id;
+	ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data());
+	ovrRequest req = ovr_AssetFile_StatusById(n_asset_id);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests information about a single asset file by name.
+/// @return Promise that contains a Dictionary with information about the assetfile. Language packs have extra information.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_name(String p_asset_name) {
+	ovrRequest req = ovr_AssetFile_StatusByName(p_asset_name.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests to download an asset file by ID.
+/// @return Promise that contains the result of the request as a Dictionary.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_id(String p_asset_id) {
+	ovrID n_asset_id;
+	ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data());
+	ovrRequest req = ovr_AssetFile_DownloadById(n_asset_id);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests to download an asset file by name.
+/// @return Promise that contains the result of the request as a Dictionary.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_name(String p_asset_name) {
+	ovrRequest req = ovr_AssetFile_DownloadByName(p_asset_name.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests to cancel a download of an assetfile by ID.
+/// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_id(String p_asset_id) {
+	ovrID n_asset_id;
+	ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data());
+	ovrRequest req = ovr_AssetFile_DownloadCancelById(n_asset_id);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests to cancel a download of an assetfile by name.
+/// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_name(String p_asset_name) {
+	ovrRequest req = ovr_AssetFile_DownloadCancelByName(p_asset_name.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests to delete an assetfile by ID.
+/// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_id(String p_asset_id) {
+	ovrID n_asset_id;
+	ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data());
+	ovrRequest req = ovr_AssetFile_DeleteById(n_asset_id);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests to delete an assetfile by name.
+/// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_name(String p_asset_name) {
+	ovrRequest req = ovr_AssetFile_DeleteByName(p_asset_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
@@ -1267,6 +1429,180 @@ void GDOculusPlatform::_process_iap_launch_checkout_flow(ovrMessageHandle p_mess
 	}
 }
 
+///// ASSET FILE
+/////////////////////////////////////////////////
+
+/// Processes the response from a request to get a list of asset files
+void GDOculusPlatform::_process_assetfile_get_list(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrAssetDetailsArrayHandle assetfile_arr_handle = ovr_Message_GetAssetDetailsArray(p_message);
+		size_t assetfile_arr_size = ovr_AssetDetailsArray_GetSize(assetfile_arr_handle);
+
+		Array resp_arr = Array();
+
+		for (size_t i = 0; i < assetfile_arr_size; i++) {
+			ovrAssetDetailsHandle assetfile_handle = ovr_AssetDetailsArray_GetElement(assetfile_arr_handle, i);
+			Dictionary assetfile;
+
+			ovrID assetfile_id = ovr_AssetDetails_GetAssetId(assetfile_handle);
+			char native_id[21];
+			ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+
+			String assetfile_type = ovr_AssetDetails_GetAssetType(assetfile_handle);
+
+			assetfile["id"] = String(native_id);
+			assetfile["type"] = assetfile_type;
+			assetfile["download_status"] = String(ovr_AssetDetails_GetDownloadStatus(assetfile_handle));
+			assetfile["file_path"] = String(ovr_AssetDetails_GetFilepath(assetfile_handle));
+			assetfile["iap_status"] = String(ovr_AssetDetails_GetIapStatus(assetfile_handle));
+			assetfile["metadata"] = String(ovr_AssetDetails_GetMetadata(assetfile_handle));
+
+			if(assetfile_type == "language_pack") {
+				ovrLanguagePackInfoHandle language_handle = ovr_AssetDetails_GetLanguage(assetfile_handle);
+				Dictionary language_info;
+
+				language_info["english_name"] = String(ovr_LanguagePackInfo_GetEnglishName(language_handle));
+				language_info["native_name"] = String(ovr_LanguagePackInfo_GetNativeName(language_handle));
+				language_info["tag"] = String(ovr_LanguagePackInfo_GetTag(language_handle)); // BCP47 format
+
+				assetfile["language_info"] = language_info;
+			}
+
+			resp_arr.push_back(assetfile);
+		}
+
+		if(_get_promise(msg_id, promise)) {
+			promise->fulfill(Array::make(resp_arr));
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the response from a request to get the status of a single asset file
+void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		
+		ovrAssetDetailsHandle assetfile_handle = ovr_Message_GetAssetDetails(p_message);
+		Dictionary assetfile;
+
+		ovrID assetfile_id = ovr_AssetDetails_GetAssetId(assetfile_handle);
+		char native_id[21];
+		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+
+		String assetfile_type = ovr_AssetDetails_GetAssetType(assetfile_handle);
+
+		assetfile["id"] = String(native_id);
+		assetfile["type"] = assetfile_type;
+		assetfile["download_status"] = String(ovr_AssetDetails_GetDownloadStatus(assetfile_handle));
+		assetfile["file_path"] = String(ovr_AssetDetails_GetFilepath(assetfile_handle));
+		assetfile["iap_status"] = String(ovr_AssetDetails_GetIapStatus(assetfile_handle));
+		assetfile["metadata"] = String(ovr_AssetDetails_GetMetadata(assetfile_handle));
+
+		if(assetfile_type == "language_pack") {
+			ovrLanguagePackInfoHandle language_handle = ovr_AssetDetails_GetLanguage(assetfile_handle);
+			Dictionary language_info;
+
+			language_info["english_name"] = String(ovr_LanguagePackInfo_GetEnglishName(language_handle));
+			language_info["native_name"] = String(ovr_LanguagePackInfo_GetNativeName(language_handle));
+			language_info["tag"] = String(ovr_LanguagePackInfo_GetTag(language_handle)); // BCP47 format
+
+			assetfile["language_info"] = language_info;
+		}
+
+		if(_get_promise(msg_id, promise)) {
+			promise->fulfill(Array::make(assetfile));
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the response from a request to download a single asset file
+void GDOculusPlatform::_process_assetfile_download(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrAssetFileDownloadResultHandle assetfile_download_handle = ovr_Message_GetAssetFileDownloadResult(p_message);
+		Dictionary assetfile_download_resp;
+
+		ovrID assetfile_id = ovr_AssetFileDownloadResult_GetAssetId(assetfile_download_handle);
+		char native_id[21];
+		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+
+		assetfile_download_resp["id"] = String(native_id);
+		assetfile_download_resp["file_path"] = String(ovr_AssetFileDownloadResult_GetFilepath(assetfile_download_handle));
+
+		if (_get_promise(msg_id, promise)) {
+			promise->fulfill(Array::make(assetfile_download_resp));
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the response from a request to cancel a download of a single asset file
+void GDOculusPlatform::_process_assetfile_download_cancel(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrAssetFileDownloadCancelResultHandle assetfile_download_c_handle = ovr_Message_GetAssetFileDownloadCancelResult(p_message);
+		Dictionary assetfile_download_c_resp;
+
+		ovrID assetfile_id = ovr_AssetFileDownloadCancelResult_GetAssetId(assetfile_download_c_handle);
+		char native_id[21];
+		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+
+		assetfile_download_c_resp["id"] = String(native_id);
+		assetfile_download_c_resp["file_path"] = String(ovr_AssetFileDownloadCancelResult_GetFilepath(assetfile_download_c_handle));
+		assetfile_download_c_resp["success"] = ovr_AssetFileDownloadCancelResult_GetSuccess(assetfile_download_c_handle);
+
+		if (_get_promise(msg_id, promise)) {
+			promise->fulfill(Array::make(assetfile_download_c_resp));
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the response from a request to delete a single asset file
+void GDOculusPlatform::_process_assetfile_delete(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrAssetFileDeleteResultHandle assetfile_delete_handle = ovr_Message_GetAssetFileDeleteResult(p_message);
+		Dictionary assetfile_delete_resp;
+
+		ovrID assetfile_id = ovr_AssetFileDeleteResult_GetAssetId(assetfile_delete_handle);
+		char native_id[21];
+		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+
+		assetfile_delete_resp["id"] = String(native_id);
+		assetfile_delete_resp["file_path"] = String(ovr_AssetFileDeleteResult_GetFilepath(assetfile_delete_handle));
+		assetfile_delete_resp["success"] = ovr_AssetFileDeleteResult_GetSuccess(assetfile_delete_handle);
+
+		if (_get_promise(msg_id, promise)) {
+			promise->fulfill(Array::make(assetfile_delete_resp));
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
 ///// PROCESSING HELPERS
 /////////////////////////////////////////////////
 
@@ -1318,6 +1654,38 @@ Dictionary GDOculusPlatform::_get_user_information(ovrUserHandle p_user_handle) 
 	user_info_presence["presence_match_session_id"] = ovr_User_GetPresenceMatchSessionId(p_user_handle);
 
 	return user_info_resp;
+}
+
+void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
+	if (!ovr_Message_IsError(p_message)) {
+		ovrAssetFileDownloadUpdateHandle download_update_handle = ovr_Message_GetAssetFileDownloadUpdate(p_message);
+
+		char native_id[21];
+		ovrID asset_id = ovr_AssetFileDownloadUpdate_GetAssetId(download_update_handle);
+		ovrID_ToString(native_id, sizeof(native_id), asset_id);
+
+		Dictionary resp;
+
+		resp["id"] = String(native_id);
+		resp["completed"] = ovr_AssetFileDownloadUpdate_GetCompleted(download_update_handle);
+		resp["total_bytes"] = (uint64_t)ovr_AssetFileDownloadUpdate_GetBytesTotalLong(download_update_handle);
+		resp["transferred_bytes"] = (int64_t)ovr_AssetFileDownloadUpdate_GetBytesTransferredLong(download_update_handle);
+
+		emit_signal("assetfile_download_update", resp);
+
+	} else {
+		ovrErrorHandle download_update_err = ovr_Message_GetError(p_message);
+		String gd_message = ovr_Error_GetMessage(download_update_err);
+
+		ovrMessageType msg_type = ovr_Message_GetType(p_message);
+		String gd_msg_type = ovrMessageType_ToString(msg_type);
+
+		Dictionary gd_msg;
+		gd_msg["type"] = gd_msg_type;
+		gd_msg["message"] = gd_message;
+
+		emit_signal("unhandled_message", gd_msg);
+	}
 }
 
 /////////////////////////////////////////////////

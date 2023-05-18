@@ -9,7 +9,7 @@ android {
     defaultConfig {
         minSdk versions.minSdk
         targetSdk versions.targetSdk
-        versionName "0.0.1"
+        versionName versions.pluginVersion
 
         ndk {
             abiFilters "arm64-v8a"

@@ -53,7 +53,19 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("iap_consume_purchase", "sku"), &GDOculusPlatform::iap_consume_purchase);
 	ClassDB::bind_method(D_METHOD("iap_launch_checkout_flow", "sku"), &GDOculusPlatform::iap_launch_checkout_flow);
 
+	// ASSET FILE
+	ClassDB::bind_method(D_METHOD("assetfile_get_list"), &GDOculusPlatform::assetfile_get_list);
+	ClassDB::bind_method(D_METHOD("assetfile_status_by_id", "asset_id"), &GDOculusPlatform::assetfile_status_by_id);
+	ClassDB::bind_method(D_METHOD("assetfile_status_by_name", "asset_name"), &GDOculusPlatform::assetfile_status_by_name);
+	ClassDB::bind_method(D_METHOD("assetfile_download_by_id", "asset_id"), &GDOculusPlatform::assetfile_download_by_id);
+	ClassDB::bind_method(D_METHOD("assetfile_download_by_name", "asset_name"), &GDOculusPlatform::assetfile_download_by_name);
+	ClassDB::bind_method(D_METHOD("assetfile_download_cancel_by_id", "asset_id"), &GDOculusPlatform::assetfile_download_cancel_by_id);
+	ClassDB::bind_method(D_METHOD("assetfile_download_cancel_by_name", "asset_name"), &GDOculusPlatform::assetfile_download_cancel_by_name);
+	ClassDB::bind_method(D_METHOD("assetfile_delete_by_id", "asset_id"), &GDOculusPlatform::assetfile_delete_by_id);
+	ClassDB::bind_method(D_METHOD("assetfile_delete_by_name", "asset_name"), &GDOculusPlatform::assetfile_delete_by_name);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
+	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -70,6 +82,11 @@ GDOculusPlatform::~GDOculusPlatform() {
 
 void GDOculusPlatform::pump_messages() {}
 
+Ref<GDOculusPlatformPromise> _empty_func_helper() {
+	Ref<GDOculusPlatformPromise> promise;
+	return promise;
+}
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 ///// PLATFORM INITIALIZATION
@@ -80,8 +97,7 @@ bool GDOculusPlatform::initialize_android(String p_app_id) {
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(String p_app_id) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 /////////////////////////////////////////////////
@@ -100,63 +116,51 @@ String GDOculusPlatform::user_get_logged_in_user_locale() {
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_is_viewer_entitled() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_logged_in_user() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user(String p_user_id) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user_proof() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user_access_token() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_blocked_users() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_logged_in_user_friends() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_org_scoped_id(String p_user_id) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_sdk_accounts() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_block_flow(String p_user_id) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_unblock_flow(String p_user_id) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_friend_request_flow(String p_user_id) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 /////////////////////////////////////////////////
@@ -165,38 +169,31 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_friend_request_flow(S
 /////////////////////////////////////////////////
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_count(String p_achievement_name, uint64_t p_count) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_fields(String p_achievement_name, String p_fields) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_unlock(String p_achievement_name) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_definitions() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_progress() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_name(Array p_achievement_names) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name(Array p_achievement_names) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 /////////////////////////////////////////////////
@@ -205,26 +202,62 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 /////////////////////////////////////////////////
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases_durable_cache() {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_products_by_sku(Array p_sku_list) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_consume_purchase(String p_sku) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_launch_checkout_flow(String p_sku) {
-	Ref<GDOculusPlatformPromise> promise;
-	return promise;
+	return _empty_func_helper();
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// ASSET FILE
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_get_list() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_id(String p_asset_id) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_name(String p_asset_name) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_id(String p_asset_id) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_name(String p_asset_name) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_id(String p_asset_id) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_name(String p_asset_name) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_id(String p_asset_id) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_name(String p_asset_name) {
+	return _empty_func_helper();
 }

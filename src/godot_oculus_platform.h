@@ -58,6 +58,16 @@ private:
 	void _process_iap_consume_purchase(ovrMessageHandle p_message);
 	void _process_iap_launch_checkout_flow(ovrMessageHandle p_message);
 
+	// ASSET FILE
+	void _process_assetfile_get_list(ovrMessageHandle p_message);
+	void _process_assetfile_get_status(ovrMessageHandle p_message);
+	void _process_assetfile_download(ovrMessageHandle p_message);
+	void _process_assetfile_download_cancel(ovrMessageHandle p_message);
+	void _process_assetfile_delete(ovrMessageHandle p_message);
+
+	// ASSET FILE HELPERS
+	void _handle_download_update(ovrMessageHandle p_message);
+
 	// USER HELPERS
 	Dictionary _get_user_information(ovrUserHandle p_user_handle);
 
@@ -97,12 +107,23 @@ public:
 	Ref<GDOculusPlatformPromise> achievements_get_definitions_by_name(Array p_achievement_names);
 	Ref<GDOculusPlatformPromise> achievements_get_progress_by_name(Array p_achievement_names);
 
-	//IAP
+	// IAP
 	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases();
 	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases_durable_cache();
 	Ref<GDOculusPlatformPromise> iap_get_products_by_sku(Array p_sku_list);
 	Ref<GDOculusPlatformPromise> iap_consume_purchase(String p_sku);
 	Ref<GDOculusPlatformPromise> iap_launch_checkout_flow(String p_sku);
+
+	// ASSET FILE
+	Ref<GDOculusPlatformPromise> assetfile_get_list();
+	Ref<GDOculusPlatformPromise> assetfile_status_by_id(String p_asset_id);
+	Ref<GDOculusPlatformPromise> assetfile_status_by_name(String p_asset_name);
+	Ref<GDOculusPlatformPromise> assetfile_download_by_id(String p_asset_id);
+	Ref<GDOculusPlatformPromise> assetfile_download_by_name(String p_asset_name);
+	Ref<GDOculusPlatformPromise> assetfile_download_cancel_by_id(String p_asset_id);
+	Ref<GDOculusPlatformPromise> assetfile_download_cancel_by_name(String p_asset_name);
+	Ref<GDOculusPlatformPromise> assetfile_delete_by_id(String p_asset_id);
+	Ref<GDOculusPlatformPromise> assetfile_delete_by_name(String p_asset_name);
 
 	void pump_messages();
 };
