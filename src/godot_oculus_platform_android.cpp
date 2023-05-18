@@ -59,6 +59,7 @@ void GDOculusPlatform::_bind_methods() {
 
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
+	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -244,37 +245,37 @@ void GDOculusPlatform::pump_messages() {
 			case ovrMessage_AssetFile_GetList:
 				_process_assetfile_get_list(message);
 				break;
-			
+
 			case ovrMessage_AssetFile_StatusById:
 				_process_assetfile_get_status(message);
-			
+
 			case ovrMessage_AssetFile_StatusByName:
 				_process_assetfile_get_status(message);
 
 			case ovrMessage_AssetFile_DownloadById:
 				_process_assetfile_download(message);
 				break;
-			
+
 			case ovrMessage_AssetFile_DownloadByName:
 				_process_assetfile_download(message);
 				break;
-			
+
 			case ovrMessage_AssetFile_DownloadCancelById:
 				_process_assetfile_download_cancel(message);
 				break;
-			
+
 			case ovrMessage_AssetFile_DownloadCancelByName:
 				_process_assetfile_download_cancel(message);
 				break;
-			
+
 			case ovrMessage_AssetFile_DeleteById:
 				_process_assetfile_delete(message);
 				break;
-			
+
 			case ovrMessage_AssetFile_DeleteByName:
 				_process_assetfile_delete(message);
 				break;
-			
+
 			case ovrMessage_Notification_AssetFile_DownloadUpdate:
 				_handle_download_update(message);
 				break;
@@ -1460,7 +1461,7 @@ void GDOculusPlatform::_process_assetfile_get_list(ovrMessageHandle p_message) {
 			assetfile["iap_status"] = String(ovr_AssetDetails_GetIapStatus(assetfile_handle));
 			assetfile["metadata"] = String(ovr_AssetDetails_GetMetadata(assetfile_handle));
 
-			if(assetfile_type == "language_pack") {
+			if (assetfile_type == "language_pack") {
 				ovrLanguagePackInfoHandle language_handle = ovr_AssetDetails_GetLanguage(assetfile_handle);
 				Dictionary language_info;
 
@@ -1474,7 +1475,7 @@ void GDOculusPlatform::_process_assetfile_get_list(ovrMessageHandle p_message) {
 			resp_arr.push_back(assetfile);
 		}
 
-		if(_get_promise(msg_id, promise)) {
+		if (_get_promise(msg_id, promise)) {
 			promise->fulfill(Array::make(resp_arr));
 		}
 
@@ -1489,7 +1490,6 @@ void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message)
 	Ref<GDOculusPlatformPromise> promise;
 
 	if (!ovr_Message_IsError(p_message)) {
-		
 		ovrAssetDetailsHandle assetfile_handle = ovr_Message_GetAssetDetails(p_message);
 		Dictionary assetfile;
 
@@ -1506,7 +1506,7 @@ void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message)
 		assetfile["iap_status"] = String(ovr_AssetDetails_GetIapStatus(assetfile_handle));
 		assetfile["metadata"] = String(ovr_AssetDetails_GetMetadata(assetfile_handle));
 
-		if(assetfile_type == "language_pack") {
+		if (assetfile_type == "language_pack") {
 			ovrLanguagePackInfoHandle language_handle = ovr_AssetDetails_GetLanguage(assetfile_handle);
 			Dictionary language_info;
 
@@ -1517,7 +1517,7 @@ void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message)
 			assetfile["language_info"] = language_info;
 		}
 
-		if(_get_promise(msg_id, promise)) {
+		if (_get_promise(msg_id, promise)) {
 			promise->fulfill(Array::make(assetfile));
 		}
 
@@ -1666,12 +1666,19 @@ void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
 
 		Dictionary resp;
 
-		resp["id"] = String(native_id);
-		resp["completed"] = ovr_AssetFileDownloadUpdate_GetCompleted(download_update_handle);
+		String download_asset_id = native_id;
+		bool download_completed = ovr_AssetFileDownloadUpdate_GetCompleted(download_update_handle);
+
+		resp["id"] = download_asset_id;
+		resp["completed"] = download_completed;
 		resp["total_bytes"] = (uint64_t)ovr_AssetFileDownloadUpdate_GetBytesTotalLong(download_update_handle);
 		resp["transferred_bytes"] = (int64_t)ovr_AssetFileDownloadUpdate_GetBytesTransferredLong(download_update_handle);
 
 		emit_signal("assetfile_download_update", resp);
+
+		if (download_completed) {
+			emit_signal("assetfile_download_finished", download_asset_id);
+		}
 
 	} else {
 		ovrErrorHandle download_update_err = ovr_Message_GetError(p_message);

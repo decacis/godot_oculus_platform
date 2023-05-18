@@ -1,6 +1,6 @@
 # Godot Oculus Platform
 An open-source implementation of the Oculus Platform SDK intended to be used with the Quest platform.
-Currently, **Oculus Platform SDK v51** and **Godot Engine 4.0.2** are supported.
+Currently, **Oculus Platform SDK v53** and **Godot Engine 4.0.2** are supported.
 
 **NOTE:** This project is still a work in progress, you should expect usage API changes in the future.
 
@@ -49,7 +49,7 @@ There are two versions right now:
 
 Stable version will have less features but they will be more tested. Development versions have more features but they haven't been tested as thoroughly as the stable versions.
 
-In the case of the development versions, look for an artifact with a name similar to `OculusPlatformSDK-51-for-godot-4.0.2-stable_v0.0.1-alpha`
+In the case of the development versions, look for an artifact with a name similar to `OculusPlatformSDK-53-for-godot-4.0.2-stable_v0.1.0-alpha`
 
 **NOTE:** "stable" is used pretty loosely at the moment. Expect usage API changes in the future.
 

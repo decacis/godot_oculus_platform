@@ -66,6 +66,7 @@ void GDOculusPlatform::_bind_methods() {
 
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
+	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
