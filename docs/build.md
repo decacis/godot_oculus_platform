@@ -1,5 +1,7 @@
 # Build
-After cloning [the repository](https://github.com/decacis/godot_oculus_platform), initialize the submodules by running:
+If you choose to build the plugin yourself, first clone [the repository](https://github.com/decacis/godot_oculus_platform).
+
+After that, initialize the submodules by running:
 ```
 git submodule update --init --recursive
 ```
