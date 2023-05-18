@@ -173,6 +173,8 @@ An `assetfile_download_update` `Signal` will be emitted periodically to track th
 }
 ```
 
+An `assetfile_download_finished` `Signal` will be emitted once the asset file has finished downloading. It will have a `String` with the asset file ID as a payload. Note that the `assetfile_download_update` `Signal` will be emitted as well one last time.
+
 ///// details | Hint
     type: tip
 
@@ -180,7 +182,7 @@ We also provide helper function that you can use to call a function whenever the
 
 ``` gdscript linenums="1"
 # The first agument is the asset file ID
-# the second parameter is a Callable to call when the file finishes downloading
+# the second argument is a Callable to call when the file finishes downloading
 GDOP.call_on_finished_downloading("265485514455", _function_to_call)
 ```
 
