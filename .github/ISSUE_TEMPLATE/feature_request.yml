@@ -1,0 +1,17 @@
+name: Feature request
+description: Suggest ideas for this project
+body:
+
+- type: markdown
+  attributes:
+    value: |
+      - Search [open](https://github.com/decacis/godot_oculus_platform/labels/enhancement) and [closed](https://github.com/decacis/godot_oculus_platform/issues?q=is%3Aclosed+label%3Aenhancement+) issues to ensure it has not already been suggested.
+
+- type: textarea
+  attributes:
+    label: Feature description
+    description: |
+      Describe your idea. Is your feature request related to a problem? Describe the solution you'd like and add as much context as possible!
+      You can include images or videos with drag and drop, and format code blocks or logs with <code>```</code> tags.
+  validations:
+    required: true
