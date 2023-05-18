@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a bug in the Godot Oculus Platform
+body:
+
+- type: markdown
+  attributes:
+    value: |
+      - Write a descriptive issue title above.
+      - Search [open](https://github.com/decacis/godot_oculus_platform/issues) and [closed](https://github.com/decacis/godot_oculus_platform/issues?q=is%3Aissue+is%3Aclosed) issues to ensure it has not already been reported.
+
+- type: input
+  attributes:
+    label: Godot Oculus Platform version
+    description: >
+      Specify the version of the Godot Oculus Platform you are using.
+      You can also enter a commit hash.
+    placeholder: OculusPlatformSDK-53-for-godot-4.0.2-stable_v0.1.0-alpha
+  validations:
+    required: true
+
+- type: input
+  attributes:
+    label: Meta Quest OS version
+    description: |
+      Specify the Meta Quest OS version, and when relevant hardware information or your OS.
+    placeholder: Meta Quest OS v53
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Issue description
+    description: |
+      Describe your issue briefly. What doesn't work, and how do you expect it to work instead?
+      You can include images or videos with drag and drop, and format code blocks or logs with <code>```</code> tags.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Steps to reproduce
+    description: |
+      List of steps or sample code that reproduces the issue. Having reproducible issues is a prerequisite for contributors to be able to solve them.
+      If you include a minimal reproduction project below, you can detail how to use it here.
+  validations:
+    required: true

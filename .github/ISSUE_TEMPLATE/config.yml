@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Documentation
+    url: https://decacis.github.io/godot_oculus_platform/
+    about: Please read the documentation before reporting a bug.
