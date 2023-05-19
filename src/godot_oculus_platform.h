@@ -65,6 +65,14 @@ private:
 	void _process_assetfile_download_cancel(ovrMessageHandle p_message);
 	void _process_assetfile_delete(ovrMessageHandle p_message);
 
+	// LEADERBOARD
+	void _process_leaderboard_get(ovrMessageHandle p_message);
+	void _process_leaderboard_get_entries(ovrMessageHandle p_message, int p_mode = 1);
+	void _process_leaderboard_write_entry(ovrMessageHandle p_message);
+
+	// LEADERBOARD HELPERS
+	void _handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle p_entries_arr_handle, int p_promise_arr_ind, Ref<GDOculusPlatformPromise> &p_promise);
+
 	// ASSET FILE HELPERS
 	void _handle_download_update(ovrMessageHandle p_message);
 
@@ -78,6 +86,20 @@ public:
 	static GDOculusPlatform *get_singleton();
 	GDOculusPlatform();
 	~GDOculusPlatform();
+
+	enum LeaderboardFilterType {
+		LEADERBOARD_FILTER_TYPE_NONE = ovrLeaderboard_FilterNone,
+		LEADERBOARD_FILTER_TYPE_FRIENDS = ovrLeaderboard_FilterFriends,
+		LEADERBOARD_FILTER_TYPE_UNKNOWN = ovrLeaderboard_FilterUnknown,
+		LEADERBOARD_FILTER_TYPE_USER_IDS = ovrLeaderboard_FilterUserIds
+	};
+
+	enum LeaderboardStartAt {
+		LEADERBOARD_START_AT_TOP = ovrLeaderboard_StartAtTop,
+		LEADERBOARD_START_AT_CENTERED_ON_VIEWER = ovrLeaderboard_StartAtCenteredOnViewer,
+		LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP = ovrLeaderboard_StartAtCenteredOnViewerOrTop,
+		LEADERBOARD_START_AT_UNKNOWN = ovrLeaderboard_StartAtUnknown
+	};
 
 	bool initialize_android(String p_app_id);
 	Ref<GDOculusPlatformPromise> initialize_android_async(String p_app_id);
@@ -109,7 +131,6 @@ public:
 
 	// IAP
 	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases();
-	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases_durable_cache();
 	Ref<GDOculusPlatformPromise> iap_get_products_by_sku(Array p_sku_list);
 	Ref<GDOculusPlatformPromise> iap_consume_purchase(String p_sku);
 	Ref<GDOculusPlatformPromise> iap_launch_checkout_flow(String p_sku);
@@ -125,9 +146,20 @@ public:
 	Ref<GDOculusPlatformPromise> assetfile_delete_by_id(String p_asset_id);
 	Ref<GDOculusPlatformPromise> assetfile_delete_by_name(String p_asset_name);
 
+	// LEADERBOARD
+	Ref<GDOculusPlatformPromise> leaderboard_get(String p_leaderboard_name);
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries(String p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter = LEADERBOARD_FILTER_TYPE_NONE, LeaderboardStartAt p_start_at = LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP);
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries_after_rank(String p_leaderboard_name, uint64_t p_limit, uint64_t p_after_rank);
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, LeaderboardStartAt p_start_at, Array p_user_ids);
+	Ref<GDOculusPlatformPromise> leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, String p_extra_data = String(""));
+	Ref<GDOculusPlatformPromise> leaderboard_write_entry_with_supplementary_metric(String p_leaderboard_name, uint64_t p_score, uint64_t p_supplementary_metric, bool p_force_update, String p_extra_data = String(""));
+
 	void pump_messages();
 };
 
 } // namespace godot
+
+VARIANT_ENUM_CAST(GDOculusPlatform::LeaderboardFilterType);
+VARIANT_ENUM_CAST(GDOculusPlatform::LeaderboardStartAt);
 
 #endif // GDOCULUSPLATFORM_H

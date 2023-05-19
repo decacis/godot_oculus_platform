@@ -5,7 +5,7 @@ body:
 - type: markdown
   attributes:
     value: |
-      - Search [open](https://github.com/decacis/godot_oculus_platform/labels/enhancement) and [closed](https://github.com/decacis/godot_oculus_platform/issues?q=is%3Aclosed+label%3Aenhancement+) issues to ensure it has not already been suggested.
+      Search [open](https://github.com/decacis/godot_oculus_platform/labels/enhancement) and [closed](https://github.com/decacis/godot_oculus_platform/issues?q=is%3Aclosed+label%3Aenhancement+) feature request issues to ensure it has not already been suggested.
 
 - type: textarea
   attributes:

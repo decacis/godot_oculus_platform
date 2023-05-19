@@ -1,0 +1,299 @@
+[gd_scene load_steps=2 format=3 uid="uid://cgixmkkxwsejx"]
+
+[ext_resource type="Script" path="res://menu/menu.gd" id="1_ag53n"]
+
+[node name="menu" type="CanvasLayer"]
+script = ExtResource("1_ag53n")
+achievements_add_count = {
+"achievement_name": "TEST_COUNT_ACHIEV_0",
+"count": 1
+}
+achievements_add_fields = {
+"achievement_name": "TEST_BITFIELD_ACHIEV_0",
+"fields": "00000001"
+}
+achievements_unlock = "TEST_SIMPLE_ACHIEV_0"
+achievements_get_definitions_by_name = Array[String](["TEST_BITFIELD_ACHIEV_0", "TEST_SIMPLE_ACHIEV_0"])
+achievements_get_progress_by_name = Array[String](["TEST_COUNT_ACHIEV_0", "TEST_BITFIELD_ACHIEV_0"])
+IAP_get_products_by_sku = Array[String](["test_consumable_0", "test_durable_0"])
+IAP_consume_purchase = "test_consumable_0"
+IAP_launch_checkout_flow = "test_consumable_0"
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(900, 600)
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="User" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/User"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NoInputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/User/VBoxContainer"]
+layout_mode = 2
+
+[node name="NoInputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+text = "No input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="GetLoggedInUserID" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetLoggedInUserID"
+
+[node name="GetLoggedInUserLocale" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetLoggedInUserLocale"
+
+[node name="GetIsViewerEntitled" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetIsViewerEntitled"
+
+[node name="GetLoggedInUser" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetLoggedInUser"
+
+[node name="GetUserProof" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetUserProof"
+
+[node name="GetUserAccessToken" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetUserAccessToken"
+
+[node name="GetBlockedUsers" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetBlockedUsers"
+
+[node name="GetLoggedInUserFriends" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetLoggedInUserFriends"
+
+[node name="GetSDKAccounts" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetSDKAccounts"
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/User/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="GetUser" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetUser"
+
+[node name="GetOrgScopedID" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GetOrgScopedID"
+
+[node name="LaunchBlockFlow" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LaunchBlockFlow"
+
+[node name="LaunchUnblockFlow" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LaunchUnblockFlow"
+
+[node name="LaunchFriendRequestFlow" type="Button" parent="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LaunchFriendRequestFlow"
+
+[node name="Achievements" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/Achievements"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NoInputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/Achievements/VBoxContainer"]
+layout_mode = 2
+
+[node name="NoInputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+text = "No input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="AchievementsGetAllDefinitions" type="Button" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AchievementsGetAllDefinitions"
+
+[node name="AchievementsGetAllProgress" type="Button" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AchievementsGetAllProgress"
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/Achievements/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="AchievementsAddCount" type="Button" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AchievementsAddCount"
+
+[node name="AchievementsAddFields" type="Button" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AchievementsAddFields"
+
+[node name="AchievementsUnlock" type="Button" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AchievementsUnlock"
+
+[node name="AchievementsGetDefinitionsByName" type="Button" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AchievementsGetDefinitionsByName"
+
+[node name="AchievementsGetProgressByName" type="Button" parent="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AchievementsGetProgressByName"
+
+[node name="IAP" type="MarginContainer" parent="PanelContainer/TabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/IAP"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NoInputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/IAP/VBoxContainer"]
+layout_mode = 2
+
+[node name="NoInputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/IAP/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+text = "No input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/IAP/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="IAPGetViewerPurchases" type="Button" parent="PanelContainer/TabContainer/IAP/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "IAPGetViewerPurchases"
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/IAP/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="IAPGetProductsBySKU" type="Button" parent="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "IAPGetProductsBySKU"
+
+[node name="IAPConsumePurchase" type="Button" parent="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "IAPConsumePurchase"
+
+[node name="IAPLaunchCheckoutFlow" type="Button" parent="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "IAPLaunchCheckoutFlow"
+
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserID" to="." method="_on_get_logged_in_user_id_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserLocale" to="." method="_on_get_logged_in_user_locale_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetIsViewerEntitled" to="." method="_on_get_is_viewer_entitled_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUser" to="." method="_on_get_logged_in_user_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetUserProof" to="." method="_on_get_user_proof_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetUserAccessToken" to="." method="_on_get_user_access_token_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetBlockedUsers" to="." method="_on_get_blocked_users_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserFriends" to="." method="_on_get_logged_in_user_friends_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetSDKAccounts" to="." method="_on_get_sdk_accounts_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer/GetUser" to="." method="_on_get_user_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer/GetOrgScopedID" to="." method="_on_get_org_scoped_id_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer/LaunchBlockFlow" to="." method="_on_launch_block_flow_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer/LaunchUnblockFlow" to="." method="_on_launch_unblock_flow_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer/LaunchFriendRequestFlow" to="." method="_on_launch_friend_request_flow_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Achievements/VBoxContainer/NoInputFuncs/HFlowContainer/AchievementsGetAllDefinitions" to="." method="_on_achievements_get_all_definitions_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Achievements/VBoxContainer/NoInputFuncs/HFlowContainer/AchievementsGetAllProgress" to="." method="_on_achievements_get_all_progress_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer/AchievementsAddCount" to="." method="_on_achievements_add_count_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer/AchievementsAddFields" to="." method="_on_achievements_add_fields_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer/AchievementsUnlock" to="." method="_on_achievements_unlock_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer/AchievementsGetDefinitionsByName" to="." method="_on_achievements_get_definitions_by_name_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Achievements/VBoxContainer/InputFuncs/HFlowContainer/AchievementsGetProgressByName" to="." method="_on_achievements_get_progress_by_name_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/IAP/VBoxContainer/NoInputFuncs/HFlowContainer/IAPGetViewerPurchases" to="." method="_on_iap_get_viewer_purchases_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPGetProductsBySKU" to="." method="_on_iap_get_products_by_sku_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPConsumePurchase" to="." method="_on_iap_consume_purchase_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPLaunchCheckoutFlow" to="." method="_on_iap_launch_checkout_flow_pressed"]

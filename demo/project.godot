@@ -18,10 +18,11 @@ config/icon="res://icon.svg"
 [autoload]
 
 GDOP="*res://addons/godot_oculus_platform/src/GDOP.gd"
+XRToolsUserSettings="*res://addons/godot-xr-tools/user_settings/user_settings.gd"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_oculus_platform/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_oculus_platform/plugin.cfg", "res://addons/godot-xr-tools/plugin.cfg")
 
 [rendering]
 

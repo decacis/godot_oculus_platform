@@ -1,0 +1,26 @@
+name: Documentation error
+description: Inform us about errors in the documentation
+body:
+
+- type: markdown
+  attributes:
+    value: |
+      Search [open](https://github.com/decacis/godot_oculus_platform/labels/documentation) and [closed](https://github.com/decacis/godot_oculus_platform/issues?q=is%3Aclosed+label%3Adocumentation+) documentation issues to ensure it has not already been suggested.
+
+- type: input
+  attributes:
+    label: Documentation URL
+    description: |
+      A link to the specific part of the documentation that is wrong. The more specific, the better.
+    placeholder: https://decacis.github.io/godot_oculus_platform/functions/user/#user_get_user
+    validations:
+      required: true
+
+- type: textarea
+  attributes:
+    label: Error description
+    description: |
+      Describe the error with as much details as possible. If you know the correct values, responses or behaviour please explain it here.
+      You can include images or videos with drag and drop, and format code blocks or logs with <code>```</code> tags.
+  validations:
+    required: true

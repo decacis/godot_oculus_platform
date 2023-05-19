@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://bmrdsf4mefv8p"]
+[gd_scene load_steps=11 format=3 uid="uid://bmrdsf4mefv8p"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_0d6t3"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_m6wc7"]
-radius = 0.05
-height = 0.1
+[ext_resource type="PackedScene" uid="uid://clc5dre31iskm" path="res://addons/godot-xr-tools/xr/start_xr.tscn" id="2_2gecq"]
+[ext_resource type="PackedScene" uid="uid://b4kad2kuba1yn" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_hand_low.tscn" id="2_xsrcq"]
+[ext_resource type="PackedScene" uid="uid://l2n30mpbkdyw" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_hand_low.tscn" id="3_sndlq"]
+[ext_resource type="PackedScene" uid="uid://cqhw276realc" path="res://addons/godot-xr-tools/functions/function_pointer.tscn" id="4_07sh7"]
+[ext_resource type="PackedScene" uid="uid://clujaf3u776a3" path="res://addons/godot-xr-tools/objects/viewport_2d_in_3d.tscn" id="5_in8rj"]
+[ext_resource type="PackedScene" uid="uid://cgixmkkxwsejx" path="res://menu/menu.tscn" id="6_byffo"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_niilw"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -25,26 +27,40 @@ script = ExtResource("1_0d6t3")
 [node name="XROrigin3D" type="XROrigin3D" parent="."]
 
 [node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="XRController3D" type="XRController3D" parent="XROrigin3D"]
+[node name="LeftHand" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
 tracker = &"left_hand"
 pose = &"aim"
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRController3D"]
-mesh = SubResource("SphereMesh_m6wc7")
+[node name="LeftHand" parent="XROrigin3D/LeftHand" instance=ExtResource("2_xsrcq")]
 
-[node name="XRController3D2" type="XRController3D" parent="XROrigin3D"]
+[node name="RightHand" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 tracker = &"right_hand"
 pose = &"aim"
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRController3D2"]
-mesh = SubResource("SphereMesh_m6wc7")
+[node name="RightHand" parent="XROrigin3D/RightHand" instance=ExtResource("3_sndlq")]
 
-[node name="Label3D" type="Label3D" parent="."]
+[node name="FunctionPointer" parent="XROrigin3D/RightHand" instance=ExtResource("4_07sh7")]
+
+[node name="Menu" type="Node3D" parent="."]
+
+[node name="Viewport2Din3D" parent="Menu" instance=ExtResource("5_in8rj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -3)
-text = "test"
+viewport_size = Vector2(900, 600)
+transparent = 0
+unshaded = true
+scene = ExtResource("6_byffo")
+update_mode = 2
+throttle_fps = 36.0
+
+[node name="StartXR" parent="." instance=ExtResource("2_2gecq")]
+physics_rate_multiplier = 1
+target_refresh_rate = 72.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_qmw2e")
+
+[connection signal="xr_started" from="StartXR" to="." method="_on_xr_started"]

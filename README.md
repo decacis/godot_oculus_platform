@@ -2,6 +2,8 @@
 An open-source implementation of the Oculus Platform SDK intended to be used with the Quest platform.
 Currently, **Oculus Platform SDK v53** and **Godot Engine 4.0.2** are supported.
 
+While you can use this plugin in the editor to get code suggestions, it **only works with the Meta Quest**, not PCVR. If you plan to develop for both the Quest and PCVR, you should add a platform check and only use this plugin when the platform is Android.
+
 **NOTE:** This project is still a work in progress, you should expect usage API changes in the future.
 
 Quick links:

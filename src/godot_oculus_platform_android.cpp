@@ -1,5 +1,6 @@
 #include <godot_oculus_platform.h>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/classes/json.hpp>
 
 #define OVRID_SIZE 21
 
@@ -43,7 +44,6 @@ void GDOculusPlatform::_bind_methods() {
 
 	// IAP
 	ClassDB::bind_method(D_METHOD("iap_get_viewer_purchases"), &GDOculusPlatform::iap_get_viewer_purchases);
-	ClassDB::bind_method(D_METHOD("iap_get_viewer_purchases_durable_cache"), &GDOculusPlatform::iap_get_viewer_purchases_durable_cache);
 	ClassDB::bind_method(D_METHOD("iap_get_products_by_sku", "sku_list"), &GDOculusPlatform::iap_get_products_by_sku);
 	ClassDB::bind_method(D_METHOD("iap_consume_purchase", "sku"), &GDOculusPlatform::iap_consume_purchase);
 	ClassDB::bind_method(D_METHOD("iap_launch_checkout_flow", "sku"), &GDOculusPlatform::iap_launch_checkout_flow);
@@ -59,9 +59,27 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("assetfile_delete_by_id", "asset_id"), &GDOculusPlatform::assetfile_delete_by_id);
 	ClassDB::bind_method(D_METHOD("assetfile_delete_by_name", "asset_name"), &GDOculusPlatform::assetfile_delete_by_name);
 
+	// LEADERBOARD
+	ClassDB::bind_method(D_METHOD("leaderboard_get", "leaderboard_name"), &GDOculusPlatform::leaderboard_get);
+	ClassDB::bind_method(D_METHOD("leaderboard_get_entries", "leaderboard_name", "limit", "filter", "start_at"), &GDOculusPlatform::leaderboard_get_entries);
+	ClassDB::bind_method(D_METHOD("leaderboard_get_entries_after_rank", "leaderboard_name", "limit", "start_at"), &GDOculusPlatform::leaderboard_get_entries_after_rank);
+	ClassDB::bind_method(D_METHOD("leaderboard_get_entries_by_ids", "leaderboard_name", "limit", "start_at", "user_ids"), &GDOculusPlatform::leaderboard_get_entries_by_ids);
+	ClassDB::bind_method(D_METHOD("leaderboard_write_entry", "leaderboard_name", "score", "force_update", "extra_data"), &GDOculusPlatform::leaderboard_write_entry);
+	ClassDB::bind_method(D_METHOD("leaderboard_write_entry_with_supplementary_metric", "leaderboard_name", "score", "supplementary_metric", "force_update", "extra_data"), &GDOculusPlatform::leaderboard_write_entry_with_supplementary_metric);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
+
+	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE);		// 0
+	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS);	// 1
+	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_UNKNOWN);	// 2
+	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_USER_IDS);	// 3
+
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP);						// 0
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER);		// 1
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP);	// 2
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_UNKNOWN);					// 3
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -87,7 +105,6 @@ bool GDOculusPlatform::_get_promise(uint64_t p_promise_id, Ref<GDOculusPlatformP
 		Ref<GDOculusPlatformPromise> temp_promise = _promises.get(i);
 		if (temp_promise->get_ids().has(p_promise_id)) {
 			p_promise = temp_promise;
-			_promises.remove_at(i);
 			return true;
 		}
 	}
@@ -220,10 +237,6 @@ void GDOculusPlatform::pump_messages() {
 				_process_iap_viewer_purchases(message);
 				break;
 
-			case ovrMessage_IAP_GetViewerPurchasesDurableCache:
-				_process_iap_viewer_purchases(message);
-				break;
-
 			case ovrMessage_IAP_GetNextPurchaseArrayPage:
 				_process_iap_viewer_purchases(message);
 				break;
@@ -282,6 +295,42 @@ void GDOculusPlatform::pump_messages() {
 				_handle_download_update(message);
 				break;
 
+			case ovrMessage_Leaderboard_Get:
+				_process_leaderboard_get(message);
+				break;
+
+			case ovrMessage_Leaderboard_GetNextLeaderboardArrayPage:
+				_process_leaderboard_get(message);
+				break;
+
+			case ovrMessage_Leaderboard_GetEntries:
+				_process_leaderboard_get_entries(message, 1);
+				break;
+
+			case ovrMessage_Leaderboard_GetEntriesByIds:
+				_process_leaderboard_get_entries(message, 1);
+				break;
+			
+			case ovrMessage_Leaderboard_GetEntriesAfterRank:
+				_process_leaderboard_get_entries(message, 1);
+				break;
+			
+			case ovrMessage_Leaderboard_GetPreviousEntries:
+				_process_leaderboard_get_entries(message, 0);
+				break;
+			
+			case ovrMessage_Leaderboard_GetNextEntries:
+				_process_leaderboard_get_entries(message, 2);
+				break;
+
+			case ovrMessage_Leaderboard_WriteEntry:
+				_process_leaderboard_write_entry(message);
+				break;
+
+			case ovrMessage_Leaderboard_WriteEntryWithSupplementaryMetric:
+				_process_leaderboard_write_entry(message);
+				break;
+
 			default:
 				_handle_unhandled_message(message);
 		}
@@ -335,7 +384,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(String p
 String GDOculusPlatform::user_get_logged_in_user_id() {
 	char native_id[OVRID_SIZE];
 	ovrID u_id = ovr_GetLoggedInUserID();
-	ovrID_ToString(native_id, sizeof(native_id), u_id);
+	ovrID_ToString(native_id, OVRID_SIZE, u_id);
 
 	return String(native_id);
 }
@@ -596,15 +645,24 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_progress() {
 /// Requests achievements definitions by name
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_name(Array p_achievement_names) {
-	int64_t achiev_arr_s = p_achievement_names.size();
+	int achiev_arr_s = p_achievement_names.size();
+
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
-		const char **char_arr = new const char *[achiev_arr_s];
-		for (size_t i = 0; i < p_achievement_names.size(); i++) {
+
+		const char **char_arr = memnew_arr(const char*, achiev_arr_s);
+		std::vector<std::string> sav(achiev_arr_s);
+
+		for (size_t j = 0; j < achiev_arr_s; j++) {
+			char_arr[j] = "";
+		}
+
+		for (int i = 0; i < achiev_arr_s; i++) {
 			if (p_achievement_names[i].get_type() == Variant::STRING) {
-				char_arr[i] = ((String)p_achievement_names[i]).utf8().get_data();
+				sav[i] = ((String)p_achievement_names[i]).utf8().get_data();
+				char_arr[i] = sav[i].c_str();
 
 			} else {
-				delete[] char_arr;
+				memdelete_arr(char_arr);
 				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 				String rejection_msg = "Invalid achievement name found in array. All achievement names must be Strings.";
 				return_promise->saved_rejection_response = Array::make(rejection_msg);
@@ -615,7 +673,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 		}
 
 		ovrRequest req = ovr_Achievements_GetDefinitionsByName(char_arr, achiev_arr_s);
-		delete[] char_arr;
+		
+		memdelete_arr(char_arr);
 
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 		_promises.push_back(return_promise);
@@ -646,13 +705,22 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 	int64_t achiev_arr_s = p_achievement_names.size();
 
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
-		const char **char_arr = new const char *[achiev_arr_s];
-		for (size_t i = 0; i < p_achievement_names.size(); i++) {
+
+		const char **char_arr = memnew_arr(const char*, achiev_arr_s);
+		std::vector<std::string> sav(achiev_arr_s);
+
+		for (size_t j = 0; j < achiev_arr_s; j++) {
+			char_arr[j] = "";
+		}
+		
+		
+		for (int i = 0; i < achiev_arr_s; i++) {
 			if (p_achievement_names[i].get_type() == Variant::STRING) {
-				char_arr[i] = ((String)p_achievement_names[i]).utf8().get_data();
+				sav[i] = ((String)p_achievement_names[i]).utf8().get_data();
+				char_arr[i] = sav[i].c_str();
 
 			} else {
-				delete[] char_arr;
+				memdelete_arr(char_arr);
 				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 				String rejection_msg = "Invalid achievement name found in array. All achievement names must be Strings.";
 				return_promise->saved_rejection_response = Array::make(rejection_msg);
@@ -661,9 +729,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 				return return_promise;
 			}
 		}
-
 		ovrRequest req = ovr_Achievements_GetProgressByName(char_arr, achiev_arr_s);
-		delete[] char_arr;
+		
+		memdelete_arr(char_arr);
 
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 		_promises.push_back(return_promise);
@@ -704,30 +772,27 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases() {
 	return return_promise;
 }
 
-/// Requests the current user's purchases. Includes only durable purchases.
-/// @return Promise that contains an Array of Dictionaries with information about each purchase.
-Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases_durable_cache() {
-	ovrRequest req = ovr_IAP_GetViewerPurchasesDurableCache();
-
-	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
-	_promises.push_back(return_promise);
-
-	return return_promise;
-}
-
 /// Requests a list of products by their SKU
 /// @return Promise that contains an Array of Dictionaries with information about each product
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_products_by_sku(Array p_sku_list) {
 	int64_t skus_arr_s = p_sku_list.size();
 
 	if (skus_arr_s > 0 && skus_arr_s <= INT_MAX) {
-		const char **char_arr = new const char *[skus_arr_s];
-		for (size_t i = 0; i < p_sku_list.size(); i++) {
+
+		const char **char_arr = memnew_arr(const char*, skus_arr_s);
+		std::vector<std::string> sav(skus_arr_s);
+
+		for (size_t j = 0; j < skus_arr_s; j++) {
+			char_arr[j] = "";
+		}
+
+		for (int i = 0; i < skus_arr_s; i++) {
 			if (p_sku_list[i].get_type() == Variant::STRING) {
-				char_arr[i] = ((String)p_sku_list[i]).utf8().get_data();
+				sav[i] = ((String)p_sku_list[i]).utf8().get_data();
+				char_arr[i] = sav[i].c_str();
 
 			} else {
-				delete[] char_arr;
+				memdelete_arr(char_arr);
 				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 				String rejection_msg = "Invalid SKU found in array. All SKUs must be Strings.";
 				return_promise->saved_rejection_response = Array::make(rejection_msg);
@@ -738,7 +803,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_products_by_sku(Array p_s
 		}
 
 		ovrRequest req = ovr_IAP_GetProductsBySKU(char_arr, skus_arr_s);
-		delete[] char_arr;
+		memdelete_arr(char_arr);
 
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 		_promises.push_back(return_promise);
@@ -935,6 +1000,120 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_name(String p
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
+///// LEADERBOARD
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get(String p_leaderboard_name) {
+	ovrRequest req = ovr_Leaderboard_Get(p_leaderboard_name.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries(String p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at) {
+	if (p_limit < 0) {
+		p_limit = 0;
+	} else if (p_limit > INT32_MAX) {
+		p_limit = INT32_MAX;
+	}
+
+	ovrRequest req = ovr_Leaderboard_GetEntries(p_leaderboard_name.utf8().get_data(), p_limit, (ovrLeaderboardFilterType)p_filter, (ovrLeaderboardStartAt)p_start_at);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_after_rank(String p_leaderboard_name, uint64_t p_limit, uint64_t p_after_rank) {
+	if (p_limit < 0) {
+		p_limit = 0;
+	} else if (p_limit > INT32_MAX) {
+		p_limit = INT32_MAX;
+	}
+
+	ovrRequest req = ovr_Leaderboard_GetEntriesAfterRank(p_leaderboard_name.utf8().get_data(), p_limit, p_after_rank);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, LeaderboardStartAt p_start_at, Array p_user_ids) {
+	if (p_limit < 0) {
+		p_limit = 0;
+	} else if (p_limit > INT32_MAX) {
+		p_limit = INT32_MAX;
+	}
+
+	int64_t ids_arr_size = p_user_ids.size();
+
+	ovrID *ovr_ids = memnew_arr(ovrID, ids_arr_size);
+	std::vector<ovrID> sav(ids_arr_size);
+
+	for (size_t j = 0; j < ids_arr_size; j++) {
+		ovr_ids[j] = 0;
+	}
+
+	for (int i = 0; i < ids_arr_size; i++) {
+		if (p_user_ids[i].get_type() == Variant::STRING) {
+			ovrID_FromString(&sav[i], ((String)p_user_ids[i]).utf8().get_data());
+			ovr_ids[i] = sav[i];
+
+		} else {
+			memdelete_arr(ovr_ids);
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "Invalid user ID found in array. All user IDs names must be Strings.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
+
+			return return_promise;
+		}
+	}
+
+	ovrRequest req = ovr_Leaderboard_GetEntriesByIds(p_leaderboard_name.utf8().get_data(), p_limit, (ovrLeaderboardStartAt)p_start_at, ovr_ids, ids_arr_size);
+	memdelete_arr(ovr_ids);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, String p_extra_data) {
+	if (p_score < 0) {
+		p_score = 0;
+	}
+
+	ovrRequest req = ovr_Leaderboard_WriteEntry(p_leaderboard_name.utf8().get_data(), p_score, p_extra_data.utf8().get_data(), p_extra_data.utf8().length(), p_force_update);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry_with_supplementary_metric(String p_leaderboard_name, uint64_t p_score, uint64_t p_supplementary_metric, bool p_force_update, String p_extra_data) {
+	if (p_score < 0) {
+		p_score = 0;
+	}
+	if (p_supplementary_metric < 0) {
+		p_supplementary_metric = 0;
+	}
+
+	ovrRequest req = ovr_Leaderboard_WriteEntryWithSupplementaryMetric(p_leaderboard_name.utf8().get_data(), p_score, p_supplementary_metric, p_extra_data.utf8().get_data(), p_extra_data.utf8().length(), p_force_update);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
 ///// INTERNAL PROCESSING METHODS
 /////////////////////////////////////////////////
 
@@ -952,6 +1131,7 @@ void GDOculusPlatform::_process_initialize_android_async(ovrMessageHandle p_mess
 
 		if (platform_init_result == ovrPlatformInitialize_Success) {
 			if (_get_promise(msg_id, promise)) {
+				_promises.erase(promise);
 				promise->fulfill(Array::make(true));
 			}
 
@@ -975,6 +1155,7 @@ void GDOculusPlatform::_process_user_get_is_viewer_entitled(ovrMessageHandle p_m
 
 	if (!ovr_Message_IsError(p_message)) {
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(true));
 		}
 
@@ -993,6 +1174,7 @@ void GDOculusPlatform::_process_user_get_logged_in_user(ovrMessageHandle p_messa
 		Dictionary user_info_resp = _get_user_information(user_info_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(user_info_resp));
 		}
 
@@ -1011,6 +1193,7 @@ void GDOculusPlatform::_process_user_get_user_proof(ovrMessageHandle p_message) 
 		String user_nonce = ovr_UserProof_GetNonce(user_proof);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(user_nonce));
 		}
 
@@ -1028,6 +1211,7 @@ void GDOculusPlatform::_process_user_get_user_access_token(ovrMessageHandle p_me
 		String access_token = ovr_Message_GetString(p_message);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(access_token));
 		}
 
@@ -1055,17 +1239,17 @@ void GDOculusPlatform::_process_user_get_blocked_users(ovrMessageHandle p_messag
 
 				char native_id[OVRID_SIZE];
 				ovrID blocked_user_id = ovr_BlockedUser_GetId(blocked_user_handle);
-				ovrID_ToString(native_id, sizeof(native_id), blocked_user_id);
+				ovrID_ToString(native_id, OVRID_SIZE, blocked_user_id);
 				((Array)promise->saved_fulfill_response[0]).push_back(String(native_id));
 			}
 
 			if (!ovr_BlockedUserArray_HasNextPage(blocked_users_handle)) {
+				_promises.erase(promise);
 				promise->fulfill(promise->saved_fulfill_response);
 
 			} else {
 				ovrRequest new_req = ovr_User_GetNextBlockedUserArrayPage(blocked_users_handle);
 				promise->add_id(new_req);
-				_promises.push_back(promise);
 			}
 		}
 
@@ -1096,12 +1280,12 @@ void GDOculusPlatform::_process_user_get_logged_in_user_friends(ovrMessageHandle
 			}
 
 			if (!ovr_UserArray_HasNextPage(user_friends_handle)) {
+				_promises.erase(promise);
 				promise->fulfill(promise->saved_fulfill_response);
 
 			} else {
 				ovrRequest new_req = ovr_User_GetNextUserArrayPage(user_friends_handle);
 				promise->add_id(new_req);
-				_promises.push_back(promise);
 			}
 		}
 
@@ -1120,9 +1304,10 @@ void GDOculusPlatform::_process_user_get_org_scoped_id(ovrMessageHandle p_messag
 
 		char native_id[OVRID_SIZE];
 		ovrID org_scoped_id = ovr_OrgScopedID_GetID(org_scoped_id_handle);
-		ovrID_ToString(native_id, sizeof(native_id), org_scoped_id);
+		ovrID_ToString(native_id, OVRID_SIZE, org_scoped_id);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(String(native_id)));
 		}
 
@@ -1143,22 +1328,22 @@ void GDOculusPlatform::_process_user_get_sdk_accounts(ovrMessageHandle p_message
 
 		for (size_t i = 0; i < accounts_size; i++) {
 			ovrSdkAccountHandle sdk_account_handle = ovr_SdkAccountArray_GetElement(accounts_array_handle, i);
+
 			ovrSdkAccountType sdk_account_type = ovr_SdkAccount_GetAccountType(sdk_account_handle);
 			ovrID sdk_user_id = ovr_SdkAccount_GetUserId(sdk_account_handle);
 
-			String gd_sdk_account_type = ovrSdkAccountType_ToString(sdk_account_type);
-
 			char native_id[OVRID_SIZE];
-			ovrID_ToString(native_id, sizeof(native_id), sdk_user_id);
+			ovrID_ToString(native_id, OVRID_SIZE, sdk_user_id);
 
 			Dictionary sdk_account_info;
-			sdk_account_info["account_type"] = gd_sdk_account_type;
-			sdk_account_info["account_id"] = gd_sdk_account_type;
+			sdk_account_info["account_type"] = ovrSdkAccountType_ToString(sdk_account_type);
+			sdk_account_info["account_id"] = String(native_id);
 
 			response_arr.push_back(sdk_account_info);
 		}
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(response_arr));
 		}
 
@@ -1180,6 +1365,7 @@ void GDOculusPlatform::_process_user_launch_block_flow(ovrMessageHandle p_messag
 		block_flow_result["did_cancel"] = ovr_LaunchBlockFlowResult_GetDidCancel(block_flow_result_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(block_flow_result));
 		}
 
@@ -1201,6 +1387,7 @@ void GDOculusPlatform::_process_user_launch_unblock_flow(ovrMessageHandle p_mess
 		unblock_flow_result["did_cancel"] = ovr_LaunchUnblockFlowResult_GetDidCancel(unblock_flow_result_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(unblock_flow_result));
 		}
 
@@ -1222,6 +1409,7 @@ void GDOculusPlatform::_process_user_launch_friend_request_flow(ovrMessageHandle
 		friend_req_flow_result["did_cancel"] = ovr_LaunchFriendRequestFlowResult_GetDidCancel(friend_req_flow_result_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(friend_req_flow_result));
 		}
 
@@ -1246,6 +1434,7 @@ void GDOculusPlatform::_process_achievements_update(ovrMessageHandle p_message) 
 		achievements_update_resp["just_unlocked"] = ovr_AchievementUpdate_GetJustUnlocked(achievents_update_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(achievements_update_resp));
 		}
 
@@ -1283,12 +1472,12 @@ void GDOculusPlatform::_process_achievements_definitions(ovrMessageHandle p_mess
 			}
 
 			if (!ovr_AchievementDefinitionArray_HasNextPage(achiev_defs_handle)) {
+				_promises.erase(promise);
 				promise->fulfill(promise->saved_fulfill_response);
 
 			} else {
 				ovrRequest new_req = ovr_Achievements_GetNextAchievementDefinitionArrayPage(achiev_defs_handle);
 				promise->add_id(new_req);
-				_promises.push_back(promise);
 			}
 		}
 
@@ -1325,12 +1514,12 @@ void GDOculusPlatform::_process_achievements_progress(ovrMessageHandle p_message
 			}
 
 			if (!ovr_AchievementProgressArray_HasNextPage(achievs_prog_handle)) {
+				_promises.erase(promise);
 				promise->fulfill(promise->saved_fulfill_response);
 
 			} else {
 				ovrRequest new_req = ovr_Achievements_GetNextAchievementProgressArrayPage(achievs_prog_handle);
 				promise->add_id(new_req);
-				_promises.push_back(promise);
 			}
 		}
 
@@ -1371,12 +1560,12 @@ void GDOculusPlatform::_process_iap_viewer_purchases(ovrMessageHandle p_message)
 			}
 
 			if (!ovr_PurchaseArray_HasNextPage(v_purchases_arr_handle)) {
+				_promises.erase(promise);
 				promise->fulfill(promise->saved_fulfill_response);
 
 			} else {
 				ovrRequest new_req = ovr_IAP_GetNextPurchaseArrayPage(v_purchases_arr_handle);
 				promise->add_id(new_req);
-				_promises.push_back(promise);
 			}
 		}
 
@@ -1412,12 +1601,12 @@ void GDOculusPlatform::_process_iap_products(ovrMessageHandle p_message) {
 			}
 
 			if (!ovr_ProductArray_HasNextPage(products_arr_handle)) {
+				_promises.erase(promise);
 				promise->fulfill(promise->saved_fulfill_response);
 
 			} else {
 				ovrRequest new_req = ovr_IAP_GetNextProductArrayPage(products_arr_handle);
 				promise->add_id(new_req);
-				_promises.push_back(promise);
 			}
 		}
 
@@ -1433,6 +1622,7 @@ void GDOculusPlatform::_process_iap_consume_purchase(ovrMessageHandle p_message)
 
 	if (!ovr_Message_IsError(p_message)) {
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(true));
 		}
 
@@ -1459,6 +1649,7 @@ void GDOculusPlatform::_process_iap_launch_checkout_flow(ovrMessageHandle p_mess
 		purchase["developer_payload"] = ovr_Purchase_GetDeveloperPayload(purchase_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(purchase));
 		}
 
@@ -1487,7 +1678,7 @@ void GDOculusPlatform::_process_assetfile_get_list(ovrMessageHandle p_message) {
 
 			ovrID assetfile_id = ovr_AssetDetails_GetAssetId(assetfile_handle);
 			char native_id[OVRID_SIZE];
-			ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+			ovrID_ToString(native_id, OVRID_SIZE, assetfile_id);
 
 			String assetfile_type = ovr_AssetDetails_GetAssetType(assetfile_handle);
 
@@ -1513,6 +1704,7 @@ void GDOculusPlatform::_process_assetfile_get_list(ovrMessageHandle p_message) {
 		}
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(resp_arr));
 		}
 
@@ -1532,7 +1724,7 @@ void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message)
 
 		ovrID assetfile_id = ovr_AssetDetails_GetAssetId(assetfile_handle);
 		char native_id[OVRID_SIZE];
-		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+		ovrID_ToString(native_id, OVRID_SIZE, assetfile_id);
 
 		String assetfile_type = ovr_AssetDetails_GetAssetType(assetfile_handle);
 
@@ -1555,6 +1747,7 @@ void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message)
 		}
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(assetfile));
 		}
 
@@ -1574,12 +1767,13 @@ void GDOculusPlatform::_process_assetfile_download(ovrMessageHandle p_message) {
 
 		ovrID assetfile_id = ovr_AssetFileDownloadResult_GetAssetId(assetfile_download_handle);
 		char native_id[OVRID_SIZE];
-		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+		ovrID_ToString(native_id, OVRID_SIZE, assetfile_id);
 
 		assetfile_download_resp["id"] = String(native_id);
 		assetfile_download_resp["file_path"] = ovr_AssetFileDownloadResult_GetFilepath(assetfile_download_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(assetfile_download_resp));
 		}
 
@@ -1599,13 +1793,14 @@ void GDOculusPlatform::_process_assetfile_download_cancel(ovrMessageHandle p_mes
 
 		ovrID assetfile_id = ovr_AssetFileDownloadCancelResult_GetAssetId(assetfile_download_c_handle);
 		char native_id[OVRID_SIZE];
-		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+		ovrID_ToString(native_id, OVRID_SIZE, assetfile_id);
 
 		assetfile_download_c_resp["id"] = String(native_id);
 		assetfile_download_c_resp["file_path"] = ovr_AssetFileDownloadCancelResult_GetFilepath(assetfile_download_c_handle);
 		assetfile_download_c_resp["success"] = ovr_AssetFileDownloadCancelResult_GetSuccess(assetfile_download_c_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(assetfile_download_c_resp));
 		}
 
@@ -1625,14 +1820,218 @@ void GDOculusPlatform::_process_assetfile_delete(ovrMessageHandle p_message) {
 
 		ovrID assetfile_id = ovr_AssetFileDeleteResult_GetAssetId(assetfile_delete_handle);
 		char native_id[OVRID_SIZE];
-		ovrID_ToString(native_id, sizeof(native_id), assetfile_id);
+		ovrID_ToString(native_id, OVRID_SIZE, assetfile_id);
 
 		assetfile_delete_resp["id"] = String(native_id);
 		assetfile_delete_resp["file_path"] = ovr_AssetFileDeleteResult_GetFilepath(assetfile_delete_handle);
 		assetfile_delete_resp["success"] = ovr_AssetFileDeleteResult_GetSuccess(assetfile_delete_handle);
 
 		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
 			promise->fulfill(Array::make(assetfile_delete_resp));
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+///// LEADERBOARD
+/////////////////////////////////////////////////
+
+/// Processes the response from a request to download a single asset file
+void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrLeaderboardArrayHandle leaderboard_arr_handle = ovr_Message_GetLeaderboardArray(p_message);
+		size_t leaderboard_arr_s = ovr_LeaderboardArray_GetSize(leaderboard_arr_handle);
+
+		if (_get_promise(msg_id, promise)) {
+			if (promise->get_ids().size() == 1 && promise->saved_fulfill_response.is_empty()) { // Only the first time
+				promise->saved_fulfill_response = Array::make(Array());
+			}
+
+			for (size_t i = 0; i < leaderboard_arr_s; i++) {
+				ovrLeaderboardHandle leaderboard_handle = ovr_LeaderboardArray_GetElement(leaderboard_arr_handle, i);
+				Dictionary leaderboard;
+
+				char native_id[OVRID_SIZE];
+				ovrID leaderboard_id = ovr_Leaderboard_GetID(leaderboard_handle);
+				ovrID_ToString(native_id, OVRID_SIZE, leaderboard_id);
+
+				leaderboard["id"] = String(native_id);
+				leaderboard["api_name"] = ovr_Leaderboard_GetApiName(leaderboard_handle);
+
+				ovrDestinationHandle destination_handle = ovr_Leaderboard_GetDestination(leaderboard_handle);
+				if (destination_handle) {
+					Dictionary destination;
+
+					destination["display_name"] = ovr_Destination_GetDisplayName(destination_handle);
+					destination["api_name"] = ovr_Destination_GetApiName(destination_handle);
+					destination["deep_link_message"] = ovr_Destination_GetDeeplinkMessage(destination_handle);
+
+					leaderboard["destination"] = destination;
+				}
+
+				((Array)promise->saved_fulfill_response[0]).push_back(leaderboard);
+			}
+
+			if (!ovr_LeaderboardArray_HasNextPage(leaderboard_arr_handle)) {
+				_promises.erase(promise);
+				promise->fulfill(promise->saved_fulfill_response);
+
+			} else {
+				ovrRequest new_req = ovr_Leaderboard_GetNextLeaderboardArrayPage(leaderboard_arr_handle);
+				promise->add_id(new_req);
+			}
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the response from a request to delete a single asset file
+void GDOculusPlatform::_process_leaderboard_get_entries(ovrMessageHandle p_message, int p_mode) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+
+		if (_get_promise(msg_id, promise)) {
+			if (promise->get_ids().size() == 1 && promise->saved_fulfill_response.is_empty()) { // Only the first time
+				promise->saved_fulfill_response = Array::make(Array(), Array(), Array(), Array());
+
+				ovrLeaderboardEntryArrayHandle entries_arr_handle = ovr_Message_GetLeaderboardEntryArray(p_message);
+				_handle_leaderboard_entries(entries_arr_handle, p_mode, promise);
+
+				bool has_prev_entries = ovr_LeaderboardEntryArray_HasPreviousPage(entries_arr_handle);
+				bool has_next_entries = ovr_LeaderboardEntryArray_HasNextPage(entries_arr_handle);
+
+				if (!has_prev_entries && !has_next_entries) {
+					promise->saved_fulfill_response.remove_at(3);
+					promise->saved_fulfill_response.remove_at(2);
+					promise->saved_fulfill_response.remove_at(0);
+
+					_promises.erase(promise);
+					promise->fulfill(promise->saved_fulfill_response);
+
+				} else {
+					if (has_prev_entries) {
+						ovrRequest new_prev_req = ovr_Leaderboard_GetPreviousEntries(entries_arr_handle);
+						promise->add_id(new_prev_req);
+					}
+					if (has_next_entries) {
+						ovrRequest new_next_req = ovr_Leaderboard_GetNextEntries(entries_arr_handle);
+						promise->add_id(new_next_req);
+					}
+				}
+			
+			} else if(p_mode == 0) {
+				ovrLeaderboardEntryArrayHandle entries_arr_handle = ovr_Message_GetLeaderboardEntryArray(p_message);
+				_handle_leaderboard_entries(entries_arr_handle, p_mode, promise);
+
+				bool has_prev_entries = ovr_LeaderboardEntryArray_HasPreviousPage(entries_arr_handle);
+
+				if (!has_prev_entries) {
+
+					// If the "other side" has finished adding values and we did too
+					if (!((Array)promise->saved_fulfill_response[3]).is_empty()) {
+
+						((Array)promise->saved_fulfill_response[0]).append_array(((Array)promise->saved_fulfill_response[1]));
+						((Array)promise->saved_fulfill_response[0]).append_array(((Array)promise->saved_fulfill_response[2]));
+
+						// Clean up
+						promise->saved_fulfill_response.remove_at(3);
+						promise->saved_fulfill_response.remove_at(2);
+						promise->saved_fulfill_response.remove_at(1);
+
+						_promises.erase(promise);
+						promise->fulfill(Array::make(promise->saved_fulfill_response));
+
+					// Inform we finished adding values
+					} else {
+						((Array)promise->saved_fulfill_response[3]).push_back(1);
+					}
+
+				} else {
+					if (has_prev_entries) {
+						ovrRequest new_prev_req = ovr_Leaderboard_GetPreviousEntries(entries_arr_handle);
+						promise->add_id(new_prev_req);
+					}
+				}
+
+			} else {
+
+				ovrLeaderboardEntryArrayHandle entries_arr_handle = ovr_Message_GetLeaderboardEntryArray(p_message);
+				_handle_leaderboard_entries(entries_arr_handle, p_mode, promise);
+
+				bool has_next_entries = ovr_LeaderboardEntryArray_HasNextPage(entries_arr_handle);
+
+				if (!has_next_entries) {
+
+					// If the "other side" has finished adding values and we did too
+					if (!((Array)promise->saved_fulfill_response[3]).is_empty()) {
+
+						((Array)promise->saved_fulfill_response[0]).append_array(((Array)promise->saved_fulfill_response[1]));
+						((Array)promise->saved_fulfill_response[0]).append_array(((Array)promise->saved_fulfill_response[2]));
+
+						// Clean up
+						promise->saved_fulfill_response.remove_at(3);
+						promise->saved_fulfill_response.remove_at(2);
+						promise->saved_fulfill_response.remove_at(1);
+
+						_promises.erase(promise);
+						promise->fulfill(Array::make(promise->saved_fulfill_response));
+
+					// Inform we finished adding values
+					} else {
+						((Array)promise->saved_fulfill_response[3]).push_back(1);
+					}
+
+				} else {
+					if (has_next_entries) {
+						ovrRequest new_prev_req = ovr_Leaderboard_GetNextEntries(entries_arr_handle);
+						promise->add_id(new_prev_req);
+					}
+				}
+
+			}
+
+		}
+
+	} else {
+		_handle_default_process_error(p_message, msg_id, promise);
+	}
+}
+
+/// Processes the response from a request to delete a single asset file
+void GDOculusPlatform::_process_leaderboard_write_entry(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+	Ref<GDOculusPlatformPromise> promise;
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrLeaderboardUpdateStatusHandle leaderboard_update_handle = ovr_Message_GetLeaderboardUpdateStatus(p_message);
+		Dictionary leaderboard_update;
+
+		uint32_t challenges_ids_s = ovr_LeaderboardUpdateStatus_GetUpdatedChallengeIdsSize(leaderboard_update_handle);
+		Array challenges_ids = Array();
+		for (size_t i = 0; i < challenges_ids_s; i++) {
+			ovrID challenge_id = ovr_LeaderboardUpdateStatus_GetUpdatedChallengeId(leaderboard_update_handle, i);
+			char native_id[OVRID_SIZE];
+			ovrID_ToString(native_id, OVRID_SIZE, challenge_id);
+
+			challenges_ids.push_back(String(native_id));
+		}
+
+		leaderboard_update["did_update"] = ovr_LeaderboardUpdateStatus_GetDidUpdate(leaderboard_update_handle);
+		leaderboard_update["challenge_ids"] = challenges_ids;
+
+		if (_get_promise(msg_id, promise)) {
+			_promises.erase(promise);
+			promise->fulfill(Array::make(leaderboard_update));
 		}
 
 	} else {
@@ -1662,8 +2061,16 @@ void GDOculusPlatform::_handle_default_process_error(ovrMessageHandle p_message,
 	ovrErrorHandle ovr_err = ovr_Message_GetError(p_message);
 	String gd_message = ovr_Error_GetMessage(ovr_err);
 
+	JSON json = JSON();
+	Variant result = json.parse_string(gd_message);
+
 	if (_get_promise(p_msg_id, p_promise)) {
-		p_promise->reject(Array::make(gd_message));
+
+		if (result && result.get_type() == Variant::DICTIONARY) {
+			p_promise->reject(Array::make(result));
+		} else {
+			p_promise->reject(Array::make(gd_message));
+		}
 	}
 }
 
@@ -1676,7 +2083,7 @@ Dictionary GDOculusPlatform::_get_user_information(ovrUserHandle p_user_handle) 
 
 	char native_id[OVRID_SIZE];
 	ovrID u_id = ovr_User_GetID(p_user_handle);
-	ovrID_ToString(native_id, sizeof(native_id), u_id);
+	ovrID_ToString(native_id, OVRID_SIZE, u_id);
 	user_info_resp["id"] = String(native_id);
 
 	user_info_resp["oculus_id"] = ovr_User_GetOculusID(p_user_handle);
@@ -1699,7 +2106,7 @@ void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
 
 		char native_id[OVRID_SIZE];
 		ovrID asset_id = ovr_AssetFileDownloadUpdate_GetAssetId(download_update_handle);
-		ovrID_ToString(native_id, sizeof(native_id), asset_id);
+		ovrID_ToString(native_id, OVRID_SIZE, asset_id);
 
 		Dictionary resp;
 
@@ -1729,6 +2136,49 @@ void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
 		gd_msg["message"] = gd_message;
 
 		emit_signal("unhandled_message", gd_msg);
+	}
+}
+
+/// Helper function to handle most common errors when processing.
+void GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle p_entries_arr_handle, int p_promise_arr_ind, Ref<GDOculusPlatformPromise> &p_promise) {
+	size_t entries_arr_s = ovr_LeaderboardEntryArray_GetSize(p_entries_arr_handle);
+
+	for (size_t i = 0; i < entries_arr_s; i++) {
+		Dictionary entry_data;
+
+		ovrLeaderboardEntryHandle entry_handle = ovr_LeaderboardEntryArray_GetElement(p_entries_arr_handle, i);
+
+		ovrID entry_id = ovr_LeaderboardEntry_GetID(entry_handle);
+		char native_id[OVRID_SIZE];
+		ovrID_ToString(native_id, OVRID_SIZE, entry_id);
+
+		entry_data["id"] = String(native_id);
+		entry_data["rank"] = ovr_LeaderboardEntry_GetRank(entry_handle);
+		entry_data["score"] = (int64_t)ovr_LeaderboardEntry_GetScore(entry_handle);
+		entry_data["timestamp"] = (uint64_t)ovr_LeaderboardEntry_GetTimestamp(entry_handle);
+		entry_data["display_score"] = ovr_LeaderboardEntry_GetDisplayScore(entry_handle);
+		entry_data["extra_data"] = ovr_LeaderboardEntry_GetExtraData(entry_handle);
+
+		ovrUserHandle user = ovr_LeaderboardEntry_GetUser(entry_handle);
+		Dictionary user_info = _get_user_information(user);
+
+		ovrSupplementaryMetricHandle supplementary_metric_handle = ovr_LeaderboardEntry_GetSupplementaryMetric(entry_handle);
+		if (supplementary_metric_handle) {
+			Dictionary supplementary_metric;
+
+			ovrID sup_metric_id = ovr_SupplementaryMetric_GetID(supplementary_metric_handle);
+			char native_metric_id[OVRID_SIZE];
+			ovrID_ToString(native_metric_id, OVRID_SIZE, sup_metric_id);
+
+			supplementary_metric["id"] = String(native_metric_id);
+			supplementary_metric["metric"] = (int64_t)ovr_SupplementaryMetric_GetMetric(supplementary_metric_handle);
+
+			entry_data["supplementary_metric"] = supplementary_metric;
+		}
+
+		entry_data["user"] = user_info;
+
+		((Array)p_promise->saved_fulfill_response[p_promise_arr_ind]).push_back(entry_data);
 	}
 }
 
