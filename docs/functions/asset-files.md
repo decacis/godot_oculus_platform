@@ -13,7 +13,7 @@ Requests a list of asset files associated with this app.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each asset file. The promise will error if the request couldn't be fulfilled.
 
-If the asset file is of type `language_pack`, the "tag" key will be in BCP47 format.
+If the asset file is of type `language_pack`, the "tag" key is supposed to conform to the BCP47 standard, but in reality it replaces the "-" with "_" so what should be `en-US` ends up as `en_US`.
 
 Example response:
 ``` json linenums="1"
@@ -22,7 +22,7 @@ Example response:
         "id": "151548188744",
         "type": "default",
         "download_status": "installed",
-        "file_path": "/sdcard/path/to/asset.obb",
+        "file_path": "/sdcard/path/to/asset.pck",
         "iap_status": "entitled",
         "metadata": "custom_metadata_set_by_you"
     },
@@ -36,7 +36,7 @@ Example response:
         "language_info": {
             "english_name": "Spanish",
             "native_name": "Español",
-            "tag": "es-ES"
+            "tag": "es_ES"
         }
     }
 ]
@@ -128,7 +128,7 @@ See the example response from [assetfile_get_list](#assetfile_get_list) to get a
 /// details | Example
     type: example
 ``` gdscript linenums="1"
-GDOculusPlatform.assetfile_status_by_name("my_asset_file")\
+GDOculusPlatform.assetfile_status_by_name("my_asset_file.po")\
 .then(func(asset_file : Dictionary):
     
     download_file(asset_file.file_path)
@@ -175,30 +175,18 @@ An `assetfile_download_update` `Signal` will be emitted periodically to track th
 
 An `assetfile_download_finished` `Signal` will be emitted once the asset file has finished downloading. It will have a `String` with the asset file ID as a payload. Note that the `assetfile_download_update` `Signal` will be emitted as well one last time.
 
-///// details | Hint
-    type: tip
-
-We also provide helper function that you can use to call a function whenever the file has finished downloading. Use it like this:
-
-``` gdscript linenums="1"
-# The first agument is the asset file ID
-# the second argument is a Callable to call when the file finishes downloading
-GDOP.call_on_finished_downloading("265485514455", _function_to_call)
-```
-
-That function will call the `Callable` you provide with a single argument, the asset file ID as a `String`.
-/////
-
 ///
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
+GDOculusPlatform.assetfile_download_finished.connect(call_me_when_finished)
+
 GDOculusPlatform.assetfile_download_by_id("821548111514")\
 .then(func(download_info : Dictionary):
     
     if download_info.file_path != "":
-        GDOP.call_on_finished_downloading("821548111514", call_me_when_finished)
+        print("Downloading file on path: ", download_info.file_path)
 )\
 .error(func(download_asset_err):
     print("Unable to download asset file: ", download_asset_err)
@@ -223,7 +211,7 @@ Please look at the response from [assetfile_download_by_id](#assetfile_download_
 /// details | Example
     type: example
 ``` gdscript linenums="1"
-GDOculusPlatform.assetfile_download_by_name("my_asset_file")\
+GDOculusPlatform.assetfile_download_by_name("my_asset_file.obb")\
 .then(func(download_info : Dictionary):
     
     if download_info.file_path != "":
@@ -292,7 +280,7 @@ Take a look at the example response from [assetfile_download_cancel_by_id](#asse
 /// details | Example
     type: example
 ``` gdscript linenums="1"
-GDOculusPlatform.assetfile_download_cancel_by_name("my_asset_name")\
+GDOculusPlatform.assetfile_download_cancel_by_name("my_asset_name.zip")\
 .then(func(download_cancel_info : Dictionary):
     
     if download_cancel_info.success:
@@ -358,7 +346,7 @@ Take a look at the example response from [assetfile_delete_by_id](#assetfile_del
 /// details | Example
     type: example
 ``` gdscript linenums="1"
-GDOculusPlatform.assetfile_delete_by_name("pack_of_gems")\
+GDOculusPlatform.assetfile_delete_by_name("pack_of_gems.pck")\
 .then(func(delete_asset_info : Dictionary):
     
     if delete_asset_info.success:

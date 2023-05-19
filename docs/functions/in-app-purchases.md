@@ -21,7 +21,7 @@ Example response:
         "purchase_str_id": "332574476951",
         "grant_time": 1683990516,
         "expiration_time": 0,
-        "developer_payload": "my_custom_payload"
+        "developer_payload": ""
     },
     {
         "sku": "consumable_product_sku",
@@ -50,57 +50,6 @@ GDOculusPlatform.iap_get_viewer_purchases()\
 )\
 .error(func(user_purchases_err):
     print("Unable to retrieve user purchases: ", user_purchases_err)
-)
-```
-///
-////
-
-## iap_get_viewer_purchases_durable_cache
-//// admonition | iap_get_viewer_purchases_durable_cache()
-    type: abstract
-
-Requests all of the logged-in user purchases that are **durable**. This is taken from the cache, so it is recommended to first call [iap_get_viewer_purchases](#iap_get_viewer_purchases) to update the cache and use this function for subsequent calls.
-
-**Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each durable cached purchase. The promise will error if the request couldn't be fulfilled.
-
-Example response:
-``` json linenums="1"
-[
-    {
-        "sku": "durable_product_sku",
-        "reporting_id": "154128782811",
-        "purchase_str_id": "332574476951",
-        "grant_time": 1683990516,
-        "expiration_time": 0,
-        "developer_payload": ""
-    },
-    {
-        "sku": "durable_product_sku_2",
-        "reporting_id": "154128452811",
-        "purchase_str_id": "328574476711",
-        "grant_time": 1683990518,
-        "expiration_time": 0,
-        "developer_payload": "developer custom message"
-    }
-]
-```
-
-/// admonition | Note
-    type: warning
-
-`grant_time` is a UNIX timestamp (in seconds). `expiration_time` will be 0 for every item since they are durable purchases.
-///
-
-/// details | Example
-    type: example
-``` gdscript linenums="1"
-GDOculusPlatform.iap_get_viewer_purchases_durable_cache()\
-.then(func(user_durable_purchases : Array):
-    for d_purchase in user_durable_purchases:
-        print("Purchased at: ", d_purchase.grant_time)
-)\
-.error(func(user_durable_purchases_err):
-    print("Unable to retrieve user durable purchases: ", user_durable_purchases_err)
 )
 ```
 ///
@@ -177,9 +126,9 @@ GDOculusPlatform.iap_consume_purchase("my_product_sku")\
 
 Launches a checkout flow for the product with the given SKU. The user will be able to complete the purchase or cancel it.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with the product information if fulfilled. The promise will error if we couldn't launch the checkout flow.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with the product information if fulfilled. The promise **will error if the user canceled the purchase** or if the checkout flow couldn't be launched.
 
-Example response:
+Example response on purchase success:
 ``` json linenums="1"
 {
     "sku": "my_product_sku",
@@ -191,11 +140,14 @@ Example response:
 }
 ```
 
-/// admonition | Note
-    type: warning
-
-If the user doesn't purchase the product, the function **will not error**, instead to know if the user completed the purchase you should check if `purchase_str_id` is empty. It will **not** be empty if the user completed the purchase.
-///
+Example error on canceled:
+``` json linenums="1"
+{
+    "category": "user_canceled",
+    "code": 0,
+    "message": "The purchase has been canceled."
+}
+```
 
 /// details | Example
     type: example
@@ -210,7 +162,13 @@ GDOculusPlatform.iap_launch_checkout_flow("my_product_sku")\
 
 )\
 .error(func(checkout_flow_err):
-    print("Unable to launch checkout flow: ", checkout_flow_err)
+    if typeof(checkout_flow_err) == TYPE_DICTIONARY\
+    and checkout_flow_err.has("category")\
+    and checkout_flow_err.category == "user_canceled":
+        print("The user canceled the purchase!")
+    
+    else:
+        print("Unable to launch checkout flow: ", checkout_flow_err)
 )
 ```
 ///

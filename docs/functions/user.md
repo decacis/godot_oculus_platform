@@ -18,7 +18,7 @@ Requests the logged-in user ID.
     type: example
 ``` gdscript linenums="1"
 var user_id : String = user_get_logged_in_user_id()
-# user_id = "314159265358979" for example
+# user_id = "3141592653589793" for example
 ```
 ///
 ////
@@ -29,13 +29,13 @@ var user_id : String = user_get_logged_in_user_id()
 
 Requests the logged-in user's locale'.
 
-**Returns:** A `String` with the user's locale that conforms to BCP47: [https://tools.ietf.org/html/bcp47](https://tools.ietf.org/html/bcp47)
+**Returns:** A `String` with the user's locale that **SHOULD** conforms to BCP47: [https://tools.ietf.org/html/bcp47](https://tools.ietf.org/html/bcp47) but in reality the API replaces "-" with "_"
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 var user_locale : String = user_get_logged_in_user_locale()
-# user_locale = "en-US" for example
+# user_locale = "en_US" for example
 ```
 ///
 ////
@@ -73,7 +73,7 @@ Requests information about a single user by ID.
 Example response:
 ``` json linenums="1"
 {
-    "id": "31415926535",
+    "id": "3141592653589793",
     "oculus_id": "some_id",
     "display_name": "steve",
     "image_url": "https://example.org/some-image.png",
@@ -113,7 +113,7 @@ Requests information about the user that launched the app.
 Example response:
 ``` json linenums="1"
 {
-    "id": "89793238462",
+    "id": "2384626433832795",
     "oculus_id": "some_other_id",
     "display_name": "steven",
     "image_url": "https://example.org/some-image.png",
@@ -208,9 +208,9 @@ Requests the user IDs of users blocked by the current user.
 Example response:
 ``` json linenums="1"
 [
-    "3141592653589",
-    "7932384626433",
-    "8327950288419"
+    "3141592653589793",
+    "2384626433832795",
+    "1288419716045741"
 ]
 ```
 
@@ -288,7 +288,7 @@ Example response:
 [
     {
         "account_type": "OCULUS",
-        "account_id": "31415926535",
+        "account_id": "3141592653589793"
     }
 ]
 ```
