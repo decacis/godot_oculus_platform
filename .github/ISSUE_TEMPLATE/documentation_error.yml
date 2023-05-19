@@ -13,8 +13,8 @@ body:
     description: |
       A link to the specific part of the documentation that is wrong. The more specific, the better.
     placeholder: https://decacis.github.io/godot_oculus_platform/functions/user/#user_get_user
-    validations:
-      required: true
+  validations:
+    required: true
 
 - type: textarea
   attributes:
