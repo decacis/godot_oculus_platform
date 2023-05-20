@@ -149,6 +149,12 @@ Example error on canceled:
 }
 ```
 
+///// admonition | Note
+    type: warning
+
+Sometimes, after the user makes a purchase, the `iap_status` key from the [assetfile_get_list](/godot_oculus_platform/functions/asset-files/#assetfile_get_list) will still show up as `not-entitled` for some time. You will be able to download assets associated with the product, but the `iap_status` may take some time to update.
+/////
+
 /// details | Example
     type: example
 ``` gdscript linenums="1"

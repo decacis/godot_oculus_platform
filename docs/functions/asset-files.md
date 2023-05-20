@@ -96,7 +96,7 @@ Requests information about a single asset file by its ID.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the asset file. The promise will error if the request couldn't be fulfilled.
 
-See the example response from [assetfile_get_list](#assetfile_get_list) to get an idea of the response. `assetfile_get_list()` returns an `Array` because it can return multiple asset files, but this function returns a single asset file (and thus a `Dictionary` instead of an `Array`).
+See the example response from [assetfile_get_list](#assetfile_get_list) to get an idea of the response. The only difference is that this function returns a single `Dictionary` and `assetfile_get_list` returns an `Array` of `Dictionaries`.
 
 /// details | Example
     type: example
@@ -123,7 +123,7 @@ Requests information about a single asset file by its name.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the asset file. The promise will error if the request couldn't be fulfilled.
 
-See the example response from [assetfile_get_list](#assetfile_get_list) to get an idea of the response. `assetfile_get_list()` returns an `Array` because it can return multiple asset files, but this function returns a single asset file (and thus a `Dictionary` instead of an `Array`).
+See the example response from [assetfile_get_list](#assetfile_get_list) to get an idea of the response. The only difference is that this function returns a single `Dictionary` and `assetfile_get_list` returns an `Array` of `Dictionaries`.
 
 /// details | Example
     type: example
@@ -144,7 +144,7 @@ GDOculusPlatform.assetfile_status_by_name("my_asset_file.po")\
 //// admonition | assetfile_download_by_id(asset_id : `String`)
     type: abstract
 
-Sends a request to download an asset file with the given ID.
+Sends a request to download an asset file with the given ID. The download may take a few seconds to begin.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
 
@@ -172,8 +172,9 @@ An `assetfile_download_update` `Signal` will be emitted periodically to track th
     "transferred_bytes": 1024
 }
 ```
+Note that the first time the `assetfile_download_update` `Signal` gets emitted, the values may be `0` for `total_bytes` and `transferred_bytes`. You should wait/check until the `Signal` has a payload with `total_bytes` more than `0` if you intend to use this value to show a progress bar, for example.
 
-An `assetfile_download_finished` `Signal` will be emitted once the asset file has finished downloading. It will have a `String` with the asset file ID as a payload. Note that the `assetfile_download_update` `Signal` will be emitted as well one last time.
+An `assetfile_download_finished` `Signal` will be emitted once the asset file has finished downloading. It will have a `String` with the asset file ID as a payload. Note that the `assetfile_download_update` `Signal` will be emitted one last time as well with `completed` as `true`.
 
 ///
 
@@ -202,7 +203,7 @@ func call_me_when_finished(asset_file_id : String):
 //// admonition | assetfile_download_by_name(asset_name : `String`)
     type: abstract
 
-Sends a request to download an asset file with the given name.
+Sends a request to download an asset file with the given name. The download may take a few seconds to begin.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain an `Dictionary` with information about the request. The promise will error if the request couldn't be fulfilled.
 

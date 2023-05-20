@@ -29,7 +29,7 @@ var user_id : String = user_get_logged_in_user_id()
 
 Requests the logged-in user's locale'.
 
-**Returns:** A `String` with the user's locale that **SHOULD** conforms to BCP47: [https://tools.ietf.org/html/bcp47](https://tools.ietf.org/html/bcp47) but in reality the API replaces "-" with "_"
+**Returns:** A `String` with the user's locale that **SHOULD** conform to BCP47: [https://tools.ietf.org/html/bcp47](https://tools.ietf.org/html/bcp47) but in reality the API replaces "-" with "_"
 
 /// details | Example
     type: example
