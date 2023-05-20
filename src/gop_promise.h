@@ -31,7 +31,8 @@ public:
 	Array saved_rejection_response;
 
 	void add_id(uint64_t p_id);
-	Vector<uint64_t> get_ids();
+	int get_ids_count() const;
+	bool has_id(uint64_t p_id) const;
 
 	Ref<GDOculusPlatformPromise> then(const Callable &p_callable);
 	Ref<GDOculusPlatformPromise> error(const Callable &p_callable);

@@ -24,7 +24,13 @@ void GDOculusPlatformPromise::add_id(uint64_t p_id) {
 	}
 }
 
-Vector<uint64_t> GDOculusPlatformPromise::get_ids() { return promise_ids; }
+bool GDOculusPlatformPromise::has_id(const uint64_t p_id) const {
+	return promise_ids.has(p_id);
+}
+
+int GDOculusPlatformPromise::get_ids_count() const {
+	return promise_ids.size();
+};
 
 Ref<GDOculusPlatformPromise> GDOculusPlatformPromise::then(const Callable &p_callable) {
 	ERR_FAIL_COND_V_MSG(!then_callable.is_null(), this, "GDOculusPlatformPromise already has a Callable connected to then()");

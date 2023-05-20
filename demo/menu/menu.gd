@@ -20,6 +20,16 @@ extends CanvasLayer
 @export var IAP_consume_purchase : String
 @export var IAP_launch_checkout_flow : String
 
+@export_group("Asset Files")
+@export var assetfile_status_by_id : String = ""
+@export var assetfile_status_by_name : String = ""
+@export var assetfile_download_by_id : String = ""
+@export var assetfile_download_by_name : String = ""
+@export var assetfile_download_cancel_by_id : String = ""
+@export var assetfile_download_cancel_by_name : String = ""
+@export var assetfile_delete_by_id : String = ""
+@export var assetfile_delete_by_name : String = ""
+
 
 func _ready() -> void:
 	if !get_user_val.is_empty():
@@ -52,6 +62,27 @@ func _ready() -> void:
 		$PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPConsumePurchase.visible = true
 	if !IAP_launch_checkout_flow.is_empty():
 		$PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPLaunchCheckoutFlow.visible = true
+	
+	## ASSET FILES
+	GDOculusPlatform.assetfile_download_update.connect(_on_asset_file_update)
+	GDOculusPlatform.assetfile_download_finished.connect(_on_asset_file_downloaded)
+	
+	if !assetfile_status_by_id.is_empty():
+		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileStatusByID.visible = true
+	if !assetfile_status_by_name.is_empty():
+		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileStatusByName.visible = true
+	if !assetfile_download_by_id.is_empty():
+		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadByID.visible = true
+	if !assetfile_download_by_name.is_empty():
+		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadByName.visible = true
+	if !assetfile_download_cancel_by_id.is_empty():
+		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadCancelByID.visible = true
+	if !assetfile_download_cancel_by_name.is_empty():
+		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadCancelByName.visible = true
+	if !assetfile_delete_by_id.is_empty():
+		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDeleteByID.visible = true
+	if !assetfile_delete_by_name.is_empty():
+		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDeleteByName.visible = true
 
 
 ## USER - NO INPUT FUNCS
@@ -347,4 +378,144 @@ func _on_iap_launch_checkout_flow_pressed():
 			print("[iap_launch_checkout_flow] RESPONSE: ", checkout_err)
 		else:
 			push_error("[iap_launch_checkout_flow] ERROR: ", checkout_err)
+	)
+
+
+## ASSET FILES
+var should_init : bool = true
+func _on_asset_file_update(asset_file_update : Dictionary) -> void:
+	print("asset_file_update: ", asset_file_update)
+	if asset_file_update.total_bytes == 0:
+		return
+	
+	if should_init:
+		should_init = false
+		_init_download_status(asset_file_update.total_bytes)
+	
+	var update_txt : String = "{bytes_prog} / {bytes_total}".format({
+		bytes_prog = asset_file_update.transferred_bytes,
+		bytes_total = asset_file_update.total_bytes,
+	})
+	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer/DownloadProgressValLbl.text = update_txt
+	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer/ProgressBar.value = asset_file_update.transferred_bytes
+
+func _on_asset_file_downloaded(asset_id : String):
+	print("[ASSET FILE DOWNLOAD] Finished!")
+	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/DownloadFinishedLbl.visible = true
+
+func _init_download_status(max_val : int) -> void:
+	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer/DownloadProgressValLbl.text = "0 / 0"
+	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer/ProgressBar.value = 0
+	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer/ProgressBar.max_value = max_val
+	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/DownloadFinishedLbl.visible = false
+
+## ASSET FILES - NO INPUT FUNCS
+func _on_assetfile_get_list_pressed():
+	print("-------------------------------------")
+	print("assetfile_get_list CALLED")
+	GDOculusPlatform.assetfile_get_list()\
+	.then(func(asset_files : Array):
+		print("[assetfile_get_list] RESPONSE: ", asset_files)
+	)\
+	.error(func(asset_files_err):
+		push_error("[assetfile_get_list] ERROR: ", asset_files_err)
+	)
+
+## ASSET FILES - INPUT FUNCS
+func _on_assetfile_status_by_id_pressed():
+	print("-------------------------------------")
+	print("assetfile_status_by_id CALLED")
+	print("INPUT: ", assetfile_status_by_id)
+	GDOculusPlatform.assetfile_status_by_id(assetfile_status_by_id)\
+	.then(func(asset_files_s : Dictionary):
+		print("[assetfile_status_by_id] RESPONSE: ", asset_files_s)
+	)\
+	.error(func(asset_files_s_err):
+		push_error("[assetfile_status_by_id] ERROR: ", asset_files_s_err)
+	)
+
+func _on_assetfile_status_by_name_pressed():
+	print("-------------------------------------")
+	print("assetfile_status_by_name CALLED")
+	print("INPUT: ", assetfile_status_by_name)
+	GDOculusPlatform.assetfile_status_by_name(assetfile_status_by_name)\
+	.then(func(asset_files_s : Dictionary):
+		print("[assetfile_status_by_name] RESPONSE: ", asset_files_s)
+	)\
+	.error(func(asset_files_s_err):
+		push_error("[assetfile_status_by_name] ERROR: ", asset_files_s_err)
+	)
+
+func _on_assetfile_download_by_id_pressed():
+	print("-------------------------------------")
+	print("assetfile_download_by_id CALLED")
+	print("INPUT: ", assetfile_download_by_id)
+	GDOculusPlatform.assetfile_download_by_id(assetfile_download_by_id)\
+	.then(func(asset_files_d : Dictionary):
+		should_init = true
+		print("[assetfile_download_by_id] RESPONSE: ", asset_files_d)
+	)\
+	.error(func(asset_files_d_err):
+		push_error("[assetfile_download_by_id] ERROR: ", asset_files_d_err)
+	)
+
+func _on_assetfile_download_by_name_pressed():
+	print("-------------------------------------")
+	print("assetfile_download_by_name CALLED")
+	print("INPUT: ", assetfile_download_by_name)
+	GDOculusPlatform.assetfile_download_by_name(assetfile_download_by_name)\
+	.then(func(asset_files_d : Dictionary):
+		should_init = true
+		print("[assetfile_download_by_name] RESPONSE: ", asset_files_d)
+	)\
+	.error(func(asset_files_d_err):
+		push_error("[assetfile_download_by_name] ERROR: ", asset_files_d_err)
+	)
+
+func _on_assetfile_download_cancel_by_id_pressed():
+	print("-------------------------------------")
+	print("assetfile_download_cancel_by_id CALLED")
+	print("INPUT: ", assetfile_download_cancel_by_id)
+	GDOculusPlatform.assetfile_download_cancel_by_id(assetfile_download_cancel_by_id)\
+	.then(func(asset_files_d_c : Dictionary):
+		print("[assetfile_download_cancel_by_id] RESPONSE: ", asset_files_d_c)
+	)\
+	.error(func(asset_files_d_c_err):
+		push_error("[assetfile_download_cancel_by_id] ERROR: ", asset_files_d_c_err)
+	)
+
+func _on_assetfile_download_cancel_by_name_pressed():
+	print("-------------------------------------")
+	print("assetfile_download_cancel_by_name CALLED")
+	print("INPUT: ", assetfile_download_cancel_by_name)
+	GDOculusPlatform.assetfile_download_cancel_by_name(assetfile_download_cancel_by_name)\
+	.then(func(asset_files_d_c : Dictionary):
+		print("[assetfile_download_cancel_by_name] RESPONSE: ", asset_files_d_c)
+	)\
+	.error(func(asset_files_d_c_err):
+		push_error("[assetfile_download_cancel_by_name] ERROR: ", asset_files_d_c_err)
+	)
+
+func _on_assetfile_delete_by_id_pressed():
+	print("-------------------------------------")
+	print("assetfile_delete_by_id CALLED")
+	print("INPUT: ", assetfile_delete_by_id)
+	GDOculusPlatform.assetfile_delete_by_id(assetfile_delete_by_id)\
+	.then(func(asset_files_del : Dictionary):
+		print("[assetfile_delete_by_id] RESPONSE: ", asset_files_del)
+	)\
+	.error(func(asset_files_del_err):
+		push_error("[assetfile_delete_by_id] ERROR: ", asset_files_del_err)
+	)
+
+func _on_assetfile_delete_by_name_pressed():
+	print("-------------------------------------")
+	print("assetfile_delete_by_name CALLED")
+	print("INPUT: ", assetfile_delete_by_name)
+	GDOculusPlatform.assetfile_delete_by_name(assetfile_delete_by_name)\
+	.then(func(asset_files_del : Dictionary):
+		print("[assetfile_delete_by_name] RESPONSE: ", asset_files_del)
+	)\
+	.error(func(asset_files_del_err):
+		push_error("[assetfile_delete_by_name] ERROR: ", asset_files_del_err)
 	)

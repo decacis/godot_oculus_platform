@@ -23,6 +23,10 @@ private:
 	Vector<Ref<GDOculusPlatformPromise>> _promises_to_reject;
 
 	bool _get_promise(uint64_t p_promise_id, Ref<GDOculusPlatformPromise> &p_promise);
+
+	bool _fulfill_promise(uint64_t p_promise_id, Array val);
+	bool _reject_promise(uint64_t p_promise_id, Array val);
+
 	uint64_t _get_reject_promise_id();
 	void _reject_promises();
 
@@ -30,7 +34,7 @@ private:
 
 	bool _get_env(JNIEnv **p_env);
 
-	void _handle_default_process_error(ovrMessageHandle p_message, ovrRequest p_msg_id, Ref<GDOculusPlatformPromise> &p_promise);
+	void _handle_default_process_error(ovrMessageHandle p_message, ovrRequest p_msg_id);
 
 	void _process_initialize_android_async(ovrMessageHandle p_message);
 

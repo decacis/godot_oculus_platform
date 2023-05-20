@@ -17,7 +17,15 @@ achievements_get_definitions_by_name = Array[String](["TEST_BITFIELD_ACHIEV_0", 
 achievements_get_progress_by_name = Array[String](["TEST_COUNT_ACHIEV_0", "TEST_BITFIELD_ACHIEV_0"])
 IAP_get_products_by_sku = Array[String](["test_consumable_0", "test_durable_0"])
 IAP_consume_purchase = "test_consumable_0"
-IAP_launch_checkout_flow = "test_consumable_0"
+IAP_launch_checkout_flow = "test_durable_0"
+assetfile_status_by_id = "6355075617871935"
+assetfile_status_by_name = "dlc_1.pck"
+assetfile_download_by_id = "6355075617871935"
+assetfile_download_by_name = "dlc_1.pck"
+assetfile_download_cancel_by_id = "6355075617871935"
+assetfile_download_cancel_by_name = "dlc_1.pck"
+assetfile_delete_by_id = "6355075617871935"
+assetfile_delete_by_name = "dlc_1.pck"
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(900, 600)
@@ -215,6 +223,7 @@ size_flags_horizontal = 4
 text = "AchievementsGetProgressByName"
 
 [node name="IAP" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -272,6 +281,122 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "IAPLaunchCheckoutFlow"
 
+[node name="AssetFiles" type="MarginContainer" parent="PanelContainer/TabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/AssetFiles"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NoInputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer"]
+layout_mode = 2
+
+[node name="NoInputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+text = "No input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="AssetfileGetList" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileGetList"
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="AssetfileStatusByID" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileStatusById"
+
+[node name="AssetfileStatusByName" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileStatusByName"
+
+[node name="AssetfileDownloadByID" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileDownloadByID"
+
+[node name="AssetfileDownloadByName" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileDownloadByName"
+
+[node name="AssetfileDownloadCancelByID" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileDownloadCancelByID"
+
+[node name="AssetfileDownloadCancelByName" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileDownloadCancelByName"
+
+[node name="AssetfileDeleteByID" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileDeleteByID"
+
+[node name="AssetfileDeleteByName" type="Button" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "AssetfileDeleteByName"
+
+[node name="DownloadStatus" type="VBoxContainer" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="DownloadProgressLbl" type="Label" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer"]
+layout_mode = 2
+text = "Download progress:"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer"]
+layout_mode = 2
+
+[node name="DownloadProgressValLbl" type="Label" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "0.0 / 0.0"
+
+[node name="ProgressBar" type="ProgressBar" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+step = 1.0
+
+[node name="DownloadFinishedLbl" type="Label" parent="PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer"]
+visible = false
+layout_mode = 2
+text = "Finished!"
+
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserID" to="." method="_on_get_logged_in_user_id_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserLocale" to="." method="_on_get_logged_in_user_locale_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetIsViewerEntitled" to="." method="_on_get_is_viewer_entitled_pressed"]
@@ -297,3 +422,12 @@ text = "IAPLaunchCheckoutFlow"
 [connection signal="pressed" from="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPGetProductsBySKU" to="." method="_on_iap_get_products_by_sku_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPConsumePurchase" to="." method="_on_iap_consume_purchase_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPLaunchCheckoutFlow" to="." method="_on_iap_launch_checkout_flow_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/NoInputFuncs/HFlowContainer/AssetfileGetList" to="." method="_on_assetfile_get_list_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileStatusByID" to="." method="_on_assetfile_status_by_id_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileStatusByName" to="." method="_on_assetfile_status_by_name_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadByID" to="." method="_on_assetfile_download_by_id_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadByName" to="." method="_on_assetfile_download_by_name_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadCancelByID" to="." method="_on_assetfile_download_cancel_by_id_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadCancelByName" to="." method="_on_assetfile_download_cancel_by_name_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDeleteByID" to="." method="_on_assetfile_delete_by_id_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDeleteByName" to="." method="_on_assetfile_delete_by_name_pressed"]
