@@ -30,6 +30,14 @@ extends CanvasLayer
 @export var assetfile_delete_by_id : String = ""
 @export var assetfile_delete_by_name : String = ""
 
+@export_group("Leaderboard")
+@export var leaderboard_get : String = ""
+@export var leaderboard_get_entries : Dictionary = {}
+@export var leaderboard_get_entries_after_rank : Dictionary = {}
+@export var leaderboard_get_entries_by_ids : Dictionary = {}
+@export var leaderboard_write_entry : Dictionary = {}
+@export var leaderboard_write_entry_with_supplementary_metric : Dictionary = {}
+
 
 func _ready() -> void:
 	if !get_user_val.is_empty():
@@ -83,6 +91,20 @@ func _ready() -> void:
 		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDeleteByID.visible = true
 	if !assetfile_delete_by_name.is_empty():
 		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDeleteByName.visible = true
+	
+	## LEADERBOARD
+	if !leaderboard_get.is_empty():
+		$PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGet.visible = true
+	if !leaderboard_get_entries.is_empty():
+		$PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGetEntries.visible = true
+	if !leaderboard_get_entries_after_rank.is_empty():
+		$PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGetEntriesAfterRank.visible = true
+	if !leaderboard_get_entries_by_ids.is_empty():
+		$PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGetEntriesByIDs.visible = true
+	if !leaderboard_write_entry.is_empty():
+		$PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardWriteEntry.visible = true
+	if !leaderboard_write_entry_with_supplementary_metric.is_empty():
+		$PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardWriteEntryWithSupplementaryMetric.visible = true
 
 
 ## USER - NO INPUT FUNCS
@@ -518,4 +540,97 @@ func _on_assetfile_delete_by_name_pressed():
 	)\
 	.error(func(asset_files_del_err):
 		push_error("[assetfile_delete_by_name] ERROR: ", asset_files_del_err)
+	)
+
+
+## LEADERBOARD - INPUT FUNCS
+func _on_leaderboard_get_pressed():
+	print("-------------------------------------")
+	print("leaderboard_get CALLED")
+	print("INPUT: ", leaderboard_get)
+	GDOculusPlatform.leaderboard_get(leaderboard_get)\
+	.then(func(leaderboard_info : Dictionary):
+		print("[leaderboard_get] RESPONSE: ", leaderboard_info)
+	)\
+	.error(func(leaderboard_err):
+		push_error("[leaderboard_get] ERROR: ", leaderboard_err)
+	)
+
+func _on_leaderboard_get_entries_pressed():
+	print("-------------------------------------")
+	print("leaderboard_get_entries CALLED")
+	print("INPUT: ", leaderboard_get_entries)
+	GDOculusPlatform.leaderboard_get_entries(leaderboard_get_entries.name,\
+	leaderboard_get_entries.limit,\
+	leaderboard_get_entries.filter,\
+	leaderboard_get_entries.start_at\
+	)\
+	.then(func(leaderboard_e_resp : Array):
+		print("[leaderboard_get_entries] RESPONSE: ", leaderboard_e_resp)
+	)\
+	.error(func(leaderboard_err):
+		push_error("[leaderboard_get_entries] ERROR: ", leaderboard_err)
+	)
+
+func _on_leaderboard_get_entries_after_rank_pressed():
+	print("-------------------------------------")
+	print("leaderboard_get_entries_after_rank CALLED")
+	print("INPUT: ", leaderboard_get_entries_after_rank)
+	GDOculusPlatform.leaderboard_get_entries_after_rank(leaderboard_get_entries_after_rank.name,\
+	leaderboard_get_entries_after_rank.limit,\
+	leaderboard_get_entries_after_rank.after_rank\
+	)\
+	.then(func(leaderboard_e_resp : Array):
+		print("[leaderboard_get_entries_after_rank] RESPONSE: ", leaderboard_e_resp)
+	)\
+	.error(func(leaderboard_err):
+		push_error("[leaderboard_get_entries_after_rank] ERROR: ", leaderboard_err)
+	)
+
+func _on_leaderboard_get_entries_by_i_ds_pressed():
+	print("-------------------------------------")
+	print("leaderboard_get_entries_by_ids CALLED")
+	print("INPUT: ", leaderboard_get_entries_by_ids)
+	GDOculusPlatform.leaderboard_get_entries_by_ids(leaderboard_get_entries_by_ids.name,\
+	leaderboard_get_entries_by_ids.limit,\
+	leaderboard_get_entries_by_ids.start_at,\
+	leaderboard_get_entries_by_ids.user_ids\
+	)\
+	.then(func(leaderboard_e_resp : Array):
+		print("[leaderboard_get_entries_by_ids] RESPONSE: ", leaderboard_e_resp)
+	)\
+	.error(func(leaderboard_err):
+		push_error("[leaderboard_get_entries_by_ids] ERROR: ", leaderboard_err)
+	)
+
+func _on_leaderboard_write_entry_pressed():
+	print("-------------------------------------")
+	print("leaderboard_write_entry CALLED")
+	print("INPUT: ", leaderboard_write_entry)
+	GDOculusPlatform.leaderboard_write_entry(leaderboard_write_entry.name,\
+	leaderboard_write_entry.score,\
+	leaderboard_write_entry.force_update,\
+	leaderboard_write_entry.extra\
+	)\
+	.then(func(leaderboard_e_resp : Dictionary):
+		print("[leaderboard_write_entry] RESPONSE: ", leaderboard_e_resp)
+	)\
+	.error(func(leaderboard_err):
+		push_error("[leaderboard_write_entry] ERROR: ", leaderboard_err)
+	)
+
+func _on_leaderboard_write_entry_with_supplementary_metric_pressed():
+	print("-------------------------------------")
+	print("leaderboard_write_entry with supplementary metric CALLED")
+	print("INPUT: ", leaderboard_write_entry_with_supplementary_metric)
+	GDOculusPlatform.leaderboard_write_entry(leaderboard_write_entry_with_supplementary_metric.name,\
+	leaderboard_write_entry_with_supplementary_metric.score,\
+	leaderboard_write_entry_with_supplementary_metric.force_update,\
+	leaderboard_write_entry_with_supplementary_metric.extra\
+	)\
+	.then(func(leaderboard_e_resp : Dictionary):
+		print("[leaderboard_write_entry with supplementary metric] RESPONSE: ", leaderboard_e_resp)
+	)\
+	.error(func(leaderboard_err):
+		push_error("[leaderboard_write_entry with supplementary metric] ERROR: ", leaderboard_err)
 	)

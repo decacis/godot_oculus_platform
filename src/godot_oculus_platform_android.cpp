@@ -64,22 +64,17 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("leaderboard_get_entries", "leaderboard_name", "limit", "filter", "start_at"), &GDOculusPlatform::leaderboard_get_entries);
 	ClassDB::bind_method(D_METHOD("leaderboard_get_entries_after_rank", "leaderboard_name", "limit", "start_at"), &GDOculusPlatform::leaderboard_get_entries_after_rank);
 	ClassDB::bind_method(D_METHOD("leaderboard_get_entries_by_ids", "leaderboard_name", "limit", "start_at", "user_ids"), &GDOculusPlatform::leaderboard_get_entries_by_ids);
-	ClassDB::bind_method(D_METHOD("leaderboard_write_entry", "leaderboard_name", "score", "force_update", "extra_data"), &GDOculusPlatform::leaderboard_write_entry);
-	ClassDB::bind_method(D_METHOD("leaderboard_write_entry_with_supplementary_metric", "leaderboard_name", "score", "supplementary_metric", "force_update", "extra_data"), &GDOculusPlatform::leaderboard_write_entry_with_supplementary_metric);
+	ClassDB::bind_method(D_METHOD("leaderboard_write_entry", "leaderboard_name", "score", "force_update", "extra"), &GDOculusPlatform::leaderboard_write_entry);
 
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
 
-	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE); // 0
-	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS); // 1
-	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_UNKNOWN); // 2
-	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_USER_IDS); // 3
+	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE);		// 0
+	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS);	// 1
 
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP); // 0
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER); // 1
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP); // 2
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_UNKNOWN); // 3
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP);					// 0
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER);	// 1
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -324,9 +319,9 @@ void GDOculusPlatform::pump_messages() {
 				_process_leaderboard_get(message);
 				break;
 
-			case ovrMessage_Leaderboard_GetNextLeaderboardArrayPage:
-				_process_leaderboard_get(message);
-				break;
+			// case ovrMessage_Leaderboard_GetNextLeaderboardArrayPage:
+			// 	_process_leaderboard_get(message);
+			// 	break;
 
 			case ovrMessage_Leaderboard_GetEntries:
 				_process_leaderboard_get_entries(message, 1);
@@ -1065,7 +1060,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_after_ran
 	return return_promise;
 }
 
-Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, LeaderboardStartAt p_start_at, Array p_user_ids) {
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at) {
 	if (p_limit < 0) {
 		p_limit = 0;
 	} else if (p_limit > INT32_MAX) {
@@ -1106,33 +1101,67 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(St
 	return return_promise;
 }
 
-Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, String p_extra_data) {
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, Dictionary p_extra) {
 	if (p_score < 0) {
 		p_score = 0;
 	}
 
-	ovrRequest req = ovr_Leaderboard_WriteEntry(p_leaderboard_name.utf8().get_data(), p_score, p_extra_data.utf8().get_data(), p_extra_data.utf8().length(), p_force_update);
+	if (!p_extra.has("supplementary_metric")) {
 
-	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
-	_promises.push_back(return_promise);
+		if (!p_extra.has("extra_data")) {
+			p_extra["extra_data"] = String("");
+		
+		} else if (p_extra.get("extra_data", "").get_type() != Variant::STRING) {
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "Extra data must be a String.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
 
-	return return_promise;
-}
+			return return_promise;
+		}
 
-Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry_with_supplementary_metric(String p_leaderboard_name, uint64_t p_score, uint64_t p_supplementary_metric, bool p_force_update, String p_extra_data) {
-	if (p_score < 0) {
-		p_score = 0;
+		ovrRequest req = ovr_Leaderboard_WriteEntry(p_leaderboard_name.utf8().get_data(), p_score, ((String)p_extra["extra_data"]).utf8().get_data(), ((String)p_extra["extra_data"]).utf8().length(), p_force_update);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+
+		if (p_extra.get("supplementary_metric", "").get_type() != Variant::INT) {
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "Supplementary metric must be an int.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
+
+			return return_promise;
+		}
+
+		if (!p_extra.has("extra_data")) {
+			p_extra["extra_data"] = String("");
+		
+		} else if (p_extra.get("extra_data", "").get_type() != Variant::STRING) {
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "Extra data must be a String.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
+
+			return return_promise;
+		}
+
+		if ((uint64_t)p_extra.get("supplementary_metric", 0) < 0) {
+			p_extra["supplementary_metric"] = 0;
+		}
+
+		ovrRequest req = ovr_Leaderboard_WriteEntryWithSupplementaryMetric(p_leaderboard_name.utf8().get_data(), p_score, (int64_t)p_extra["supplementary_metric"], ((String)p_extra["extra_data"]).utf8().get_data(), ((String)p_extra["extra_data"]).utf8().length(), p_force_update);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
 	}
-	if (p_supplementary_metric < 0) {
-		p_supplementary_metric = 0;
-	}
-
-	ovrRequest req = ovr_Leaderboard_WriteEntryWithSupplementaryMetric(p_leaderboard_name.utf8().get_data(), p_score, p_supplementary_metric, p_extra_data.utf8().get_data(), p_extra_data.utf8().length(), p_force_update);
-
-	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
-	_promises.push_back(return_promise);
-
-	return return_promise;
 }
 
 /////////////////////////////////////////////////
@@ -1795,47 +1824,29 @@ void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
 
 	if (!ovr_Message_IsError(p_message)) {
 		ovrLeaderboardArrayHandle leaderboard_arr_handle = ovr_Message_GetLeaderboardArray(p_message);
-		size_t leaderboard_arr_s = ovr_LeaderboardArray_GetSize(leaderboard_arr_handle);
 
-		if (_get_promise(msg_id, promise)) {
-			if (promise->get_ids_count() == 1 && promise->saved_fulfill_response.is_empty()) { // Only the first time
-				promise->saved_fulfill_response = Array::make(Array());
-			}
+		ovrLeaderboardHandle leaderboard_handle = ovr_LeaderboardArray_GetElement(leaderboard_arr_handle, 0);
+		Dictionary leaderboard;
 
-			for (size_t i = 0; i < leaderboard_arr_s; i++) {
-				ovrLeaderboardHandle leaderboard_handle = ovr_LeaderboardArray_GetElement(leaderboard_arr_handle, i);
-				Dictionary leaderboard;
+		char native_id[OVRID_SIZE];
+		ovrID leaderboard_id = ovr_Leaderboard_GetID(leaderboard_handle);
+		ovrID_ToString(native_id, OVRID_SIZE, leaderboard_id);
 
-				char native_id[OVRID_SIZE];
-				ovrID leaderboard_id = ovr_Leaderboard_GetID(leaderboard_handle);
-				ovrID_ToString(native_id, OVRID_SIZE, leaderboard_id);
+		leaderboard["id"] = String(native_id);
+		leaderboard["api_name"] = ovr_Leaderboard_GetApiName(leaderboard_handle);
 
-				leaderboard["id"] = String(native_id);
-				leaderboard["api_name"] = ovr_Leaderboard_GetApiName(leaderboard_handle);
+		ovrDestinationHandle destination_handle = ovr_Leaderboard_GetDestination(leaderboard_handle);
+		if (destination_handle) {
+			Dictionary destination;
 
-				ovrDestinationHandle destination_handle = ovr_Leaderboard_GetDestination(leaderboard_handle);
-				if (destination_handle) {
-					Dictionary destination;
+			destination["display_name"] = ovr_Destination_GetDisplayName(destination_handle);
+			destination["api_name"] = ovr_Destination_GetApiName(destination_handle);
+			destination["deep_link_message"] = ovr_Destination_GetDeeplinkMessage(destination_handle);
 
-					destination["display_name"] = ovr_Destination_GetDisplayName(destination_handle);
-					destination["api_name"] = ovr_Destination_GetApiName(destination_handle);
-					destination["deep_link_message"] = ovr_Destination_GetDeeplinkMessage(destination_handle);
-
-					leaderboard["destination"] = destination;
-				}
-
-				((Array)promise->saved_fulfill_response[0]).push_back(leaderboard);
-			}
-
-			if (!ovr_LeaderboardArray_HasNextPage(leaderboard_arr_handle)) {
-				_promises.erase(promise);
-				promise->fulfill(promise->saved_fulfill_response);
-
-			} else {
-				ovrRequest new_req = ovr_Leaderboard_GetNextLeaderboardArrayPage(leaderboard_arr_handle);
-				promise->add_id(new_req);
-			}
+			leaderboard["destination"] = destination;
 		}
+
+		_fulfill_promise(msg_id, Array::make(leaderboard));
 
 	} else {
 		_handle_default_process_error(p_message, msg_id);

@@ -93,16 +93,12 @@ public:
 
 	enum LeaderboardFilterType {
 		LEADERBOARD_FILTER_TYPE_NONE = ovrLeaderboard_FilterNone,
-		LEADERBOARD_FILTER_TYPE_FRIENDS = ovrLeaderboard_FilterFriends,
-		LEADERBOARD_FILTER_TYPE_UNKNOWN = ovrLeaderboard_FilterUnknown,
-		LEADERBOARD_FILTER_TYPE_USER_IDS = ovrLeaderboard_FilterUserIds
+		LEADERBOARD_FILTER_TYPE_FRIENDS = ovrLeaderboard_FilterFriends
 	};
 
 	enum LeaderboardStartAt {
 		LEADERBOARD_START_AT_TOP = ovrLeaderboard_StartAtTop,
-		LEADERBOARD_START_AT_CENTERED_ON_VIEWER = ovrLeaderboard_StartAtCenteredOnViewer,
-		LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP = ovrLeaderboard_StartAtCenteredOnViewerOrTop,
-		LEADERBOARD_START_AT_UNKNOWN = ovrLeaderboard_StartAtUnknown
+		LEADERBOARD_START_AT_CENTERED_ON_VIEWER = ovrLeaderboard_StartAtCenteredOnViewer
 	};
 
 	bool initialize_android(String p_app_id);
@@ -152,11 +148,10 @@ public:
 
 	// LEADERBOARD
 	Ref<GDOculusPlatformPromise> leaderboard_get(String p_leaderboard_name);
-	Ref<GDOculusPlatformPromise> leaderboard_get_entries(String p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter = LEADERBOARD_FILTER_TYPE_NONE, LeaderboardStartAt p_start_at = LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP);
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries(String p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter = LEADERBOARD_FILTER_TYPE_NONE, LeaderboardStartAt p_start_at = LEADERBOARD_START_AT_TOP);
 	Ref<GDOculusPlatformPromise> leaderboard_get_entries_after_rank(String p_leaderboard_name, uint64_t p_limit, uint64_t p_after_rank);
-	Ref<GDOculusPlatformPromise> leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, LeaderboardStartAt p_start_at, Array p_user_ids);
-	Ref<GDOculusPlatformPromise> leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, String p_extra_data = String(""));
-	Ref<GDOculusPlatformPromise> leaderboard_write_entry_with_supplementary_metric(String p_leaderboard_name, uint64_t p_score, uint64_t p_supplementary_metric, bool p_force_update, String p_extra_data = String(""));
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at = LEADERBOARD_START_AT_TOP);
+	Ref<GDOculusPlatformPromise> leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update = false, Dictionary p_extra = Dictionary());
 
 	void pump_messages();
 };

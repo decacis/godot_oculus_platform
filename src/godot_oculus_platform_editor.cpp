@@ -68,8 +68,7 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("leaderboard_get_entries", "leaderboard_name", "limit", "filter", "start_at"), &GDOculusPlatform::leaderboard_get_entries);
 	ClassDB::bind_method(D_METHOD("leaderboard_get_entries_after_rank", "leaderboard_name", "limit", "start_at"), &GDOculusPlatform::leaderboard_get_entries_after_rank);
 	ClassDB::bind_method(D_METHOD("leaderboard_get_entries_by_ids", "leaderboard_name", "limit", "start_at", "user_ids"), &GDOculusPlatform::leaderboard_get_entries_by_ids);
-	ClassDB::bind_method(D_METHOD("leaderboard_write_entry", "leaderboard_name", "score", "force_update", "extra_data"), &GDOculusPlatform::leaderboard_write_entry);
-	ClassDB::bind_method(D_METHOD("leaderboard_write_entry_with_supplementary_metric", "leaderboard_name", "score", "supplementary_metric", "force_update", "extra_data"), &GDOculusPlatform::leaderboard_write_entry_with_supplementary_metric);
+	ClassDB::bind_method(D_METHOD("leaderboard_write_entry", "leaderboard_name", "score", "force_update", "extra"), &GDOculusPlatform::leaderboard_write_entry);
 
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
@@ -77,13 +76,9 @@ void GDOculusPlatform::_bind_methods() {
 
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE);		// 0
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS);	// 1
-	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_UNKNOWN);	// 2
-	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_USER_IDS);	// 3
 
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP);						// 0
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER);		// 1
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP);	// 2
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_UNKNOWN);					// 3
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP);					// 0
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER);	// 1
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -293,14 +288,10 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_after_ran
 	return _empty_func_helper();
 }
 
-Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, LeaderboardStartAt p_start_at, Array p_user_ids) {
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at) {
 	return _empty_func_helper();
 }
 
-Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, String p_extra_data) {
-	return _empty_func_helper();
-}
-
-Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry_with_supplementary_metric(String p_leaderboard_name, uint64_t p_score, uint64_t p_supplementary_metric, bool p_force_update, String p_extra_data) {
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, Dictionary p_extra) {
 	return _empty_func_helper();
 }

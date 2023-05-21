@@ -26,6 +26,41 @@ assetfile_download_cancel_by_id = "6355075617871935"
 assetfile_download_cancel_by_name = "dlc_1.pck"
 assetfile_delete_by_id = "6355075617871935"
 assetfile_delete_by_name = "dlc_1.pck"
+leaderboard_get = "TEST_LEADERBOARD_0"
+leaderboard_get_entries = {
+"filter": 0,
+"limit": 50,
+"name": "TEST_LEADERBOARD_0",
+"start_at": 2
+}
+leaderboard_get_entries_after_rank = {
+"after_rank": 0,
+"limit": 50,
+"name": "TEST_LEADERBOARD_0"
+}
+leaderboard_get_entries_by_ids = {
+"limit": 50,
+"name": "TEST_LEADERBOARD_0",
+"start_at": 2,
+"user_ids": ["00000"]
+}
+leaderboard_write_entry = {
+"extra": {
+"extra_data": "test extra data"
+},
+"force_update": true,
+"name": "TEST_LEADERBOARD_0",
+"score": 1
+}
+leaderboard_write_entry_with_supplementary_metric = {
+"extra": {
+"extra_data": "",
+"supplementary_metric": 3
+},
+"force_update": true,
+"name": "TEST_LEADERBOARD_0",
+"score": 2
+}
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(900, 600)
@@ -36,7 +71,6 @@ offset_bottom = 40.0
 layout_mode = 2
 
 [node name="User" type="MarginContainer" parent="PanelContainer/TabContainer"]
-visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -282,6 +316,7 @@ size_flags_horizontal = 4
 text = "IAPLaunchCheckoutFlow"
 
 [node name="AssetFiles" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -397,6 +432,66 @@ visible = false
 layout_mode = 2
 text = "Finished!"
 
+[node name="Leaderboard" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/Leaderboard"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="LeaderboardGet" type="Button" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LeaderboardGet"
+
+[node name="LeaderboardGetEntries" type="Button" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LeaderboardGetEntries"
+
+[node name="LeaderboardGetEntriesAfterRank" type="Button" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LeaderboardGetEntriesAfterRank"
+
+[node name="LeaderboardGetEntriesByIDs" type="Button" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LeaderboardGetEntriesByIDs"
+
+[node name="LeaderboardWriteEntry" type="Button" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LeaderboardWriteEntry"
+
+[node name="LeaderboardWriteEntryWithSupplementaryMetric" type="Button" parent="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "LeaderboardWriteEntryWithSupplementaryMetric"
+
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserID" to="." method="_on_get_logged_in_user_id_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserLocale" to="." method="_on_get_logged_in_user_locale_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetIsViewerEntitled" to="." method="_on_get_is_viewer_entitled_pressed"]
@@ -431,3 +526,9 @@ text = "Finished!"
 [connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDownloadCancelByName" to="." method="_on_assetfile_download_cancel_by_name_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDeleteByID" to="." method="_on_assetfile_delete_by_id_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileDeleteByName" to="." method="_on_assetfile_delete_by_name_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGet" to="." method="_on_leaderboard_get_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGetEntries" to="." method="_on_leaderboard_get_entries_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGetEntriesAfterRank" to="." method="_on_leaderboard_get_entries_after_rank_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGetEntriesByIDs" to="." method="_on_leaderboard_get_entries_by_i_ds_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardWriteEntry" to="." method="_on_leaderboard_write_entry_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardWriteEntryWithSupplementaryMetric" to="." method="_on_leaderboard_write_entry_with_supplementary_metric_pressed"]
