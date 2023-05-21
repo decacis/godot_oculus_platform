@@ -1,8 +1,8 @@
 # Functions - Asset Files
 Related Oculus Platform documentation:
 
-- [https://developer.oculus.com/documentation/native/ps-iap/](https://developer.oculus.com/documentation/native/ps-iap/)
 - [https://developer.oculus.com/resources/add-ons/](https://developer.oculus.com/resources/add-ons/)
+- [https://developer.oculus.com/documentation/native/ps-iap/](https://developer.oculus.com/documentation/native/ps-iap/)
 
 ------
 ## assetfile_get_list
