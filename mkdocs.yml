@@ -17,6 +17,7 @@ nav:
     - Achievements: 'functions/achievements.md'
     - In-App Purchases: 'functions/in-app-purchases.md'
     - Asset Files: 'functions/asset-files.md'
+    - Leaderboards: 'functions/leaderboards.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg

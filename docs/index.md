@@ -31,5 +31,5 @@ The following table tracks the supported functions from the Oculus Platform SDK:
 | [Achievements](/godot_oculus_platform/functions/achievements/)              |   ✔️   |
 | [In-App Purchases](/godot_oculus_platform/functions/in-app-purchases/)      |   ✔️   |
 | [Asset Files](/godot_oculus_platform/functions/asset-files/)                |   ✔️   |
-| Leaderboard                                                                 |   ❌   |
+| [Leaderboards](/godot_oculus_platform/functions/leaderboards/)              |   ✔️   |
 | Deep Linking                                                                |   ❌   |
