@@ -593,8 +593,8 @@ func _on_leaderboard_get_entries_by_i_ds_pressed():
 	print("INPUT: ", leaderboard_get_entries_by_ids)
 	GDOculusPlatform.leaderboard_get_entries_by_ids(leaderboard_get_entries_by_ids.name,\
 	leaderboard_get_entries_by_ids.limit,\
-	leaderboard_get_entries_by_ids.start_at,\
-	leaderboard_get_entries_by_ids.user_ids\
+	leaderboard_get_entries_by_ids.user_ids,\
+	leaderboard_get_entries_by_ids.start_at\
 	)\
 	.then(func(leaderboard_e_resp : Array):
 		print("[leaderboard_get_entries_by_ids] RESPONSE: ", leaderboard_e_resp)

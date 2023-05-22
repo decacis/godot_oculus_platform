@@ -74,6 +74,13 @@ private:
 	void _process_leaderboard_get_entries(ovrMessageHandle p_message, int p_mode = 1);
 	void _process_leaderboard_write_entry(ovrMessageHandle p_message);
 
+	// ABUSE REPORT
+	void _process_abuse_report_handled(ovrMessageHandle p_message);
+
+	// APPLICATION
+	void _process_application_get_version(ovrMessageHandle p_message);
+	void _process_application_launch_other_app(ovrMessageHandle p_message);
+
 	// LEADERBOARD HELPERS
 	void _handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle p_entries_arr_handle, int p_promise_arr_ind, Ref<GDOculusPlatformPromise> &p_promise);
 
@@ -91,6 +98,11 @@ public:
 	GDOculusPlatform();
 	~GDOculusPlatform();
 
+	enum ReportRequestResponse {
+		REPORT_REQUEST_HANDLED = ovrReportRequestResponse_Handled,
+		REPORT_REQUEST_UNHANDLED = ovrReportRequestResponse_Unhandled
+	};
+
 	enum LeaderboardFilterType {
 		LEADERBOARD_FILTER_TYPE_NONE = ovrLeaderboard_FilterNone,
 		LEADERBOARD_FILTER_TYPE_FRIENDS = ovrLeaderboard_FilterFriends
@@ -103,6 +115,9 @@ public:
 
 	bool initialize_android(String p_app_id);
 	Ref<GDOculusPlatformPromise> initialize_android_async(String p_app_id);
+
+	// ABUSE REPORT
+	Ref<GDOculusPlatformPromise> abuse_report_request_handled(ReportRequestResponse p_report_req_resp);
 
 	// USER
 	String user_get_logged_in_user_id();
@@ -153,6 +168,11 @@ public:
 	Ref<GDOculusPlatformPromise> leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at = LEADERBOARD_START_AT_TOP);
 	Ref<GDOculusPlatformPromise> leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update = false, Dictionary p_extra = Dictionary());
 
+	// APPLICATION
+	Ref<GDOculusPlatformPromise> application_get_version();
+	Ref<GDOculusPlatformPromise> application_launch_other_app(String p_app_id, Dictionary p_deeplink_options = Dictionary());
+	Dictionary application_get_launch_details();
+
 	void pump_messages();
 };
 
@@ -160,5 +180,6 @@ public:
 
 VARIANT_ENUM_CAST(GDOculusPlatform::LeaderboardFilterType);
 VARIANT_ENUM_CAST(GDOculusPlatform::LeaderboardStartAt);
+VARIANT_ENUM_CAST(GDOculusPlatform::ReportRequestResponse);
 
 #endif // GDOCULUSPLATFORM_H

@@ -66,15 +66,28 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("leaderboard_get_entries_by_ids", "leaderboard_name", "limit", "start_at", "user_ids"), &GDOculusPlatform::leaderboard_get_entries_by_ids);
 	ClassDB::bind_method(D_METHOD("leaderboard_write_entry", "leaderboard_name", "score", "force_update", "extra"), &GDOculusPlatform::leaderboard_write_entry);
 
+	// ABUSE REPORT
+	ClassDB::bind_method(D_METHOD("abuse_report_request_handled", "report_request_response"), &GDOculusPlatform::abuse_report_request_handled);
+
+	// APPLICATION
+	ClassDB::bind_method(D_METHOD("application_get_version"), &GDOculusPlatform::application_get_version);
+	ClassDB::bind_method(D_METHOD("application_launch_other_app", "app_id", "deeplink_options"), &GDOculusPlatform::application_launch_other_app);
+	ClassDB::bind_method(D_METHOD("application_get_launch_details"), &GDOculusPlatform::application_get_launch_details);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
+	ADD_SIGNAL(MethodInfo("abouse_report_form_requested"));
+	ADD_SIGNAL(MethodInfo("app_launch_intent_changed", PropertyInfo(Variant::STRING, "intent_type")));
 
-	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE);		// 0
-	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS);	// 1
+	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE); // 0
+	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS); // 1
 
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP);					// 0
-	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER);	// 1
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP); // 0
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER); // 1
+
+	BIND_ENUM_CONSTANT(REPORT_REQUEST_HANDLED); // 1
+	BIND_ENUM_CONSTANT(REPORT_REQUEST_UNHANDLED); // 2
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -319,9 +332,9 @@ void GDOculusPlatform::pump_messages() {
 				_process_leaderboard_get(message);
 				break;
 
-			// case ovrMessage_Leaderboard_GetNextLeaderboardArrayPage:
-			// 	_process_leaderboard_get(message);
-			// 	break;
+				// case ovrMessage_Leaderboard_GetNextLeaderboardArrayPage:
+				// 	_process_leaderboard_get(message);
+				// 	break;
 
 			case ovrMessage_Leaderboard_GetEntries:
 				_process_leaderboard_get_entries(message, 1);
@@ -349,6 +362,26 @@ void GDOculusPlatform::pump_messages() {
 
 			case ovrMessage_Leaderboard_WriteEntryWithSupplementaryMetric:
 				_process_leaderboard_write_entry(message);
+				break;
+
+			case ovrMessage_Notification_AbuseReport_ReportButtonPressed:
+				emit_signal("abouse_report_form_requested");
+				break;
+
+			case ovrMessage_AbuseReport_ReportRequestHandled:
+				_process_abuse_report_handled(message);
+				break;
+
+			case ovrMessage_Application_GetVersion:
+				_process_application_get_version(message);
+				break;
+
+			case ovrMessage_Application_LaunchOtherApp:
+				_process_application_launch_other_app(message);
+				break;
+
+			case ovrMessage_Notification_ApplicationLifecycle_LaunchIntentChanged:
+				emit_signal("app_launch_intent_changed", String(ovr_Message_GetString(message)));
 				break;
 
 			default:
@@ -1021,6 +1054,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_name(String p
 ///// LEADERBOARD
 /////////////////////////////////////////////////
 
+/// Requests information about a single leaderboard.
+/// @return Promise that contains a Dictionary with the ID and API name of the leaderboard, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get(String p_leaderboard_name) {
 	ovrRequest req = ovr_Leaderboard_Get(p_leaderboard_name.utf8().get_data());
 
@@ -1030,6 +1065,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get(String p_leaderbo
 	return return_promise;
 }
 
+/// Requests entries of a given leaderboard. Several filters can be applied to narrow down the result.
+/// @return Promise that contains an Array of Dictionaries as entries of the leaderboard, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries(String p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at) {
 	if (p_limit < 0) {
 		p_limit = 0;
@@ -1045,6 +1082,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries(String p_
 	return return_promise;
 }
 
+/// Requests entries after a rank of a given leaderboard. No other filters can be applied.
+/// @return Promise that contains an Array of Dictionaries as entries of the leaderboard, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_after_rank(String p_leaderboard_name, uint64_t p_limit, uint64_t p_after_rank) {
 	if (p_limit < 0) {
 		p_limit = 0;
@@ -1060,6 +1099,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_after_ran
 	return return_promise;
 }
 
+/// Requests entries of a given leaderboard. Only returns entries that match the given IDs.
+/// @return Promise that contains an Array of Dictionaries as entries of the leaderboard, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at) {
 	if (p_limit < 0) {
 		p_limit = 0;
@@ -1101,16 +1142,17 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(St
 	return return_promise;
 }
 
+/// Sends a request to write an entry to a leaderboard. Several options such as supplementary metrics and extra data can be specified.
+/// @return Promise that contains a Dictionary with info about the request status, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, Dictionary p_extra) {
 	if (p_score < 0) {
 		p_score = 0;
 	}
 
 	if (!p_extra.has("supplementary_metric")) {
-
 		if (!p_extra.has("extra_data")) {
 			p_extra["extra_data"] = String("");
-		
+
 		} else if (p_extra.get("extra_data", "").get_type() != Variant::STRING) {
 			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 			String rejection_msg = "Extra data must be a String.";
@@ -1128,7 +1170,6 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_
 		return return_promise;
 
 	} else {
-
 		if (p_extra.get("supplementary_metric", "").get_type() != Variant::INT) {
 			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 			String rejection_msg = "Supplementary metric must be an int.";
@@ -1140,7 +1181,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_
 
 		if (!p_extra.has("extra_data")) {
 			p_extra["extra_data"] = String("");
-		
+
 		} else if (p_extra.get("extra_data", "").get_type() != Variant::STRING) {
 			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 			String rejection_msg = "Extra data must be a String.";
@@ -1160,8 +1201,178 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_
 		_promises.push_back(return_promise);
 
 		return return_promise;
-
 	}
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// ABUSE REPORT
+/////////////////////////////////////////////////
+
+/// Informs the platform whether the app handled or not the report request.
+/// @return Promise that will contain a true bool if the request was successful.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::abuse_report_request_handled(ReportRequestResponse p_report_req_resp) {
+	ovrRequest req = ovr_AbuseReport_ReportRequestHandled((ovrReportRequestResponse)p_report_req_resp);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// APPLICATION
+/////////////////////////////////////////////////
+
+/// Requests information about the app, including current installed version and latest version.
+/// @return Promise that will contain a Dictionary with information about the app.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_get_version() {
+	ovrRequest req = ovr_Application_GetVersion();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests the platform to launch another app.
+/// @return Promise that will contain a message with information about the request.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(String p_app_id, Dictionary p_deeplink_options) {
+	ovrApplicationOptionsHandle deeplink_options = ovr_ApplicationOptions_Create();
+	ovrID app_id;
+
+	if (ovrID_FromString(&app_id, p_app_id.utf8().get_data())) {
+		if (!p_deeplink_options.is_empty()) {
+			if (p_deeplink_options.has("deeplink_message")) {
+				if (!p_deeplink_options.get("deeplink_message", 0).get_type() != Variant::STRING) {
+					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+					String rejection_msg = "The deeplink_message value must be a String.";
+					return_promise->saved_rejection_response = Array::make(rejection_msg);
+					_promises_to_reject.push_back(return_promise);
+
+					return return_promise;
+
+				} else {
+					ovr_ApplicationOptions_SetDeeplinkMessage(deeplink_options, ((String)p_deeplink_options["deeplink_message"]).utf8().get_data());
+				}
+
+				if (p_deeplink_options.has("destination_api_name")) {
+					if (!p_deeplink_options.get("destination_api_name", 0).get_type() != Variant::STRING) {
+						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+						String rejection_msg = "The destination_api_name value must be a String.";
+						return_promise->saved_rejection_response = Array::make(rejection_msg);
+						_promises_to_reject.push_back(return_promise);
+
+						return return_promise;
+					} else {
+						ovr_ApplicationOptions_SetDestinationApiName(deeplink_options, ((String)p_deeplink_options["destination_api_name"]).utf8().get_data());
+					}
+				}
+
+				if (p_deeplink_options.has("lobby_session_id")) {
+					if (!p_deeplink_options.get("lobby_session_id", 0).get_type() != Variant::STRING) {
+						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+						String rejection_msg = "The destination_api_name value must be a String.";
+						return_promise->saved_rejection_response = Array::make(rejection_msg);
+						_promises_to_reject.push_back(return_promise);
+
+						return return_promise;
+					} else {
+						ovr_ApplicationOptions_SetLobbySessionId(deeplink_options, ((String)p_deeplink_options["lobby_session_id"]).utf8().get_data());
+					}
+				}
+
+				if (p_deeplink_options.has("match_session_id")) {
+					if (!p_deeplink_options.get("match_session_id", 0).get_type() != Variant::STRING) {
+						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+						String rejection_msg = "The destination_api_name value must be a String.";
+						return_promise->saved_rejection_response = Array::make(rejection_msg);
+						_promises_to_reject.push_back(return_promise);
+
+						return return_promise;
+					} else {
+						ovr_ApplicationOptions_SetMatchSessionId(deeplink_options, ((String)p_deeplink_options["match_session_id"]).utf8().get_data());
+					}
+				}
+
+				ovrRequest req = ovr_Application_LaunchOtherApp(app_id, deeplink_options);
+
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+				_promises.push_back(return_promise);
+
+				return return_promise;
+
+			} else {
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "A deeplink_message is required when supplying a non-empty deeplink_options dictionary.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+
+		} else {
+			ovr_ApplicationOptions_SetDeeplinkMessage(deeplink_options, "");
+
+			ovrRequest req = ovr_Application_LaunchOtherApp(app_id, deeplink_options);
+
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+			_promises.push_back(return_promise);
+
+			return return_promise;
+		}
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid app id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+/// Requests information about the app's launch.
+/// @return A Dictionary with info about the app launch. This can be used to place the player in a specific place inside your app.
+Dictionary GDOculusPlatform::application_get_launch_details() {
+	ovrLaunchDetailsHandle launch_details_h = ovr_ApplicationLifecycle_GetLaunchDetails();
+
+	Dictionary resp;
+
+	resp["deeplink_message"] = ovr_LaunchDetails_GetDeeplinkMessage(launch_details_h);
+	resp["destination_api_name"] = ovr_LaunchDetails_GetDestinationApiName(launch_details_h);
+	resp["lobby_session_id"] = ovr_LaunchDetails_GetLobbySessionID(launch_details_h);
+	resp["match_session_id"] = ovr_LaunchDetails_GetMatchSessionID(launch_details_h);
+	resp["tracking_id"] = ovr_LaunchDetails_GetTrackingID(launch_details_h);
+	resp["launch_source"] = ovr_LaunchDetails_GetLaunchSource(launch_details_h);
+
+	// DEEPLINK, COORDINATED, INVITE, NORMAL, UNKNOWN
+	ovrLaunchType launch_type = ovr_LaunchDetails_GetLaunchType(launch_details_h);
+	resp["launch_type"] = ovrLaunchType_ToString(launch_type);
+
+	ovrUserArrayHandle user_arr_h = ovr_LaunchDetails_GetUsers(launch_details_h);
+	if (user_arr_h) {
+		Array new_user_arr = Array();
+		size_t user_arr_s = ovr_UserArray_GetSize(user_arr_h);
+
+		for (size_t i = 0; i < user_arr_s; i++) {
+			ovrUserHandle user_h = ovr_UserArray_GetElement(user_arr_h, i);
+			Dictionary user_info = _get_user_information(user_h);
+
+			new_user_arr.push_back(user_info);
+		}
+
+		if (ovr_UserArray_HasNextPage(user_arr_h)) {
+			WARN_PRINT("Unexpected behavior. There may be more users than reported here, please contact the developers of the Godot Oculus Platform plugin about this message.");
+		}
+
+		resp["users"] = new_user_arr;
+	} else {
+		resp["users"] = Array();
+	}
+
+	return resp;
 }
 
 /////////////////////////////////////////////////
@@ -1817,7 +2028,7 @@ void GDOculusPlatform::_process_assetfile_delete(ovrMessageHandle p_message) {
 ///// LEADERBOARD
 /////////////////////////////////////////////////
 
-/// Processes the response from a request to download a single asset file
+/// Processes the response from a request to get a single leaderboard
 void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 	Ref<GDOculusPlatformPromise> promise;
@@ -1853,7 +2064,7 @@ void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
 	}
 }
 
-/// Processes the response from a request to delete a single asset file
+/// Processes the response from a request to get entries of a leaderboard. This function automatically paginates through the data
 void GDOculusPlatform::_process_leaderboard_get_entries(ovrMessageHandle p_message, int p_mode) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 	Ref<GDOculusPlatformPromise> promise;
@@ -1959,7 +2170,7 @@ void GDOculusPlatform::_process_leaderboard_get_entries(ovrMessageHandle p_messa
 	}
 }
 
-/// Processes the response from a request to delete a single asset file
+/// Processes the response from a request to write an entry to a leaderboard
 void GDOculusPlatform::_process_leaderboard_write_entry(ovrMessageHandle p_message) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
@@ -1981,6 +2192,58 @@ void GDOculusPlatform::_process_leaderboard_write_entry(ovrMessageHandle p_messa
 		leaderboard_update["challenge_ids"] = challenges_ids;
 
 		_fulfill_promise(msg_id, Array::make(leaderboard_update));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+///// ABUSE REPORT
+/////////////////////////////////////////////////
+
+/// Processes report request handled [response]
+void GDOculusPlatform::_process_abuse_report_handled(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+///// APPLICATION
+/////////////////////////////////////////////////
+
+/// Processes the result of launching another app from the current app
+void GDOculusPlatform::_process_application_launch_other_app(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		String msg = ovr_Message_GetString(p_message);
+		_fulfill_promise(msg_id, Array::make(msg));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+/// Processes the result of the version launch request
+void GDOculusPlatform::_process_application_get_version(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrApplicationVersionHandle version_h = ovr_Message_GetApplicationVersion(p_message);
+
+		Dictionary version_info;
+
+		version_info["current_code"] = ovr_ApplicationVersion_GetCurrentCode(version_h);
+		version_info["latest_code"] = ovr_ApplicationVersion_GetLatestCode(version_h);
+		version_info["current_name"] = ovr_ApplicationVersion_GetCurrentName(version_h);
+		version_info["latest_name"] = ovr_ApplicationVersion_GetLatestName(version_h);
+
+		_fulfill_promise(msg_id, Array::make(version_info));
 
 	} else {
 		_handle_default_process_error(p_message, msg_id);

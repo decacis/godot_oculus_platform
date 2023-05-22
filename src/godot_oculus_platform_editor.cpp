@@ -70,15 +70,28 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("leaderboard_get_entries_by_ids", "leaderboard_name", "limit", "start_at", "user_ids"), &GDOculusPlatform::leaderboard_get_entries_by_ids);
 	ClassDB::bind_method(D_METHOD("leaderboard_write_entry", "leaderboard_name", "score", "force_update", "extra"), &GDOculusPlatform::leaderboard_write_entry);
 
+	// ABUSE REPORT
+	ClassDB::bind_method(D_METHOD("abuse_report_request_handled", "report_request_response"), &GDOculusPlatform::abuse_report_request_handled);
+
+	// APPLICATION
+	ClassDB::bind_method(D_METHOD("application_get_version"), &GDOculusPlatform::application_get_version);
+	ClassDB::bind_method(D_METHOD("application_launch_other_app", "app_id", "deeplink_options"), &GDOculusPlatform::application_launch_other_app);
+	ClassDB::bind_method(D_METHOD("application_get_launch_details"), &GDOculusPlatform::application_get_launch_details);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
+	ADD_SIGNAL(MethodInfo("abouse_report_form_requested"));
+	ADD_SIGNAL(MethodInfo("app_launch_intent_changed", PropertyInfo(Variant::STRING, "intent_type")));
 
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE);		// 0
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS);	// 1
 
 	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP);					// 0
 	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER);	// 1
+
+	BIND_ENUM_CONSTANT(REPORT_REQUEST_HANDLED);		// 1
+	BIND_ENUM_CONSTANT(REPORT_REQUEST_UNHANDLED);	// 2
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -295,3 +308,29 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(St
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, Dictionary p_extra) {
 	return _empty_func_helper();
 }
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// ABUSE REPORT
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::abuse_report_request_handled(ReportRequestResponse p_report_req_resp) {
+	return _empty_func_helper();
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// APPLICATION
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_get_version() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(String p_app_id, Dictionary p_deeplink_options) {
+	return _empty_func_helper();
+};
+
+Dictionary GDOculusPlatform::application_get_launch_details() {
+	return Dictionary();
+};
