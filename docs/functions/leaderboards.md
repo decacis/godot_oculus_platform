@@ -105,8 +105,8 @@ The `timestamp` key is a UNIX timestamp (in seconds).
 var leaderboard_info : Dictionary = {
     "name": "MY_LEADERBOARD_0",
     "limit": 50,
-    "filter": LeaderboardFilterType.LEADERBOARD_FILTER_TYPE_NONE,
-    "start_at": LeaderboardStartAt.LEADERBOARD_START_AT_CENTERED_ON_VIEWER
+    "filter": GDOculusPlatform.LEADERBOARD_FILTER_TYPE_NONE,
+    "start_at": GDOculusPlatform.LEADERBOARD_START_AT_CENTERED_ON_VIEWER
 }
 
 GDOculusPlatform.leaderboard_get_entries(\
@@ -197,7 +197,7 @@ var leaderboard_info : Dictionary = {
         "4238760617434810",
         "7438380617106547"
     ],
-    "start_at": LeaderboardStartAt.LEADERBOARD_START_AT_TOP
+    "start_at": GDOculusPlatform.LEADERBOARD_START_AT_TOP
 }
 
 GDOculusPlatform.leaderboard_get_entries_by_ids(\

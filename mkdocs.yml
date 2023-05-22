@@ -13,6 +13,8 @@ nav:
   - Build: build.md
   - Functions:
     - Initialization: 'functions/initialization.md'
+    - Application: 'functions/application.md'
+    - Abuse Report: 'functions/abuse-report.md'
     - User: 'functions/user.md'
     - Achievements: 'functions/achievements.md'
     - In-App Purchases: 'functions/in-app-purchases.md'

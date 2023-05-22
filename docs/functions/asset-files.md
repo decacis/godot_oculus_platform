@@ -5,6 +5,31 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-iap/](https://developer.oculus.com/documentation/native/ps-iap/)
 
 ------
+## Signals
+
+### assetfile_download_update
+//// admonition | About
+    type: abstract
+This signal will be emitted periodically to track the progress of the download. Here's an example of the payload of the signal:
+
+``` json linenums="1"
+{
+    "id": "821548111514",
+    "completed": false,
+    "total_bytes": 2048,
+    "transferred_bytes": 1024
+}
+```
+Note that the first time the `assetfile_download_update` `Signal` gets emitted, the values may be `0` for `total_bytes` and `transferred_bytes`. You should wait/check until the `Signal` has a payload with `total_bytes` more than `0` if you intend to use this value to show a progress bar, for example.
+////
+
+### assetfile_download_finished
+//// admonition | About
+    type: abstract
+This signal will be emitted once the asset file has finished downloading. It will have a `String` with the asset file ID as a payload. Note that the `assetfile_download_update` `Signal` will be emitted one last time as well with `completed` as `true`.
+////
+
+------
 ## assetfile_get_list
 //// admonition | assetfile_get_list()
     type: abstract
@@ -162,20 +187,7 @@ Example response:
 
 The `file_path` in the dictionary does not indicate that the asset has finished downloading, it just indicates where the asset will be/is being downloaded.
 
-An `assetfile_download_update` `Signal` will be emitted periodically to track the progress of the download. Here's an example of the payload of the signal:
-
-``` json linenums="1"
-{
-    "id": "821548111514",
-    "completed": false,
-    "total_bytes": 2048,
-    "transferred_bytes": 1024
-}
-```
-Note that the first time the `assetfile_download_update` `Signal` gets emitted, the values may be `0` for `total_bytes` and `transferred_bytes`. You should wait/check until the `Signal` has a payload with `total_bytes` more than `0` if you intend to use this value to show a progress bar, for example.
-
-An `assetfile_download_finished` `Signal` will be emitted once the asset file has finished downloading. It will have a `String` with the asset file ID as a payload. Note that the `assetfile_download_update` `Signal` will be emitted one last time as well with `completed` as `true`.
-
+See the [Signals](#signals) section to know about useful signals to track the progress of the download.
 ///
 
 /// details | Example

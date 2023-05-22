@@ -27,9 +27,13 @@ The following table tracks the supported functions from the Oculus Platform SDK:
 | Category                                                                    | Status |
 |-----------------------------------------------------------------------------|:------:|
 | [Platform initialization](/godot_oculus_platform/functions/initialization/) |   ✔️   |
+| [Application](/godot_oculus_platform/functions/application/)                |   ✔️   |
+| [Abuse Report](/godot_oculus_platform/functions/abuse-report/)              |   ✔️   |
 | [User](/godot_oculus_platform/functions/user/)                              |   ✔️   |
 | [Achievements](/godot_oculus_platform/functions/achievements/)              |   ✔️   |
 | [In-App Purchases](/godot_oculus_platform/functions/in-app-purchases/)      |   ✔️   |
 | [Asset Files](/godot_oculus_platform/functions/asset-files/)                |   ✔️   |
 | [Leaderboards](/godot_oculus_platform/functions/leaderboards/)              |   ✔️   |
-| Deep Linking                                                                |   ❌   |
+| Challenges                                                                  |   ❌   |
+| Group Presence                                                              |   ❌   |
+| Rich Presence                                                               |   ❌   |
