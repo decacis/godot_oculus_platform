@@ -1,4 +1,4 @@
-# Functions - Application
+# Functions - Abuse Report
 Related Oculus Platform documentation:
 
 - [User Reporting FAQs](https://developer.oculus.com/faqs#faq_856753478660534)
