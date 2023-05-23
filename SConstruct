@@ -13,10 +13,11 @@ env = SConscript("godot-cpp/SConstruct")
 # - LINKFLAGS are for linking flags
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
-env.Append(CPPPATH=["src/", "src/include/"])
+env.Append(CPPPATH=["src/", "src/include/", "src/custom_types/"])
 
 if env["platform"] != "android":
     sources = Glob("src/*.cpp", exclude=["src/*android.cpp"])
+    sources.append(Glob("src/custom_types/*.cpp"))
 
     if env["platform"] == "macos":
         if env["target"] != "template_debug":
@@ -56,6 +57,7 @@ if env["platform"] != "android":
 
 else:
     sources = Glob("src/*.cpp", exclude=["src/*editor.cpp"])
+    sources.append(Glob("src/custom_types/*.cpp"))
 
     env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/android/libs/arm64-v8a/"])
     env.Append(LIBS=["libovrplatformloader"])

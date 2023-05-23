@@ -7,6 +7,8 @@
 #include <godot_cpp/variant/dictionary.hpp>
 
 #include "gop_promise.h"
+#include "custom_types/gdop_user_array.h"
+#include "custom_types/gdop_leaderboard_entries.h"
 
 namespace godot {
 
@@ -21,6 +23,7 @@ protected:
 private:
 	Vector<Ref<GDOculusPlatformPromise>> _promises;
 	Vector<Ref<GDOculusPlatformPromise>> _promises_to_reject;
+	Vector<Ref<GDOculusPlatformPromise>> _promises_to_fulfill;
 
 	bool _get_promise(uint64_t p_promise_id, Ref<GDOculusPlatformPromise> &p_promise);
 
@@ -28,9 +31,13 @@ private:
 	bool _reject_promise(uint64_t p_promise_id, Array val);
 
 	uint64_t _get_reject_promise_id();
+	uint64_t _get_fulfill_promise_id();
+
 	void _reject_promises();
+	void _fulfill_promises();
 
 	uint64_t _last_promise_rejected_id = 0;
+	uint64_t _last_promise_fulfilled_id = 0;
 
 	bool _get_env(JNIEnv **p_env);
 
@@ -71,7 +78,7 @@ private:
 
 	// LEADERBOARD
 	void _process_leaderboard_get(ovrMessageHandle p_message);
-	void _process_leaderboard_get_entries(ovrMessageHandle p_message, int p_mode = 1);
+	void _process_leaderboard_get_entries(ovrMessageHandle p_message);
 	void _process_leaderboard_write_entry(ovrMessageHandle p_message);
 
 	// ABUSE REPORT
@@ -82,7 +89,7 @@ private:
 	void _process_application_launch_other_app(ovrMessageHandle p_message);
 
 	// LEADERBOARD HELPERS
-	void _handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle p_entries_arr_handle, int p_promise_arr_ind, Ref<GDOculusPlatformPromise> &p_promise);
+	Array _handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle p_entries_arr_handle);
 
 	// ASSET FILE HELPERS
 	void _handle_download_update(ovrMessageHandle p_message);
@@ -91,6 +98,7 @@ private:
 	Dictionary _get_user_information(ovrUserHandle p_user_handle);
 
 	void _handle_unhandled_message(ovrMessageHandle p_message);
+	void _process_user_get_next_array_page(ovrMessageHandle p_message);
 #endif
 
 public:
@@ -112,6 +120,10 @@ public:
 		LEADERBOARD_START_AT_TOP = ovrLeaderboard_StartAtTop,
 		LEADERBOARD_START_AT_CENTERED_ON_VIEWER = ovrLeaderboard_StartAtCenteredOnViewer
 	};
+
+	Ref<GDOculusPlatformPromise> user_array_get_next_page(Ref<GDOPUserArray> p_user_array);
+	Ref<GDOculusPlatformPromise> leaderboard_entries_get_next_page(Ref<GDOPLeaderboardEntries> p_leaderboard_entries);
+	Ref<GDOculusPlatformPromise> leaderboard_entries_get_prev_page(Ref<GDOPLeaderboardEntries> p_leaderboard_entries);
 
 	bool initialize_android(String p_app_id);
 	Ref<GDOculusPlatformPromise> initialize_android_async(String p_app_id);

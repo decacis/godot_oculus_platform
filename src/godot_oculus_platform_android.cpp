@@ -14,6 +14,10 @@ GDOculusPlatform *GDOculusPlatform::singleton = nullptr;
 void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("pump_messages"), &GDOculusPlatform::pump_messages);
 
+	ClassDB::bind_method(D_METHOD("user_array_get_next_page", "user_array"), &GDOculusPlatform::user_array_get_next_page);
+	ClassDB::bind_method(D_METHOD("leaderboard_entries_get_prev_page", "leaderboard_entries"), &GDOculusPlatform::leaderboard_entries_get_prev_page);
+	ClassDB::bind_method(D_METHOD("leaderboard_entries_get_next_page", "leaderboard_entries"), &GDOculusPlatform::leaderboard_entries_get_next_page);
+
 	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
 	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
 
@@ -153,14 +157,88 @@ void GDOculusPlatform::_reject_promises() {
 	}
 }
 
+/// Fulfills all promises in the rejection queue.
+void GDOculusPlatform::_fulfill_promises() {
+	for (int i = _promises_to_fulfill.size() - 1; i > -1; i--) {
+		Ref<GDOculusPlatformPromise> temp_promise = _promises_to_fulfill.get(i);
+		_promises_to_fulfill.remove_at(i);
+
+		temp_promise->fulfill(temp_promise->saved_fulfill_response);
+	}
+}
+
 /// Returns a unique promise id. Only used for promises that should be rejected straight away.
 uint64_t GDOculusPlatform::_get_reject_promise_id() {
 	_last_promise_rejected_id += 1;
 	return _last_promise_rejected_id;
 }
 
+/// Returns a unique promise id. Only used for promises that should be fulfilled straight away.
+uint64_t GDOculusPlatform::_get_fulfill_promise_id() {
+	_last_promise_fulfilled_id += 1;
+	return _last_promise_fulfilled_id;
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::user_array_get_next_page(Ref<GDOPUserArray> p_user_array) {
+	if (p_user_array->get_has_next_page()) {
+		ovrRequest req = ovr_User_GetNextUserArrayPage(p_user_array->array_handle);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	} else {
+		WARN_PRINT_ED("GDOPUserArray does not have a next page. Returning same GDOPUserArray.");
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_fulfill_promise_id()));
+		return_promise->saved_fulfill_response = Array::make(p_user_array);
+		_promises_to_fulfill.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_entries_get_next_page(Ref<GDOPLeaderboardEntries> p_leaderboard_entries) {
+	if (p_leaderboard_entries->get_has_next_page()) {
+		ovrRequest req = ovr_Leaderboard_GetNextEntries(p_leaderboard_entries->array_handle);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	} else {
+		WARN_PRINT_ED("GDOPLeaderboardEntries does not have a next page. Returning same GDOPLeaderboardEntries.");
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_fulfill_promise_id()));
+		return_promise->saved_fulfill_response = Array::make(p_leaderboard_entries);
+		_promises_to_fulfill.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_entries_get_prev_page(Ref<GDOPLeaderboardEntries> p_leaderboard_entries) {
+	if (p_leaderboard_entries->get_has_prev_page()) {
+		ovrRequest req = ovr_Leaderboard_GetPreviousEntries(p_leaderboard_entries->array_handle);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	} else {
+		WARN_PRINT_ED("GDOPLeaderboardEntries does not have a previous page. Returning same GDOPLeaderboardEntries.");
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_fulfill_promise_id()));
+		return_promise->saved_fulfill_response = Array::make(p_leaderboard_entries);
+		_promises_to_fulfill.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
 /// Checks the OVR messages queue and handles them according to their type.
 void GDOculusPlatform::pump_messages() {
+	_fulfill_promises();
 	_reject_promises();
 
 	ovrMessageHandle message = nullptr;
@@ -205,7 +283,7 @@ void GDOculusPlatform::pump_messages() {
 				break;
 
 			case ovrMessage_User_GetNextUserArrayPage:
-				_process_user_get_logged_in_user_friends(message);
+				_process_user_get_next_array_page(message);
 				break;
 
 			case ovrMessage_User_GetOrgScopedID:
@@ -337,23 +415,23 @@ void GDOculusPlatform::pump_messages() {
 				// 	break;
 
 			case ovrMessage_Leaderboard_GetEntries:
-				_process_leaderboard_get_entries(message, 1);
+				_process_leaderboard_get_entries(message);
 				break;
 
 			case ovrMessage_Leaderboard_GetEntriesByIds:
-				_process_leaderboard_get_entries(message, 1);
+				_process_leaderboard_get_entries(message);
 				break;
 
 			case ovrMessage_Leaderboard_GetEntriesAfterRank:
-				_process_leaderboard_get_entries(message, 1);
+				_process_leaderboard_get_entries(message);
 				break;
 
 			case ovrMessage_Leaderboard_GetPreviousEntries:
-				_process_leaderboard_get_entries(message, 0);
+				_process_leaderboard_get_entries(message);
 				break;
 
 			case ovrMessage_Leaderboard_GetNextEntries:
-				_process_leaderboard_get_entries(message, 2);
+				_process_leaderboard_get_entries(message);
 				break;
 
 			case ovrMessage_Leaderboard_WriteEntry:
@@ -1352,6 +1430,8 @@ Dictionary GDOculusPlatform::application_get_launch_details() {
 	resp["launch_type"] = ovrLaunchType_ToString(launch_type);
 
 	ovrUserArrayHandle user_arr_h = ovr_LaunchDetails_GetUsers(launch_details_h);
+	Ref<GDOPUserArray> user_arr = memnew(GDOPUserArray(user_arr_h));
+
 	if (user_arr_h) {
 		Array new_user_arr = Array();
 		size_t user_arr_s = ovr_UserArray_GetSize(user_arr_h);
@@ -1363,14 +1443,13 @@ Dictionary GDOculusPlatform::application_get_launch_details() {
 			new_user_arr.push_back(user_info);
 		}
 
-		if (ovr_UserArray_HasNextPage(user_arr_h)) {
-			WARN_PRINT("Unexpected behavior. There may be more users than reported here, please contact the developers of the Godot Oculus Platform plugin about this message.");
-		}
-
-		resp["users"] = new_user_arr;
+		user_arr->has_next_page = ovr_UserArray_HasNextPage(user_arr_h);
+		user_arr->set_users(new_user_arr);
 	} else {
-		resp["users"] = Array();
+		user_arr->set_users(Array());
 	}
+
+	resp["users"] = user_arr;
 
 	return resp;
 }
@@ -1379,6 +1458,33 @@ Dictionary GDOculusPlatform::application_get_launch_details() {
 /////////////////////////////////////////////////
 ///// INTERNAL PROCESSING METHODS
 /////////////////////////////////////////////////
+
+void GDOculusPlatform::_process_user_get_next_array_page(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+
+		ovrUserArrayHandle user_friends_handle = ovr_Message_GetUserArray(p_message);
+		Ref<GDOPUserArray> users_array = memnew(GDOPUserArray(user_friends_handle));
+		size_t user_friends_array_size = ovr_UserArray_GetSize(user_friends_handle);
+		Array users = Array();
+
+		for (size_t i = 0; i < user_friends_array_size; i++) {
+			ovrUserHandle user_handle = ovr_UserArray_GetElement(user_friends_handle, i);
+			Dictionary user_info = _get_user_information(user_handle);
+
+			users.push_back(user_info);
+		}
+
+		users_array->set_users(users);
+		users_array->has_next_page = ovr_UserArray_HasNextPage(user_friends_handle);
+
+		_fulfill_promise(msg_id, Array::make(users_array));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
 
 ///// USERS
 /////////////////////////////////////////////////
@@ -1502,33 +1608,25 @@ void GDOculusPlatform::_process_user_get_blocked_users(ovrMessageHandle p_messag
 /// Processes user information about the current user's friends. Paginated
 void GDOculusPlatform::_process_user_get_logged_in_user_friends(ovrMessageHandle p_message) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
-	Ref<GDOculusPlatformPromise> promise;
 
 	if (!ovr_Message_IsError(p_message)) {
+
 		ovrUserArrayHandle user_friends_handle = ovr_Message_GetUserArray(p_message);
+		Ref<GDOPUserArray> users_array = memnew(GDOPUserArray(user_friends_handle));
 		size_t user_friends_array_size = ovr_UserArray_GetSize(user_friends_handle);
+		Array users = Array();
 
-		if (_get_promise(msg_id, promise)) {
-			if (promise->get_ids_count() == 1 && promise->saved_fulfill_response.is_empty()) { // Only the first time
-				promise->saved_fulfill_response = Array::make(Array());
-			}
+		for (size_t i = 0; i < user_friends_array_size; i++) {
+			ovrUserHandle user_handle = ovr_UserArray_GetElement(user_friends_handle, i);
+			Dictionary user_info = _get_user_information(user_handle);
 
-			for (size_t i = 0; i < user_friends_array_size; i++) {
-				ovrUserHandle user_handle = ovr_UserArray_GetElement(user_friends_handle, i);
-				Dictionary user_info = _get_user_information(user_handle);
-
-				((Array)promise->saved_fulfill_response[0]).push_back(user_info);
-			}
-
-			if (!ovr_UserArray_HasNextPage(user_friends_handle)) {
-				_promises.erase(promise);
-				promise->fulfill(promise->saved_fulfill_response);
-
-			} else {
-				ovrRequest new_req = ovr_User_GetNextUserArrayPage(user_friends_handle);
-				promise->add_id(new_req);
-			}
+			users.push_back(user_info);
 		}
+
+		users_array->set_users(users);
+		users_array->has_next_page = ovr_UserArray_HasNextPage(user_friends_handle);
+
+		_fulfill_promise(msg_id, Array::make(users_array));
 
 	} else {
 		_handle_default_process_error(p_message, msg_id);
@@ -2055,6 +2153,8 @@ void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
 			destination["deep_link_message"] = ovr_Destination_GetDeeplinkMessage(destination_handle);
 
 			leaderboard["destination"] = destination;
+		}else{
+			leaderboard["destination"] = Dictionary();
 		}
 
 		_fulfill_promise(msg_id, Array::make(leaderboard));
@@ -2065,105 +2165,21 @@ void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
 }
 
 /// Processes the response from a request to get entries of a leaderboard. This function automatically paginates through the data
-void GDOculusPlatform::_process_leaderboard_get_entries(ovrMessageHandle p_message, int p_mode) {
+void GDOculusPlatform::_process_leaderboard_get_entries(ovrMessageHandle p_message) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
-	Ref<GDOculusPlatformPromise> promise;
 
 	if (!ovr_Message_IsError(p_message)) {
-		if (_get_promise(msg_id, promise)) {
-			if (promise->get_ids_count() == 1 && promise->saved_fulfill_response.is_empty()) { // Only the first time
-				promise->saved_fulfill_response = Array::make(Array(), Array(), Array(), Array());
 
-				ovrLeaderboardEntryArrayHandle entries_arr_handle = ovr_Message_GetLeaderboardEntryArray(p_message);
-				_handle_leaderboard_entries(entries_arr_handle, p_mode, promise);
+		ovrLeaderboardEntryArrayHandle entries_arr_handle = ovr_Message_GetLeaderboardEntryArray(p_message);
+		Array entries = _handle_leaderboard_entries(entries_arr_handle);
 
-				bool has_prev_entries = ovr_LeaderboardEntryArray_HasPreviousPage(entries_arr_handle);
-				bool has_next_entries = ovr_LeaderboardEntryArray_HasNextPage(entries_arr_handle);
+		Ref<GDOPLeaderboardEntries> l_entries = memnew(GDOPLeaderboardEntries(entries_arr_handle));
+		l_entries->set_entries(entries);
+		l_entries->has_prev_page = ovr_LeaderboardEntryArray_HasPreviousPage(entries_arr_handle);
+		l_entries->has_next_page = ovr_LeaderboardEntryArray_HasNextPage(entries_arr_handle);
+		l_entries->total_count = ovr_LeaderboardEntryArray_GetTotalCount(entries_arr_handle);
 
-				if (!has_prev_entries && !has_next_entries) {
-					promise->saved_fulfill_response.remove_at(3);
-					promise->saved_fulfill_response.remove_at(2);
-					promise->saved_fulfill_response.remove_at(0);
-
-					_promises.erase(promise);
-					promise->fulfill(promise->saved_fulfill_response);
-
-				} else {
-					if (has_prev_entries) {
-						ovrRequest new_prev_req = ovr_Leaderboard_GetPreviousEntries(entries_arr_handle);
-						promise->add_id(new_prev_req);
-					}
-					if (has_next_entries) {
-						ovrRequest new_next_req = ovr_Leaderboard_GetNextEntries(entries_arr_handle);
-						promise->add_id(new_next_req);
-					}
-				}
-
-			} else if (p_mode == 0) {
-				ovrLeaderboardEntryArrayHandle entries_arr_handle = ovr_Message_GetLeaderboardEntryArray(p_message);
-				_handle_leaderboard_entries(entries_arr_handle, p_mode, promise);
-
-				bool has_prev_entries = ovr_LeaderboardEntryArray_HasPreviousPage(entries_arr_handle);
-
-				if (!has_prev_entries) {
-					// If the "other side" has finished adding values and we did too
-					if (!((Array)promise->saved_fulfill_response[3]).is_empty()) {
-						((Array)promise->saved_fulfill_response[0]).append_array(((Array)promise->saved_fulfill_response[1]));
-						((Array)promise->saved_fulfill_response[0]).append_array(((Array)promise->saved_fulfill_response[2]));
-
-						// Clean up
-						promise->saved_fulfill_response.remove_at(3);
-						promise->saved_fulfill_response.remove_at(2);
-						promise->saved_fulfill_response.remove_at(1);
-
-						_promises.erase(promise);
-						promise->fulfill(Array::make(promise->saved_fulfill_response));
-
-						// Inform we finished adding values
-					} else {
-						((Array)promise->saved_fulfill_response[3]).push_back(1);
-					}
-
-				} else {
-					if (has_prev_entries) {
-						ovrRequest new_prev_req = ovr_Leaderboard_GetPreviousEntries(entries_arr_handle);
-						promise->add_id(new_prev_req);
-					}
-				}
-
-			} else {
-				ovrLeaderboardEntryArrayHandle entries_arr_handle = ovr_Message_GetLeaderboardEntryArray(p_message);
-				_handle_leaderboard_entries(entries_arr_handle, p_mode, promise);
-
-				bool has_next_entries = ovr_LeaderboardEntryArray_HasNextPage(entries_arr_handle);
-
-				if (!has_next_entries) {
-					// If the "other side" has finished adding values and we did too
-					if (!((Array)promise->saved_fulfill_response[3]).is_empty()) {
-						((Array)promise->saved_fulfill_response[0]).append_array(((Array)promise->saved_fulfill_response[1]));
-						((Array)promise->saved_fulfill_response[0]).append_array(((Array)promise->saved_fulfill_response[2]));
-
-						// Clean up
-						promise->saved_fulfill_response.remove_at(3);
-						promise->saved_fulfill_response.remove_at(2);
-						promise->saved_fulfill_response.remove_at(1);
-
-						_promises.erase(promise);
-						promise->fulfill(Array::make(promise->saved_fulfill_response));
-
-						// Inform we finished adding values
-					} else {
-						((Array)promise->saved_fulfill_response[3]).push_back(1);
-					}
-
-				} else {
-					if (has_next_entries) {
-						ovrRequest new_prev_req = ovr_Leaderboard_GetNextEntries(entries_arr_handle);
-						promise->add_id(new_prev_req);
-					}
-				}
-			}
-		}
+		_fulfill_promise(msg_id, Array::make(l_entries));
 
 	} else {
 		_handle_default_process_error(p_message, msg_id);
@@ -2249,7 +2265,6 @@ void GDOculusPlatform::_process_application_get_version(ovrMessageHandle p_messa
 		_handle_default_process_error(p_message, msg_id);
 	}
 }
-
 ///// PROCESSING HELPERS
 /////////////////////////////////////////////////
 
@@ -2347,8 +2362,9 @@ void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
 	}
 }
 
-/// Helper function to handle most common errors when processing.
-void GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle p_entries_arr_handle, int p_promise_arr_ind, Ref<GDOculusPlatformPromise> &p_promise) {
+/// Helper function to handle the entries array handle
+Array GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle p_entries_arr_handle) {
+	Array entries = Array();
 	size_t entries_arr_s = ovr_LeaderboardEntryArray_GetSize(p_entries_arr_handle);
 
 	for (size_t i = 0; i < entries_arr_s; i++) {
@@ -2386,8 +2402,10 @@ void GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHandl
 
 		entry_data["user"] = user_info;
 
-		((Array)p_promise->saved_fulfill_response[p_promise_arr_ind]).push_back(entry_data);
+		entries.push_back(entry_data);
 	}
+
+	return entries;
 }
 
 /////////////////////////////////////////////////

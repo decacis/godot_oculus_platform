@@ -180,8 +180,9 @@ func _on_get_logged_in_user_friends_pressed():
 	print("-------------------------------------")
 	print("user_get_logged_in_user_friends CALLED")
 	GDOculusPlatform.user_get_logged_in_user_friends()\
-	.then(func(friends : Array):
-		print("[user_get_logged_in_user_friends] RESPONSE: ", friends)
+	.then(func(friends : GDOPUserArray):
+		print("[user_get_logged_in_user_friends] RESPONSE: ", await GDOP.users_array_get_all(friends))
+		print("Has next page? ", friends.has_next_page)
 	)\
 	.error(func(friends_err):
 		push_error("[user_get_logged_in_user_friends] ERROR: ", friends_err)
@@ -565,8 +566,8 @@ func _on_leaderboard_get_entries_pressed():
 	leaderboard_get_entries.filter,\
 	leaderboard_get_entries.start_at\
 	)\
-	.then(func(leaderboard_e_resp : Array):
-		print("[leaderboard_get_entries] RESPONSE: ", leaderboard_e_resp)
+	.then(func(leaderboard_e_resp : GDOPLeaderboardEntries):
+		print("[leaderboard_get_entries] RESPONSE: ", await GDOP.leaderboard_entries_get_all(leaderboard_e_resp))
 	)\
 	.error(func(leaderboard_err):
 		push_error("[leaderboard_get_entries] ERROR: ", leaderboard_err)
@@ -580,8 +581,8 @@ func _on_leaderboard_get_entries_after_rank_pressed():
 	leaderboard_get_entries_after_rank.limit,\
 	leaderboard_get_entries_after_rank.after_rank\
 	)\
-	.then(func(leaderboard_e_resp : Array):
-		print("[leaderboard_get_entries_after_rank] RESPONSE: ", leaderboard_e_resp)
+	.then(func(leaderboard_e_resp : GDOPLeaderboardEntries):
+		print("[leaderboard_get_entries_after_rank] RESPONSE: ", await GDOP.leaderboard_entries_get_all(leaderboard_e_resp))
 	)\
 	.error(func(leaderboard_err):
 		push_error("[leaderboard_get_entries_after_rank] ERROR: ", leaderboard_err)
@@ -596,8 +597,8 @@ func _on_leaderboard_get_entries_by_i_ds_pressed():
 	leaderboard_get_entries_by_ids.user_ids,\
 	leaderboard_get_entries_by_ids.start_at\
 	)\
-	.then(func(leaderboard_e_resp : Array):
-		print("[leaderboard_get_entries_by_ids] RESPONSE: ", leaderboard_e_resp)
+	.then(func(leaderboard_e_resp : GDOPLeaderboardEntries):
+		print("[leaderboard_get_entries_by_ids] RESPONSE: ", await GDOP.leaderboard_entries_get_all(leaderboard_e_resp))
 	)\
 	.error(func(leaderboard_err):
 		push_error("[leaderboard_get_entries_by_ids] ERROR: ", leaderboard_err)

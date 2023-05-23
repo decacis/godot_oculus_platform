@@ -10,7 +10,7 @@ env:
   OCULUS_VERSION: 53
   GODOT_ENGINE_VERSION: "4.0.2"
   GODOT_ENGINE_STAGE: "stable"
-  INTEGRATION_VERSION: "v0.2.0-alpha"
+  INTEGRATION_VERSION: "v0.2.5-alpha"
 
 jobs:
   build-all:

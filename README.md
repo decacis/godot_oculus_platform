@@ -44,16 +44,11 @@ We use a promise-based approach for every request that is asynchronous. The `the
 **NOTE:** The demo included in this repository won't work on its own. You still have to setup an app in the Oculus Dashboard, upload a release version and request all the required [Data Use Checkup](https://developer.oculus.com/resources/publish-data-use/) permissions to test, otherwise most fields will be empty/null. Also, it's missing the [OpenXR Loaders](https://github.com/GodotVR/godot_openxr_loaders).
 
 ## Getting this asset
-There are two versions right now:
+You can find all the releases in the [GitHub releases page](https://github.com/decacis/godot_oculus_platform/releases).
 
-- [Stable](https://github.com/decacis/godot_oculus_platform/releases)
-- [Development](https://github.com/decacis/godot_oculus_platform/actions?query=branch%3Amain)
+You can also use the [interactive version list](https://decacis.github.io/godot_oculus_platform/download/) in the documentation website to quickly find the version you need.
 
-Stable version will have less features but they will be more tested. Development versions have more features but they haven't been tested as thoroughly as the stable versions.
-
-In the case of the development versions, look for an artifact with a name similar to `OculusPlatformSDK-53-for-godot-4.0.2-stable_v0.2.0-alpha`
-
-**NOTE:** "stable" is used pretty loosely at the moment. Expect usage API changes in the future.
+In-development precompiled versions can be found in the [GitHub actions page](https://github.com/decacis/godot_oculus_platform/actions?query=branch%3Amain).
 
 ## Building this asset
 After cloning this repository, initialize the submodules by running:
