@@ -235,16 +235,19 @@ GDOculusPlatform.user_get_blocked_users()\
 
 Requests the user IDs of the current user's friends.
 
-**Returns:** A `GDOculusPlatformPromise` will contain an `Array` of `Dictionaries` with information about each friend. Same format as the `Dictionary` returned by [user_get_user](#user_get_user). The function will error with a message if an error occured.
+**Returns:** A `GDOculusPlatformPromise` will contain a [GDOPUserArray](/godot_oculus_platform/classes/gdopuserarray/) with information about each friend. Each element of the `Array` will have the same format as the `Dictionary` returned by [user_get_user](#user_get_user). The function will error with a message if an error occured.
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.user_get_logged_in_user_friends()\
-.then(func(friends : Array):
+.then(func(friends_resp : GDOPUserArray):
+
+    var friends : Array = await GDOP.users_array_get_all(friends_resp)
     for friend_info in friends:
         print("Friend ID: ", friend_info.id)
         print("Friend image: ", friend_info.image_url)
+    
 )\
 .error(func(friends_err):
     print("Error getting friends: ", friends_err)

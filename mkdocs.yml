@@ -20,6 +20,9 @@ nav:
     - In-App Purchases: 'functions/in-app-purchases.md'
     - Asset Files: 'functions/asset-files.md'
     - Leaderboards: 'functions/leaderboards.md'
+  - Classes:
+    - GDOPUserArray: 'classes/gdopuserarray.md'
+    - GDOPLeaderboardEntries: 'classes/gdopleaderboardentries.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg

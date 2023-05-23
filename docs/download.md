@@ -1,4 +1,6 @@
 # Download
+------
+
 The interactive list bellow will help you find all of the precompiled releases from a combination of Godot and Oculus Platform SDK versions:
 
 <div>
@@ -16,6 +18,10 @@ The interactive list bellow will help you find all of the precompiled releases f
                 },
             ],
             "53": [
+                {
+                    "name": "v0.2.5-alpha",
+                    "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v0.2.5-alpha"
+                },
                 {
                     "name": "v0.2.0-alpha",
                     "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v0.2.0-alpha"
