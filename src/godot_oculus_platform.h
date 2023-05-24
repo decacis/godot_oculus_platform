@@ -10,7 +10,6 @@
 #include "custom_types/gdop_user_array.h"
 #include "gop_promise.h"
 
-
 namespace godot {
 
 class GDOculusPlatform : public Object {
