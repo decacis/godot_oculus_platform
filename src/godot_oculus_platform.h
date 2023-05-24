@@ -6,9 +6,10 @@
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 
-#include "gop_promise.h"
-#include "custom_types/gdop_user_array.h"
 #include "custom_types/gdop_leaderboard_entries.h"
+#include "custom_types/gdop_user_array.h"
+#include "gop_promise.h"
+
 
 namespace godot {
 

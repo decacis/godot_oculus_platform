@@ -1463,7 +1463,6 @@ void GDOculusPlatform::_process_user_get_next_array_page(ovrMessageHandle p_mess
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
-
 		ovrUserArrayHandle user_friends_handle = ovr_Message_GetUserArray(p_message);
 		Ref<GDOPUserArray> users_array = memnew(GDOPUserArray(user_friends_handle));
 		size_t user_friends_array_size = ovr_UserArray_GetSize(user_friends_handle);
@@ -1610,7 +1609,6 @@ void GDOculusPlatform::_process_user_get_logged_in_user_friends(ovrMessageHandle
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
-
 		ovrUserArrayHandle user_friends_handle = ovr_Message_GetUserArray(p_message);
 		Ref<GDOPUserArray> users_array = memnew(GDOPUserArray(user_friends_handle));
 		size_t user_friends_array_size = ovr_UserArray_GetSize(user_friends_handle);
@@ -2153,7 +2151,7 @@ void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
 			destination["deep_link_message"] = ovr_Destination_GetDeeplinkMessage(destination_handle);
 
 			leaderboard["destination"] = destination;
-		}else{
+		} else {
 			leaderboard["destination"] = Dictionary();
 		}
 
@@ -2169,7 +2167,6 @@ void GDOculusPlatform::_process_leaderboard_get_entries(ovrMessageHandle p_messa
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
-
 		ovrLeaderboardEntryArrayHandle entries_arr_handle = ovr_Message_GetLeaderboardEntryArray(p_message);
 		Array entries = _handle_leaderboard_entries(entries_arr_handle);
 

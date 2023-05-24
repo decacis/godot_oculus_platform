@@ -17,28 +17,28 @@ protected:
 	static void _bind_methods();
 
 private:
-    Array entries;
+	Array entries;
 
 public:
 	GDOPLeaderboardEntries();
 	GDOPLeaderboardEntries(ovrLeaderboardEntryArrayHandle p_array_handle);
 	~GDOPLeaderboardEntries();
 
-    ovrLeaderboardEntryArrayHandle array_handle;
+	ovrLeaderboardEntryArrayHandle array_handle;
 
-    uint64_t total_count = 0;
-    bool has_next_page = false;
-    bool has_prev_page = false;
+	uint64_t total_count = 0;
+	bool has_next_page = false;
+	bool has_prev_page = false;
 
-    uint64_t get_total_count() const;
+	uint64_t get_total_count() const;
 
-    bool get_has_next_page() const;
+	bool get_has_next_page() const;
 
-    bool get_has_prev_page() const;
+	bool get_has_prev_page() const;
 
-    Array get_entries() const;
-    void set_entries(const Array p_entries_array);
-    void add_entries(Array p_entries_array);
+	Array get_entries() const;
+	void set_entries(const Array p_entries_array);
+	void add_entries(Array p_entries_array);
 };
 
 } // namespace godot

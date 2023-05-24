@@ -17,21 +17,21 @@ protected:
 	static void _bind_methods();
 
 private:
-    Array users;
+	Array users;
 
 public:
 	GDOPUserArray();
 	GDOPUserArray(ovrUserArrayHandle p_array_handle);
 	~GDOPUserArray();
 
-    ovrUserArrayHandle array_handle;
-    bool has_next_page = false;
+	ovrUserArrayHandle array_handle;
+	bool has_next_page = false;
 
-    bool get_has_next_page() const;
+	bool get_has_next_page() const;
 
-    Array get_users() const;
-    void set_users(const Array p_users_array);
-    void add_users(Array p_users_array);
+	Array get_users() const;
+	void set_users(const Array p_users_array);
+	void add_users(Array p_users_array);
 };
 
 } // namespace godot

@@ -7,9 +7,9 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "godot_oculus_platform.h"
-#include "custom_types/gdop_user_array.h"
 #include "custom_types/gdop_leaderboard_entries.h"
+#include "custom_types/gdop_user_array.h"
+#include "godot_oculus_platform.h"
 #include "gop_promise.h"
 
 using namespace godot;
