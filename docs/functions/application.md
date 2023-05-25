@@ -55,7 +55,7 @@ GDOculusPlatform.application_get_version()\
 //// admonition | application_launch_other_app(app_id : `String`, deeplink_options : `Dictionary`)
     type: abstract
 
-Sends a request to the Oculus Platform to launch another app. The `app_id` argument is the ID of the other app you wish to launch. The `deeplink_options` is **optional** and an example of the options is shown bellow.
+Sends a request to the Oculus Platform to launch another app. The `app_id` argument is the ID of the other app you wish to launch. You can pass an empty `Dictionary` for `deeplink_options` and an example of the options is shown bellow.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain a `String` with information about the request if fulfilled. The promise will error if the request couldn't be completed.
 

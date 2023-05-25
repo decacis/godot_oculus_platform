@@ -8,7 +8,7 @@ Related Oculus Platform documentation:
 //// admonition | leaderboard_get(leaderboard_name : `String`)
     type: abstract
 
-Returns information about a single leaderboard.
+Returns information about a single leaderboard with the given API name.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about the leaderboard with the given API name if fulfilled. The promise will error if the request couldn't be completed.
 
@@ -38,16 +38,9 @@ GDOculusPlatform.leaderboard_get("MY_LEADERBOARD_0")\
 //// admonition | leaderboard_get_entries(leaderboard_name : `String`, limit : `int`, filter : `LeaderboardFilterType`, start_at : `LeaderboardStartAt`)
     type: abstract
 
-Requests the entries of the leaderboard with the given `leaderboard_name`. The `limit` argument defines the number of entries to return and **must be more than 0**.
+Requests the entries of the leaderboard with the given `leaderboard_name` (API name). The `limit` argument defines the number of entries to return and **must be more than 0**.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPLeaderboardEntries](/godot_oculus_platform/classes/gdopleaderboardentries/) with information about a block of entries from the leaderboard. The promise will error if the request couldn't be fulfilled.
-
-Default values:
-
-| Argument | Value                                              |
-|----------|----------------------------------------------------|
-| filter   | LeaderboardFilterType.LEADERBOARD_FILTER_TYPE_NONE |
-| start_at | LeaderboardStartAt.LEADERBOARD_START_AT_TOP        |
 
 Enums:
 
@@ -108,7 +101,7 @@ leaderboard_info.start_at\
 //// admonition | leaderboard_get_entries_after_rank(leaderboard_name : `String`, limit : `int`, after_rank : `int`)
     type: abstract
 
-Requests the entries of the leaderboard with the given `leaderboard_name` after a given `after_rank`. The `limit` argument defines the number of entries to return and **must be more than 0**.
+Requests the entries of the leaderboard with the given `leaderboard_name` (API name) after a given `after_rank`. The `limit` argument defines the number of entries to return and **must be more than 0**.
 
 The `after_rank` argument is exclusive, meaning that if for example you call this function with a `limit` of 3 and `after_rank` of 5, the response will include the 6th, 7th and 8th ranks/entries.
 
@@ -154,7 +147,7 @@ leaderboard_info.after_rank\
 //// admonition | leaderboard_get_entries_by_ids(leaderboard_name : `String`, limit : `int`, user_ids : `Array`, start_at : `LeaderboardStartAt`)
     type: abstract
 
-Requests the entries of the leaderboard with the given `leaderboard_name` and only entries that match the given `user_ids`. The `limit` argument defines the number of entries to return and **must be more than 0**. If the `start_at` argument is `LEADERBOARD_START_AT_CENTERED_ON_VIEWER` the current user/player ID will be automatically added to the request.
+Requests the entries of the leaderboard with the given `leaderboard_name` (API name) and only entries that match the given `user_ids`. The `limit` argument defines the number of entries to return and **must be more than 0**. If the `start_at` argument is `LEADERBOARD_START_AT_CENTERED_ON_VIEWER` the current user/player ID will be automatically added to the request.
 
 As an example use case, you can use this function to get a list of users that are competing and compare their ranks.
 
@@ -165,12 +158,6 @@ As an example use case, you can use this function to get a list of users that ar
 
 Please see the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
 /////
-
-Default values:
-
-| Argument | Value                                              |
-|----------|----------------------------------------------------|
-| start_at | LeaderboardStartAt.LEADERBOARD_START_AT_TOP        |
 
 /// details | Example
     type: example
@@ -211,16 +198,9 @@ leaderboard_info.start_at\
 //// admonition | leaderboard_write_entry(leaderboard_name : `String`, score : `int`, force_update : `bool`, extra : `Dictionary`)
     type: abstract
 
-Sends a request to write a new entry to the leaderboard with the given `leaderboard_name`. See bellow for optional values for the `extra` `Dictionary`.
+Sends a request to write a new entry to the leaderboard with the given `leaderboard_name` (API name). You can pass an empty `Dictionary` for `extra` if you don't want to include extra data. See bellow for optional values for the `extra` `Dictionary`.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about request status. The promise will error if the request couldn't be completed.
-
-Default values:
-
-| Argument     |  Value  |
-|--------------|:-------:|
-| force_update |  false  |
-| extra        |    {}   |
 
 **Note:** if `force_update` is true, then the new ranking will replace the previous ranking even if the new score is lower (assuming the leaderboard's sort order is higher is better).
 

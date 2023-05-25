@@ -79,6 +79,8 @@ The `type` field can be `USER_CREATED`, `DEVELOPER_CREATED` or `UNKNOWN`.
 The `leaderboard` field can be an empty `Dictionaty`.
 
 The `destination` field of `leaderboard` can be an empty `Dictionary`.
+
+**NOTE: there is a bug that makes the `destination` key of `leaderboard` always be null when the leaderboard is retrieved from a challenge (like in this case). You have to get the destination (if it exists) by using [leaderboard_get](/godot_oculus_platform/functions/leaderboards/#leaderboard_get) for now.**
 ///
 ////
 

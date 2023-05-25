@@ -162,13 +162,6 @@ Requests the entries of the challenge with the given `challenge_id`. The `limit`
 
 **Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPChallengeEntries](/godot_oculus_platform/classes/gdopchallengeentries/) with information about a block of entries from the challenge. The promise will error if the request couldn't be fulfilled.
 
-Default values:
-
-| Argument | Value                                              |
-|----------|----------------------------------------------------|
-| filter   | LeaderboardFilterType.LEADERBOARD_FILTER_TYPE_NONE |
-| start_at | LeaderboardStartAt.LEADERBOARD_START_AT_TOP        |
-
 You can check the `enums` from [leaderboard_get_entries](/godot_oculus_platform/functions/leaderboards/#leaderboard_get_entries) to know what values you are allowed to use.
 
 ///// admonition | Note
@@ -268,12 +261,6 @@ Requests the entries of the challenge with the given `challenge_id` and only ent
 
 Please see the example of the `entries` property from the `GDOPChallengeEntries` class [**here**](/godot_oculus_platform/classes/gdopchallengeentries/#entries) for an idea of the format of each entry.
 /////
-
-Default values:
-
-| Argument | Value                                              |
-|----------|----------------------------------------------------|
-| start_at | LeaderboardStartAt.LEADERBOARD_START_AT_TOP        |
 
 /// details | Example
     type: example
