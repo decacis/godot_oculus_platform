@@ -2,6 +2,7 @@
 Used in:
 
 - [User](/godot_oculus_platform/functions/user/)
+- [Application](/godot_oculus_platform/functions/application/)
 
 -----
 

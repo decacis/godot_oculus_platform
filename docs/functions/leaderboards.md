@@ -60,15 +60,16 @@ Enums:
 
 **LeaderboardStartAt**
 
-| Name                                    |  Value  | Description                                                                                           |
-|-----------------------------------------|:-------:|-------------------------------------------------------------------------------------------------------|
-| LEADERBOARD_START_AT_TOP                |    0    | Default behavior. Will return results starting with the player that is ranked 1st on the leaderboard. |
-| LEADERBOARD_START_AT_CENTERED_ON_VIEWER |    1    | Will try to start from the user's rank on the leaderboard and center the leaderboard entries around that.  Example:  If the user is rank 10th and the request is to fetch 3 entries centered on the user, it'll return the entries ranked 9th, 10th, and 11th. If the user is not ranked on the requested leaderboard, this will return an error. |
+| Name                                           |  Value  | Description                                                                                           |
+|------------------------------------------------|:-------:|-------------------------------------------------------------------------------------------------------|
+| LEADERBOARD_START_AT_TOP                       |    0    | Default behavior. Will return results starting with the player that is ranked 1st on the leaderboard. |
+| LEADERBOARD_START_AT_CENTERED_ON_VIEWER        |    1    | Will try to start from the user's rank on the leaderboard and center the leaderboard entries around that.  Example:  If the user is rank 10th and the request is to fetch 3 entries centered on the user, it'll return the entries ranked 9th, 10th, and 11th. If the user is not ranked on the requested leaderboard, this will return an error. |
+| LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP |    2    | Will try center on viewer, but if it can it will fallback to LEADERBOARD_START_AT_TOP |
 
 ///// admonition | Note
     type: warning
 
-Please the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
+Please see the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
 /////
 
 /// details | Example
@@ -116,7 +117,7 @@ The `after_rank` argument is exclusive, meaning that if for example you call thi
 ///// admonition | Note
     type: warning
 
-Please the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
+Please see the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
 /////
 
 /// details | Example
@@ -162,7 +163,7 @@ As an example use case, you can use this function to get a list of users that ar
 ///// admonition | Note
     type: warning
 
-Please the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
+Please see the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
 /////
 
 Default values:

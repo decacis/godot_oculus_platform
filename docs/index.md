@@ -34,5 +34,5 @@ The following table tracks the supported functions from the Oculus Platform SDK:
 | [In-App Purchases](/godot_oculus_platform/functions/in-app-purchases/)      |   ✔️   |
 | [Asset Files](/godot_oculus_platform/functions/asset-files/)                |   ✔️   |
 | [Leaderboards](/godot_oculus_platform/functions/leaderboards/)              |   ✔️   |
-| Challenges                                                                  |   ❌   |
+| [Challenges](/godot_oculus_platform/functions/challenges/)                  |   ✔️   |
 | Group Presence                                                              |   ❌   |

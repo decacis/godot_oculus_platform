@@ -52,6 +52,10 @@ An `Array` of leaderboard entries. See bellow for an example:
         "timestamp": 1684639488,
         "display_score": "500 pts",
         "extra_data": "",
+        "supplementary_metric": {
+            "id": "5614515145111",
+            "metric": 16674
+        },
         "user": { 
             "display_name": "Steve",
             "id": "4238760617434810",
@@ -73,6 +77,8 @@ An `Array` of leaderboard entries. See bellow for an example:
     type: warning
 
 The `timestamp` key is a UNIX timestamp (in seconds).
+
+The `supplementary_metric` key can be an empty `Dictionary`.
 ///
 ////
 
