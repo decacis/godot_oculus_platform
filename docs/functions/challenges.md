@@ -68,13 +68,25 @@ GDOculusPlatform.challenges_get("511854451440")\
 //// admonition | challenges_get_list(limit : `int`, challenge_options : `Dictionary`)
     type: abstract
 
-Returns a list of challenges as an `Array`. You can pass certain filters to narrow down the response - see bellow. The limit is the maximum number of challenges that this function can return.
+Requests a list of challenges. You can pass various filters to narrow down the response - see bellow. The `limit` is the maximum number of challenges that this function can return.
 
 **Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPChallengeArray](/godot_oculus_platform/classes/gdopchallengearray/) with information about a block of challenges if fulfilled. The promise will error if the request couldn't be completed.
 
 Default values:
 
 `limit` defaults to `10`.
+
+By default `challenge_options` is:
+
+/// details | Example
+    type: example
+``` json linenums="1"
+{
+    "include_active_challenges": true,
+    "include_future_challenges": false,
+    "include_past_challenges": false
+}
+```
 
 `challenge_options` can have the following **optional** keys/fields:
 
@@ -90,14 +102,6 @@ Default values:
 | include_active_challenges |               bool              | true                                                     |
 | include_future_challenges |               bool              | false                                                    |
 | include_past_challenges   |               bool              | true                                                     |
-
-And by default `challenge_options` has:
-
-| Key                       |              value              |
-|---------------------------|:-------------------------------:|
-| include_active_challenges |               true              |
-| include_future_challenges |              false              |
-| include_past_challenges   |              false              |
 
 Enums:
 
@@ -373,8 +377,8 @@ GDOculusPlatform.challenges_decline_invite("264822651547")\
 .then(func(challenge_info : Dictionary):
     print("Challenge information: ", challenge_info)
 )\
-.error(func(challenge_devline_err):
-    print("Unable to decline challenge invite: ", challenge_devline_err)
+.error(func(challenge_decline_err):
+    print("Unable to decline challenge invite: ", challenge_decline_err)
 )
 ```
 ///
