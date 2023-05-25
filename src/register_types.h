@@ -14,7 +14,6 @@
 #include "gdop_promise.h"
 #include "godot_oculus_platform.h"
 
-
 using namespace godot;
 
 void initialize_gdoculusplatform_module(ModuleInitializationLevel p_level);
