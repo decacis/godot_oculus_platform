@@ -31,7 +31,6 @@ public:
 
 	Array get_users() const;
 	void set_users(const Array p_users_array);
-	void add_users(Array p_users_array);
 };
 
 } // namespace godot

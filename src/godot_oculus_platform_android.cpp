@@ -14,10 +14,16 @@ GDOculusPlatform *GDOculusPlatform::singleton = nullptr;
 void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("pump_messages"), &GDOculusPlatform::pump_messages);
 
+	// PAGINATION
 	ClassDB::bind_method(D_METHOD("user_array_get_next_page", "user_array"), &GDOculusPlatform::user_array_get_next_page);
 	ClassDB::bind_method(D_METHOD("leaderboard_entries_get_prev_page", "leaderboard_entries"), &GDOculusPlatform::leaderboard_entries_get_prev_page);
 	ClassDB::bind_method(D_METHOD("leaderboard_entries_get_next_page", "leaderboard_entries"), &GDOculusPlatform::leaderboard_entries_get_next_page);
+	ClassDB::bind_method(D_METHOD("challenge_array_get_prev_page", "challenge_array"), &GDOculusPlatform::challenge_array_get_prev_page);
+	ClassDB::bind_method(D_METHOD("challenge_array_get_next_page", "challenge_array"), &GDOculusPlatform::challenge_array_get_next_page);
+	ClassDB::bind_method(D_METHOD("challenge_entries_get_prev_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_prev_page);
+	ClassDB::bind_method(D_METHOD("challenge_entries_get_next_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_next_page);
 
+	// INITIALIZATION
 	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
 	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
 
@@ -78,6 +84,16 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("application_launch_other_app", "app_id", "deeplink_options"), &GDOculusPlatform::application_launch_other_app);
 	ClassDB::bind_method(D_METHOD("application_get_launch_details"), &GDOculusPlatform::application_get_launch_details);
 
+	// CHALLENGES
+	ClassDB::bind_method(D_METHOD("challenges_get", "challenge_id"), &GDOculusPlatform::challenges_get);
+	ClassDB::bind_method(D_METHOD("challenges_get_list", "limit", "challenge_options"), &GDOculusPlatform::challenges_get_list);
+	ClassDB::bind_method(D_METHOD("challenges_get_entries", "challenge_id", "limit", "filter", "start_at"), &GDOculusPlatform::challenges_get_entries);
+	ClassDB::bind_method(D_METHOD("challenges_get_entries_after_rank", "challenge_id", "limit", "start_at"), &GDOculusPlatform::challenges_get_entries_after_rank);
+	ClassDB::bind_method(D_METHOD("challenges_get_entries_by_ids", "challenge_id", "limit", "start_at", "user_ids"), &GDOculusPlatform::challenges_get_entries_by_ids);
+	ClassDB::bind_method(D_METHOD("challenges_join", "challenge_id"), &GDOculusPlatform::challenges_join);
+	ClassDB::bind_method(D_METHOD("challenges_leave", "challenge_id"), &GDOculusPlatform::challenges_leave);
+	ClassDB::bind_method(D_METHOD("challenges_decline_invite", "challenge_id"), &GDOculusPlatform::challenges_decline_invite);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
@@ -89,9 +105,19 @@ void GDOculusPlatform::_bind_methods() {
 
 	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP); // 0
 	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER); // 1
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP); // 2
 
 	BIND_ENUM_CONSTANT(REPORT_REQUEST_HANDLED); // 1
 	BIND_ENUM_CONSTANT(REPORT_REQUEST_UNHANDLED); // 2
+
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_VIEWER_ALL_VISIBLE); // 1
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_VIEWER_PARTICIPATING); // 2
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_VIEWER_INVITED); // 3
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_VIEWER_PARTICIPATING_OR_INVITED); // 4
+
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_INVITE_ONLY); // 1
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_PUBLIC); // 2
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_PRIVATE); // 3
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -236,6 +262,82 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_entries_get_prev_page
 	}
 }
 
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_array_get_next_page(Ref<GDOPChallengeArray> p_challenge_array) {
+	if (p_challenge_array->get_has_next_page()) {
+		ovrRequest req = ovr_Challenges_GetNextChallenges(p_challenge_array->array_handle);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	} else {
+		WARN_PRINT_ED("GDOPLeaderboardEntries does not have a next page. Returning same GDOPLeaderboardEntries.");
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_fulfill_promise_id()));
+		return_promise->saved_fulfill_response = Array::make(p_challenge_array);
+		_promises_to_fulfill.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_array_get_prev_page(Ref<GDOPChallengeArray> p_challenge_array) {
+	if (p_challenge_array->get_has_prev_page()) {
+		ovrRequest req = ovr_Challenges_GetPreviousChallenges(p_challenge_array->array_handle);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	} else {
+		WARN_PRINT_ED("GDOPLeaderboardEntries does not have a previous page. Returning same GDOPLeaderboardEntries.");
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_fulfill_promise_id()));
+		return_promise->saved_fulfill_response = Array::make(p_challenge_array);
+		_promises_to_fulfill.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_next_page(Ref<GDOPChallengeEntries> p_challenge_entries) {
+	if (p_challenge_entries->get_has_next_page()) {
+		ovrRequest req = ovr_Challenges_GetNextEntries(p_challenge_entries->array_handle);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	} else {
+		WARN_PRINT_ED("GDOPLeaderboardEntries does not have a next page. Returning same GDOPLeaderboardEntries.");
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_fulfill_promise_id()));
+		return_promise->saved_fulfill_response = Array::make(p_challenge_entries);
+		_promises_to_fulfill.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_prev_page(Ref<GDOPChallengeEntries> p_challenge_entries) {
+	if (p_challenge_entries->get_has_prev_page()) {
+		ovrRequest req = ovr_Challenges_GetPreviousEntries(p_challenge_entries->array_handle);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	} else {
+		WARN_PRINT_ED("GDOPLeaderboardEntries does not have a previous page. Returning same GDOPLeaderboardEntries.");
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_fulfill_promise_id()));
+		return_promise->saved_fulfill_response = Array::make(p_challenge_entries);
+		_promises_to_fulfill.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
 /// Checks the OVR messages queue and handles them according to their type.
 void GDOculusPlatform::pump_messages() {
 	_fulfill_promises();
@@ -279,7 +381,7 @@ void GDOculusPlatform::pump_messages() {
 				break;
 
 			case ovrMessage_User_GetLoggedInUserFriends:
-				_process_user_get_logged_in_user_friends(message);
+				_process_user_get_next_array_page(message);
 				break;
 
 			case ovrMessage_User_GetNextUserArrayPage:
@@ -460,6 +562,54 @@ void GDOculusPlatform::pump_messages() {
 
 			case ovrMessage_Notification_ApplicationLifecycle_LaunchIntentChanged:
 				emit_signal("app_launch_intent_changed", String(ovr_Message_GetString(message)));
+				break;
+
+			case ovrMessage_Challenges_Get:
+				_process_challenges_get(message);
+				break;
+
+			case ovrMessage_Challenges_GetList:
+				_process_challenges_get_list(message);
+				break;
+
+			case ovrMessage_Challenges_GetNextChallenges:
+				_process_challenges_get_list(message);
+				break;
+
+			case ovrMessage_Challenges_GetPreviousChallenges:
+				_process_challenges_get_list(message);
+				break;
+
+			case ovrMessage_Challenges_GetEntries:
+				_process_challenges_get_entries(message);
+				break;
+
+			case ovrMessage_Challenges_GetEntriesAfterRank:
+				_process_challenges_get_entries(message);
+				break;
+
+			case ovrMessage_Challenges_GetEntriesByIds:
+				_process_challenges_get_entries(message);
+				break;
+
+			case ovrMessage_Challenges_GetPreviousEntries:
+				_process_challenges_get_entries(message);
+				break;
+
+			case ovrMessage_Challenges_GetNextEntries:
+				_process_challenges_get_entries(message);
+				break;
+
+			case ovrMessage_Challenges_Join:
+				_process_challenges_get(message);
+				break;
+
+			case ovrMessage_Challenges_Leave:
+				_process_challenges_get(message);
+				break;
+
+			case ovrMessage_Challenges_DeclineInvite:
+				_process_challenges_get(message);
 				break;
 
 			default:
@@ -1456,34 +1606,378 @@ Dictionary GDOculusPlatform::application_get_launch_details() {
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
-///// INTERNAL PROCESSING METHODS
-/////////////////////////////////////////////////
+///// CHALLENGES
+////////////////////////////////////////////////
 
-void GDOculusPlatform::_process_user_get_next_array_page(ovrMessageHandle p_message) {
-	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+/// Requests information about a single challenge.
+/// @return A Dictionary with info about the challenge.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get(String p_challenge_id) {
+	ovrID challenge_id;
+	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
+		ovrRequest req = ovr_Challenges_Get(challenge_id);
 
-	if (!ovr_Message_IsError(p_message)) {
-		ovrUserArrayHandle user_friends_handle = ovr_Message_GetUserArray(p_message);
-		Ref<GDOPUserArray> users_array = memnew(GDOPUserArray(user_friends_handle));
-		size_t user_friends_array_size = ovr_UserArray_GetSize(user_friends_handle);
-		Array users = Array();
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
 
-		for (size_t i = 0; i < user_friends_array_size; i++) {
-			ovrUserHandle user_handle = ovr_UserArray_GetElement(user_friends_handle, i);
-			Dictionary user_info = _get_user_information(user_handle);
-
-			users.push_back(user_info);
-		}
-
-		users_array->set_users(users);
-		users_array->has_next_page = ovr_UserArray_HasNextPage(user_friends_handle);
-
-		_fulfill_promise(msg_id, Array::make(users_array));
+		return return_promise;
 
 	} else {
-		_handle_default_process_error(p_message, msg_id);
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid challenge id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
 	}
 }
+
+/// Requests information about a list challenges. Several filters can be applied.
+/// @return A GDOPChallengeArray with info about the challenges.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_list(uint64_t p_limit, Dictionary p_challenge_options) {
+	if (p_limit < 0) {
+		p_limit = 0;
+	} else if (p_limit > INT32_MAX) {
+		p_limit = INT32_MAX;
+	}
+
+	ovrChallengeOptionsHandle challenge_options = ovr_ChallengeOptions_Create();
+	if (p_challenge_options.is_empty()) {
+		ovr_ChallengeOptions_SetVisibility(challenge_options, ovrChallengeVisibility_Public);
+		ovr_ChallengeOptions_SetViewerFilter(challenge_options, ovrChallengeViewerFilter_AllVisible);
+		ovr_ChallengeOptions_SetIncludeActiveChallenges(challenge_options, true);
+		ovr_ChallengeOptions_SetIncludeFutureChallenges(challenge_options, false);
+		ovr_ChallengeOptions_SetIncludePastChallenges(challenge_options, false);
+
+	} else {
+		if (p_challenge_options.has("description")) {
+			if (p_challenge_options.get("description", 0).get_type() == Variant::STRING) {
+				ovr_ChallengeOptions_SetDescription(challenge_options, ((String)p_challenge_options.get("description", "")).utf8().get_data());
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options description value. Description must be a String.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("title")) {
+			if (p_challenge_options.get("title", 0).get_type() == Variant::STRING) {
+				ovr_ChallengeOptions_SetTitle(challenge_options, ((String)p_challenge_options.get("title", "")).utf8().get_data());
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options title value. Title must be a String.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("leaderboard_name")) {
+			if (p_challenge_options.get("leaderboard_name", 0).get_type() == Variant::STRING) {
+				ovr_ChallengeOptions_SetLeaderboardName(challenge_options, ((String)p_challenge_options.get("leaderboard_name", "")).utf8().get_data());
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options leaderboard_name value. Leaderboard name must be a String.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("start_date")) {
+			if (p_challenge_options.get("start_date", "").get_type() == Variant::INT) {
+				ovr_ChallengeOptions_SetStartDate(challenge_options, ((uint64_t)p_challenge_options.get("start_date", 0)));
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options start_date value. Start date must be an int.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("end_date")) {
+			if (p_challenge_options.get("end_date", "").get_type() == Variant::INT) {
+				ovr_ChallengeOptions_SetEndDate(challenge_options, ((uint64_t)p_challenge_options.get("end_date", 0)));
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options end_date value. End date must be an int.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("viewer_filter")) {
+			if (p_challenge_options.get("viewer_filter", "").get_type() == Variant::INT) {
+				ovr_ChallengeOptions_SetViewerFilter(challenge_options, (ovrChallengeViewerFilter)((uint64_t)p_challenge_options.get("viewer_filter", 0)));
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options viewer_filter value. Viewer filter must be a ChallengeVisibilityViewerFilter.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("visibility")) {
+			if (p_challenge_options.get("visibility", "").get_type() == Variant::INT) {
+				ovr_ChallengeOptions_SetVisibility(challenge_options, (ovrChallengeVisibility)((uint64_t)p_challenge_options.get("visibility", 0)));
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options visibility value. Visibility must be a ChallengeVisibility.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("include_active_challenges")) {
+			if (p_challenge_options.get("include_active_challenges", "").get_type() == Variant::BOOL) {
+				ovr_ChallengeOptions_SetIncludeActiveChallenges(challenge_options, ((bool)p_challenge_options.get("include_active_challenges", true)));
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options include_active_challenges value. Include active challenges must be an bool.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("include_future_challenges")) {
+			if (p_challenge_options.get("include_future_challenges", "").get_type() == Variant::BOOL) {
+				ovr_ChallengeOptions_SetIncludeFutureChallenges(challenge_options, ((bool)p_challenge_options.get("include_future_challenges", false)));
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options include_future_challenges value. Include future challenges must be an bool.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		if (p_challenge_options.has("include_past_challenges")) {
+			if (p_challenge_options.get("include_past_challenges", "").get_type() == Variant::BOOL) {
+				ovr_ChallengeOptions_SetIncludePastChallenges(challenge_options, ((bool)p_challenge_options.get("include_past_challenges", false)));
+			} else {
+				ovr_ChallengeOptions_Destroy(challenge_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid challenge options include_past_challenges value. Include past challenges must be an bool.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+	}
+
+	ovrRequest req = ovr_Challenges_GetList(challenge_options, p_limit);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests the entries from a challenge. Several filters can be applied.
+/// @return A GDOPChallengeEntries that contains an array of entries.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries(String p_challenge_id, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at) {
+	if (p_limit < 0) {
+		p_limit = 0;
+	} else if (p_limit > INT32_MAX) {
+		p_limit = INT32_MAX;
+	}
+
+	ovrID challenge_id;
+	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
+		ovrRequest req = ovr_Challenges_GetEntries(challenge_id, p_limit, (ovrLeaderboardFilterType)p_filter, (ovrLeaderboardStartAt)p_start_at);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid challenge id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+/// Requests the entries from a challenge after a given rank.
+/// @return A GDOPChallengeEntries that contains an array of entries.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_after_rank(String p_challenge_id, uint64_t p_limit, uint64_t p_after_rank) {
+	if (p_limit < 0) {
+		p_limit = 0;
+	} else if (p_limit > INT32_MAX) {
+		p_limit = INT32_MAX;
+	}
+
+	ovrID challenge_id;
+	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
+		ovrRequest req = ovr_Challenges_GetEntriesAfterRank(challenge_id, p_limit, p_after_rank);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid challenge id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+/// Requests the entries from a challenge, but only including entries of the given user ids.
+/// @return A GDOPChallengeEntries that contains an array of entries.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_by_ids(String p_challenge_id, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at) {
+	if (p_limit < 0) {
+		p_limit = 0;
+	} else if (p_limit > INT32_MAX) {
+		p_limit = INT32_MAX;
+	}
+
+	ovrID challenge_id;
+	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
+		int64_t ids_arr_size = p_user_ids.size();
+
+		ovrID *ovr_ids = memnew_arr(ovrID, ids_arr_size);
+		std::vector<ovrID> sav(ids_arr_size);
+
+		for (size_t j = 0; j < ids_arr_size; j++) {
+			ovr_ids[j] = 0;
+		}
+
+		for (int i = 0; i < ids_arr_size; i++) {
+			if (p_user_ids[i].get_type() == Variant::STRING) {
+				ovrID_FromString(&sav[i], ((String)p_user_ids[i]).utf8().get_data());
+				ovr_ids[i] = sav[i];
+
+			} else {
+				memdelete_arr(ovr_ids);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "Invalid user ID found in array. All user IDs names must be Strings.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+			}
+		}
+
+		ovrRequest req = ovr_Challenges_GetEntriesByIds(challenge_id, p_limit, (ovrLeaderboardStartAt)p_start_at, ovr_ids, ids_arr_size);
+		memdelete_arr(ovr_ids);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid challenge id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+/// Tries to join the user to a challenge.
+/// @return A Dictionary with info about the challenge.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_join(String p_challenge_id) {
+	ovrID challenge_id;
+	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
+		ovrRequest req = ovr_Challenges_Join(challenge_id);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid challenge id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+/// Requests the user withdrawal from a challenge.
+/// @return A Dictionary with info about the challenge.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_leave(String p_challenge_id) {
+	ovrID challenge_id;
+	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
+		ovrRequest req = ovr_Challenges_Leave(challenge_id);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid challenge id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+/// Declines an invite to join a challenge.
+/// @return A Dictionary with info about the challenge.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_decline_invite(String p_challenge_id) {
+	ovrID challenge_id;
+	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
+		ovrRequest req = ovr_Challenges_DeclineInvite(challenge_id);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid challenge id.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// INTERNAL PROCESSING METHODS
+/////////////////////////////////////////////////
 
 ///// USERS
 /////////////////////////////////////////////////
@@ -1604,25 +2098,26 @@ void GDOculusPlatform::_process_user_get_blocked_users(ovrMessageHandle p_messag
 	}
 }
 
-/// Processes user information about the current user's friends. Paginated
-void GDOculusPlatform::_process_user_get_logged_in_user_friends(ovrMessageHandle p_message) {
+/// Processes user information about an array of users. Paginated
+/// Used by: user_get_logged_in_user_friends
+void GDOculusPlatform::_process_user_get_next_array_page(ovrMessageHandle p_message) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
-		ovrUserArrayHandle user_friends_handle = ovr_Message_GetUserArray(p_message);
-		Ref<GDOPUserArray> users_array = memnew(GDOPUserArray(user_friends_handle));
-		size_t user_friends_array_size = ovr_UserArray_GetSize(user_friends_handle);
+		ovrUserArrayHandle user_arr_h = ovr_Message_GetUserArray(p_message);
+		Ref<GDOPUserArray> users_array = memnew(GDOPUserArray(user_arr_h));
+		size_t user_friends_array_size = ovr_UserArray_GetSize(user_arr_h);
 		Array users = Array();
 
 		for (size_t i = 0; i < user_friends_array_size; i++) {
-			ovrUserHandle user_handle = ovr_UserArray_GetElement(user_friends_handle, i);
+			ovrUserHandle user_handle = ovr_UserArray_GetElement(user_arr_h, i);
 			Dictionary user_info = _get_user_information(user_handle);
 
 			users.push_back(user_info);
 		}
 
 		users_array->set_users(users);
-		users_array->has_next_page = ovr_UserArray_HasNextPage(user_friends_handle);
+		users_array->has_next_page = ovr_UserArray_HasNextPage(user_arr_h);
 
 		_fulfill_promise(msg_id, Array::make(users_array));
 
@@ -2262,6 +2757,91 @@ void GDOculusPlatform::_process_application_get_version(ovrMessageHandle p_messa
 		_handle_default_process_error(p_message, msg_id);
 	}
 }
+
+///// CHALLENGES
+/////////////////////////////////////////////////
+
+/// Processes the response from a request to get a single challenge.
+/// Used by: challenges_get, challenges_join, challenges_leave, challenges_decline_invite
+void GDOculusPlatform::_process_challenges_get(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrChallengeHandle challenge_h = ovr_Message_GetChallenge(p_message);
+
+		Dictionary challenge = _get_challenge_information(challenge_h);
+
+		_fulfill_promise(msg_id, Array::make(challenge));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+/// Processes the response from a request to get a a list of challenges
+/// Used by: challenges_get_list
+void GDOculusPlatform::_process_challenges_get_list(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrChallengeArrayHandle challenge_array_h = ovr_Message_GetChallengeArray(p_message);
+		Ref<GDOPChallengeArray> challenge_array = memnew(GDOPChallengeArray(challenge_array_h));
+
+		challenge_array->has_prev_page = ovr_ChallengeArray_HasPreviousPage(challenge_array_h);
+		challenge_array->has_next_page = ovr_ChallengeArray_HasNextPage(challenge_array_h);
+		challenge_array->total_count = ovr_ChallengeArray_GetTotalCount(challenge_array_h);
+
+		size_t challenge_arr_s = ovr_ChallengeArray_GetSize(challenge_array_h);
+		Array challenges_arr = Array();
+
+		for (size_t i = 0; i < challenge_arr_s; i++) {
+			ovrChallengeHandle challenge_element = ovr_ChallengeArray_GetElement(challenge_array_h, i);
+			Dictionary challenge = _get_challenge_information(challenge_element);
+
+			challenges_arr.push_back(challenge);
+		}
+
+		challenge_array->set_challenges(challenges_arr);
+
+		_fulfill_promise(msg_id, Array::make(challenge_array));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+/// Processes the response from a request to get a a list of challenge entries
+/// Used by: challenges_get_entries, challenges_get_entries_after_rank, challenges_get_entries_by_ids
+void GDOculusPlatform::_process_challenges_get_entries(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrChallengeEntryArrayHandle challenge_e_array_h = ovr_Message_GetChallengeEntryArray(p_message);
+		Ref<GDOPChallengeEntries> challenge_e_array = memnew(GDOPChallengeEntries(challenge_e_array_h));
+
+		challenge_e_array->has_prev_page = ovr_ChallengeEntryArray_HasPreviousPage(challenge_e_array_h);
+		challenge_e_array->has_next_page = ovr_ChallengeEntryArray_HasNextPage(challenge_e_array_h);
+		challenge_e_array->total_count = ovr_ChallengeEntryArray_GetTotalCount(challenge_e_array_h);
+
+		size_t challenge_e_arr_s = ovr_ChallengeEntryArray_GetSize(challenge_e_array_h);
+		Array challenges_e_arr = Array();
+
+		for (size_t i = 0; i < challenge_e_arr_s; i++) {
+			ovrChallengeEntryHandle challenge_e_element = ovr_ChallengeEntryArray_GetElement(challenge_e_array_h, i);
+			Dictionary challenge_entry = _get_challenge_entry_information(challenge_e_element);
+
+			challenges_e_arr.push_back(challenge_entry);
+		}
+
+		challenge_e_array->set_entries(challenges_e_arr);
+
+		_fulfill_promise(msg_id, Array::make(challenge_e_array));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
 ///// PROCESSING HELPERS
 /////////////////////////////////////////////////
 
@@ -2295,7 +2875,7 @@ void GDOculusPlatform::_handle_default_process_error(ovrMessageHandle p_message,
 }
 
 // Helper function to get a Dictionary with information about a single user.
-Dictionary GDOculusPlatform::_get_user_information(ovrUserHandle p_user_handle) {
+Dictionary GDOculusPlatform::_get_user_information(ovrUserHandle &p_user_handle) {
 	Dictionary user_info_resp;
 	Dictionary user_info_presence;
 
@@ -2318,6 +2898,120 @@ Dictionary GDOculusPlatform::_get_user_information(ovrUserHandle p_user_handle) 
 	user_info_presence["presence_match_session_id"] = ovr_User_GetPresenceMatchSessionId(p_user_handle);
 
 	return user_info_resp;
+}
+
+// Helper function to get information about a single challenge
+Dictionary GDOculusPlatform::_get_challenge_information(ovrChallengeHandle &p_challenge_h) {
+	Dictionary challenge;
+
+	char native_id[OVRID_SIZE];
+	ovrID challenge_id = ovr_Challenge_GetID(p_challenge_h);
+	ovrID_ToString(native_id, OVRID_SIZE, challenge_id);
+
+	challenge["id"] = String(native_id);
+	challenge["title"] = ovr_Challenge_GetTitle(p_challenge_h);
+	challenge["description"] = ovr_Challenge_GetDescription(p_challenge_h);
+	challenge["start_date"] = (uint64_t)ovr_Challenge_GetStartDate(p_challenge_h);
+	challenge["end_date"] = (uint64_t)ovr_Challenge_GetEndDate(p_challenge_h);
+
+	// PUBLIC, PRIVATE, INVITE_ONLY, UNKNOWN
+	ovrChallengeVisibility challenge_v = ovr_Challenge_GetVisibility(p_challenge_h);
+	challenge["visibility"] = ovrChallengeVisibility_ToString(challenge_v);
+
+	// USER_CREATED, DEVELOPER_CREATED, UNKNOWN
+	ovrChallengeCreationType challenge_t = ovr_Challenge_GetCreationType(p_challenge_h);
+	challenge["type"] = ovrChallengeCreationType_ToString(challenge_t);
+
+	ovrLeaderboardHandle challenge_l = ovr_Challenge_GetLeaderboard(p_challenge_h);
+	Dictionary challenge_leaderboard;
+
+	char native_cl_id[OVRID_SIZE];
+	ovrID cl_id = ovr_Leaderboard_GetID(challenge_l);
+	ovrID_ToString(native_cl_id, OVRID_SIZE, cl_id);
+	challenge_leaderboard["id"] = native_cl_id;
+
+	challenge_leaderboard["api_name"] = ovr_Leaderboard_GetApiName(challenge_l);
+
+	ovrDestinationHandle cl_destination_h = ovr_Leaderboard_GetDestination(challenge_l);
+	if (cl_destination_h) {
+		Dictionary cl_destination;
+		cl_destination["display_name"] = ovr_Destination_GetDisplayName(cl_destination_h);
+		cl_destination["api_name"] = ovr_Destination_GetApiName(cl_destination_h);
+		cl_destination["deeplink_message"] = ovr_Destination_GetDeeplinkMessage(cl_destination_h);
+
+		challenge_leaderboard["destination"] = cl_destination;
+	} else {
+		challenge_leaderboard["destination"] = Dictionary();
+	}
+
+	challenge["leaderboard"] = challenge_leaderboard;
+
+	ovrUserArrayHandle invited_users_arr_h = ovr_Challenge_GetInvitedUsers(p_challenge_h);
+	Ref<GDOPUserArray> invited_users_array = memnew(GDOPUserArray(invited_users_arr_h));
+	if (invited_users_arr_h) {
+		size_t user_array_size = ovr_UserArray_GetSize(invited_users_arr_h);
+		Array users = Array();
+
+		for (size_t i = 0; i < user_array_size; i++) {
+			ovrUserHandle user_handle = ovr_UserArray_GetElement(invited_users_arr_h, i);
+			Dictionary user_info = _get_user_information(user_handle);
+
+			users.push_back(user_info);
+		}
+
+		invited_users_array->set_users(users);
+		invited_users_array->has_next_page = ovr_UserArray_HasNextPage(invited_users_arr_h);
+
+		challenge["invited_users"] = invited_users_array;
+	} else {
+		invited_users_array->set_users(Array());
+		challenge["invited_users"] = invited_users_array;
+	}
+
+	ovrUserArrayHandle participants_array_h = ovr_Challenge_GetParticipants(p_challenge_h);
+	Ref<GDOPUserArray> participants_array = memnew(GDOPUserArray(participants_array_h));
+	if (participants_array_h) {
+		size_t user_array_size = ovr_UserArray_GetSize(participants_array_h);
+		Array users = Array();
+
+		for (size_t i = 0; i < user_array_size; i++) {
+			ovrUserHandle user_handle = ovr_UserArray_GetElement(participants_array_h, i);
+			Dictionary user_info = _get_user_information(user_handle);
+
+			users.push_back(user_info);
+		}
+
+		participants_array->set_users(users);
+		participants_array->has_next_page = ovr_UserArray_HasNextPage(participants_array_h);
+
+		challenge["participants"] = participants_array;
+	} else {
+		participants_array->set_users(Array());
+		challenge["participants"] = participants_array;
+	}
+}
+
+// Helper function to get information about a single challenge entry
+Dictionary GDOculusPlatform::_get_challenge_entry_information(ovrChallengeEntryHandle &p_challenge_entry_h) {
+	Dictionary entry_data;
+
+	ovrID entry_id = ovr_ChallengeEntry_GetID(p_challenge_entry_h);
+	char native_id[OVRID_SIZE];
+	ovrID_ToString(native_id, OVRID_SIZE, entry_id);
+
+	entry_data["id"] = String(native_id);
+	entry_data["rank"] = ovr_ChallengeEntry_GetRank(p_challenge_entry_h);
+	entry_data["score"] = (int64_t)ovr_ChallengeEntry_GetScore(p_challenge_entry_h);
+	entry_data["timestamp"] = (uint64_t)ovr_ChallengeEntry_GetTimestamp(p_challenge_entry_h);
+	entry_data["display_score"] = ovr_ChallengeEntry_GetDisplayScore(p_challenge_entry_h);
+	entry_data["extra_data"] = ovr_ChallengeEntry_GetExtraData(p_challenge_entry_h);
+
+	ovrUserHandle user = ovr_ChallengeEntry_GetUser(p_challenge_entry_h);
+	Dictionary user_info = _get_user_information(user);
+
+	entry_data["user"] = user_info;
+
+	return entry_data;
 }
 
 void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
@@ -2360,7 +3054,7 @@ void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
 }
 
 /// Helper function to handle the entries array handle
-Array GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle p_entries_arr_handle) {
+Array GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle &p_entries_arr_handle) {
 	Array entries = Array();
 	size_t entries_arr_s = ovr_LeaderboardEntryArray_GetSize(p_entries_arr_handle);
 
@@ -2395,6 +3089,8 @@ Array GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHand
 			supplementary_metric["metric"] = (int64_t)ovr_SupplementaryMetric_GetMetric(supplementary_metric_handle);
 
 			entry_data["supplementary_metric"] = supplementary_metric;
+		} else {
+			entry_data["supplementary_metric"] = Dictionary();
 		}
 
 		entry_data["user"] = user_info;

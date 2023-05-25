@@ -1,5 +1,5 @@
-#ifndef GOP_PROMISE_H
-#define GOP_PROMISE_H
+#ifndef GDOP_PROMISE_H
+#define GDOP_PROMISE_H
 
 #include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
@@ -43,4 +43,4 @@ public:
 
 } // namespace godot
 
-#endif // GOP_PROMISE_H
+#endif // GDOP_PROMISE_H

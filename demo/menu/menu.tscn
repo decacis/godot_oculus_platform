@@ -71,6 +71,7 @@ offset_bottom = 40.0
 layout_mode = 2
 
 [node name="User" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -492,6 +493,77 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "LeaderboardWriteEntryWithSupplementaryMetric"
 
+[node name="Challenges" type="MarginContainer" parent="PanelContainer/TabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/Challenges"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/Challenges/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="ChallengesGet" type="Button" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ChallengesGet"
+
+[node name="ChallengesGetList" type="Button" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ChallengesGetList"
+
+[node name="ChallengesGetEntries" type="Button" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ChallengesGetEntries"
+
+[node name="ChallengesGetEntriesAfterRank" type="Button" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ChallengesGetEntriesAfterRank"
+
+[node name="ChallengesGetEntriesByIds" type="Button" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ChallengesGetEntriesByIds"
+
+[node name="ChallengesJoin" type="Button" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ChallengesJoin"
+
+[node name="ChallengesLeave" type="Button" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ChallengesLeave"
+
+[node name="ChallengesDeclineInvite" type="Button" parent="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ChallengesDeclineInvite"
+
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserID" to="." method="_on_get_logged_in_user_id_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserLocale" to="." method="_on_get_logged_in_user_locale_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetIsViewerEntitled" to="." method="_on_get_is_viewer_entitled_pressed"]
@@ -532,3 +604,11 @@ text = "LeaderboardWriteEntryWithSupplementaryMetric"
 [connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardGetEntriesByIDs" to="." method="_on_leaderboard_get_entries_by_i_ds_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardWriteEntry" to="." method="_on_leaderboard_write_entry_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardWriteEntryWithSupplementaryMetric" to="." method="_on_leaderboard_write_entry_with_supplementary_metric_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGet" to="." method="_on_challenges_get_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGetList" to="." method="_on_challenges_get_list_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGetEntries" to="." method="_on_challenges_get_entries_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGetEntriesAfterRank" to="." method="_on_challenges_get_entries_after_rank_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGetEntriesByIds" to="." method="_on_challenges_get_entries_by_ids_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesJoin" to="." method="_on_challenges_join_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesLeave" to="." method="_on_challenges_leave_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesDeclineInvite" to="." method="_on_challenges_decline_invite_pressed"]

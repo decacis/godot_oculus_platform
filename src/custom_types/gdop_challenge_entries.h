@@ -1,5 +1,5 @@
-#ifndef GDOP_LEADERBOARD_ENTRIES_H
-#define GDOP_LEADERBOARD_ENTRIES_H
+#ifndef GDOP_CHALLENGE_ENTRIES_H
+#define GDOP_CHALLENGE_ENTRIES_H
 
 #include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
@@ -10,8 +10,8 @@
 
 namespace godot {
 
-class GDOPLeaderboardEntries : public RefCounted {
-	GDCLASS(GDOPLeaderboardEntries, RefCounted)
+class GDOPChallengeEntries : public RefCounted {
+	GDCLASS(GDOPChallengeEntries, RefCounted)
 
 protected:
 	static void _bind_methods();
@@ -20,11 +20,11 @@ private:
 	Array entries;
 
 public:
-	GDOPLeaderboardEntries();
-	GDOPLeaderboardEntries(ovrLeaderboardEntryArrayHandle p_array_handle);
-	~GDOPLeaderboardEntries();
+	GDOPChallengeEntries();
+	GDOPChallengeEntries(ovrChallengeEntryArrayHandle p_array_handle);
+	~GDOPChallengeEntries();
 
-	ovrLeaderboardEntryArrayHandle array_handle;
+	ovrChallengeEntryArrayHandle array_handle;
 
 	uint64_t total_count = 0;
 	bool has_next_page = false;
@@ -42,4 +42,4 @@ public:
 
 } // namespace godot
 
-#endif // GDOP_LEADERBOARD_ENTRIES_H
+#endif // GDOP_CHALLENGE_ENTRIES_H

@@ -38,6 +38,16 @@ extends CanvasLayer
 @export var leaderboard_write_entry : Dictionary = {}
 @export var leaderboard_write_entry_with_supplementary_metric : Dictionary = {}
 
+@export_group("Challenges")
+@export var challenges_get : String = ""
+@export var challenges_get_list : Dictionary = {}
+@export var challenges_get_entries : Dictionary = {}
+@export var challenges_get_entries_after_rank : Dictionary = {}
+@export var challenges_get_entries_by_ids : Dictionary = {}
+@export var challenges_join : String = ""
+@export var challenges_leave : String = ""
+@export var challenges_decline_invite : String = ""
+
 
 func _ready() -> void:
 	if !get_user_val.is_empty():
@@ -105,6 +115,24 @@ func _ready() -> void:
 		$PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardWriteEntry.visible = true
 	if !leaderboard_write_entry_with_supplementary_metric.is_empty():
 		$PanelContainer/TabContainer/Leaderboard/VBoxContainer/InputFuncs/HFlowContainer/LeaderboardWriteEntryWithSupplementaryMetric.visible = true
+		
+	## CHALLENGES
+	if !challenges_get.is_empty():
+		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGet.visible = true
+	if !challenges_get_list.is_empty():
+		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGetList.visible = true
+	if !challenges_get_entries.is_empty():
+		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGetEntries.visible = true
+	if !challenges_get_entries_after_rank.is_empty():
+		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGetEntriesAfterRank.visible = true
+	if !challenges_get_entries_by_ids.is_empty():
+		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesGetEntriesByIds.visible = true
+	if !challenges_join.is_empty():
+		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesJoin.visible = true
+	if !challenges_leave.is_empty():
+		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesLeave.visible = true
+	if !challenges_decline_invite.is_empty():
+		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesDeclineInvite.visible = true
 
 
 ## USER - NO INPUT FUNCS
@@ -635,3 +663,29 @@ func _on_leaderboard_write_entry_with_supplementary_metric_pressed():
 	.error(func(leaderboard_err):
 		push_error("[leaderboard_write_entry with supplementary metric] ERROR: ", leaderboard_err)
 	)
+
+
+## CHALLENGES - INPUT FUNCS
+func _on_challenges_get_pressed():
+	pass # Replace with function body.
+
+func _on_challenges_get_list_pressed():
+	pass # Replace with function body.
+
+func _on_challenges_get_entries_pressed():
+	pass # Replace with function body.
+
+func _on_challenges_get_entries_after_rank_pressed():
+	pass # Replace with function body.
+
+func _on_challenges_get_entries_by_ids_pressed():
+	pass # Replace with function body.
+
+func _on_challenges_join_pressed():
+	pass # Replace with function body.
+
+func _on_challenges_leave_pressed():
+	pass # Replace with function body.
+
+func _on_challenges_decline_invite_pressed():
+	pass # Replace with function body.

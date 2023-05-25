@@ -18,10 +18,16 @@ GDOculusPlatform *GDOculusPlatform::singleton = nullptr;
 void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("pump_messages"), &GDOculusPlatform::pump_messages);
 
+	// PAGINATION
 	ClassDB::bind_method(D_METHOD("user_array_get_next_page", "user_array"), &GDOculusPlatform::user_array_get_next_page);
 	ClassDB::bind_method(D_METHOD("leaderboard_entries_get_prev_page", "leaderboard_entries"), &GDOculusPlatform::leaderboard_entries_get_prev_page);
 	ClassDB::bind_method(D_METHOD("leaderboard_entries_get_next_page", "leaderboard_entries"), &GDOculusPlatform::leaderboard_entries_get_next_page);
+	ClassDB::bind_method(D_METHOD("challenge_array_get_prev_page", "challenge_array"), &GDOculusPlatform::challenge_array_get_prev_page);
+	ClassDB::bind_method(D_METHOD("challenge_array_get_next_page", "challenge_array"), &GDOculusPlatform::challenge_array_get_next_page);
+	ClassDB::bind_method(D_METHOD("challenge_entries_get_prev_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_prev_page);
+	ClassDB::bind_method(D_METHOD("challenge_entries_get_next_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_next_page);
 
+	// INITIALIZATION
 	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
 	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
 
@@ -82,6 +88,16 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("application_launch_other_app", "app_id", "deeplink_options"), &GDOculusPlatform::application_launch_other_app);
 	ClassDB::bind_method(D_METHOD("application_get_launch_details"), &GDOculusPlatform::application_get_launch_details);
 
+	// CHALLENGES
+	ClassDB::bind_method(D_METHOD("challenges_get", "challenge_id"), &GDOculusPlatform::challenges_get);
+	ClassDB::bind_method(D_METHOD("challenges_get_list", "limit", "challenge_options"), &GDOculusPlatform::challenges_get_list);
+	ClassDB::bind_method(D_METHOD("challenges_get_entries", "challenge_id", "limit", "filter", "start_at"), &GDOculusPlatform::challenges_get_entries);
+	ClassDB::bind_method(D_METHOD("challenges_get_entries_after_rank", "challenge_id", "limit", "start_at"), &GDOculusPlatform::challenges_get_entries_after_rank);
+	ClassDB::bind_method(D_METHOD("challenges_get_entries_by_ids", "challenge_id", "limit", "start_at", "user_ids"), &GDOculusPlatform::challenges_get_entries_by_ids);
+	ClassDB::bind_method(D_METHOD("challenges_join", "challenge_id"), &GDOculusPlatform::challenges_join);
+	ClassDB::bind_method(D_METHOD("challenges_leave", "challenge_id"), &GDOculusPlatform::challenges_leave);
+	ClassDB::bind_method(D_METHOD("challenges_decline_invite", "challenge_id"), &GDOculusPlatform::challenges_decline_invite);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
@@ -93,9 +109,19 @@ void GDOculusPlatform::_bind_methods() {
 
 	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_TOP); // 0
 	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER); // 1
+	BIND_ENUM_CONSTANT(LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP); // 2
 
 	BIND_ENUM_CONSTANT(REPORT_REQUEST_HANDLED); // 1
 	BIND_ENUM_CONSTANT(REPORT_REQUEST_UNHANDLED); // 2
+
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_VIEWER_ALL_VISIBLE); // 1
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_VIEWER_PARTICIPATING); // 2
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_VIEWER_INVITED); // 3
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_VIEWER_PARTICIPATING_OR_INVITED); // 4
+
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_INVITE_ONLY); // 1
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_PUBLIC); // 2
+	BIND_ENUM_CONSTANT(CHALLENGE_VISIBILITY_PRIVATE); // 3
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -125,6 +151,20 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_entries_get_next_page
 	return _empty_func_helper();
 }
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_entries_get_prev_page(Ref<GDOPLeaderboardEntries> p_leaderboard_entries) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_array_get_next_page(Ref<GDOPChallengeArray> p_challenge_array) {
+	return _empty_func_helper();
+}
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_array_get_prev_page(Ref<GDOPChallengeArray> p_challenge_array) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_next_page(Ref<GDOPChallengeEntries> p_challenge_entries) {
+	return _empty_func_helper();
+}
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_prev_page(Ref<GDOPChallengeEntries> p_challenge_entries) {
 	return _empty_func_helper();
 }
 
@@ -349,3 +389,40 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(Stri
 Dictionary GDOculusPlatform::application_get_launch_details() {
 	return Dictionary();
 };
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// CHALLENGES
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get(String p_challenge_id) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_list(uint64_t p_limit, Dictionary p_challenge_options) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries(String p_challenge_id, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_after_rank(String p_challenge_id, uint64_t p_limit, uint64_t p_after_rank) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_by_ids(String p_challenge_id, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_join(String p_challenge_id) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_leave(String p_challenge_id) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_decline_invite(String p_challenge_id) {
+	return _empty_func_helper();
+}

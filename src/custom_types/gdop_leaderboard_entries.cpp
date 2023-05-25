@@ -14,8 +14,6 @@ void GDOPLeaderboardEntries::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_has_prev_page"), &GDOPLeaderboardEntries::get_has_prev_page);
 
 	ClassDB::bind_method(D_METHOD("get_total_count"), &GDOPLeaderboardEntries::get_total_count);
-
-	ClassDB::bind_method(D_METHOD("add_entries", "entries_array"), &GDOPLeaderboardEntries::add_entries);
 }
 
 GDOPLeaderboardEntries::GDOPLeaderboardEntries() {}
@@ -42,8 +40,4 @@ Array GDOPLeaderboardEntries::get_entries() const {
 
 void GDOPLeaderboardEntries::set_entries(const Array p_entries_array) {
 	entries = p_entries_array;
-}
-
-void GDOPLeaderboardEntries::add_entries(Array p_entries_array) {
-	entries.append_array(p_entries_array);
 }

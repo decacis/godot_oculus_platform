@@ -11,6 +11,8 @@ void initialize_gdoculusplatform_module(ModuleInitializationLevel p_level) {
 
 	ClassDB::register_class<GDOPUserArray>();
 	ClassDB::register_class<GDOPLeaderboardEntries>();
+	ClassDB::register_class<GDOPChallengeArray>();
+	ClassDB::register_class<GDOPChallengeEntries>();
 	ClassDB::register_class<GDOculusPlatformPromise>();
 	ClassDB::register_class<GDOculusPlatform>();
 	gd_oculus_platform = memnew(GDOculusPlatform);

@@ -10,8 +10,6 @@ void GDOPUserArray::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "users"), "set_users", "get_users");
 
 	ClassDB::bind_method(D_METHOD("get_has_next_page"), &GDOPUserArray::get_has_next_page);
-
-	ClassDB::bind_method(D_METHOD("add_users", "users_array"), &GDOPUserArray::add_users);
 }
 
 GDOPUserArray::GDOPUserArray() {}
@@ -30,8 +28,4 @@ Array GDOPUserArray::get_users() const {
 
 void GDOPUserArray::set_users(const Array p_users_array) {
 	users = p_users_array;
-}
-
-void GDOPUserArray::add_users(Array p_users_array) {
-	users.append_array(p_users_array);
 }
