@@ -78,8 +78,6 @@ Default values:
 
 By default `challenge_options` is:
 
-/// details | Example
-    type: example
 ``` json linenums="1"
 {
     "include_active_challenges": true,
