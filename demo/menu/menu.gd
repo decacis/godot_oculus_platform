@@ -667,25 +667,120 @@ func _on_leaderboard_write_entry_with_supplementary_metric_pressed():
 
 ## CHALLENGES - INPUT FUNCS
 func _on_challenges_get_pressed():
-	pass # Replace with function body.
+	print("-------------------------------------")
+	print("challenges_get CALLED")
+	print("INPUT: ", challenges_get)
+	GDOculusPlatform.challenges_get(challenges_get)\
+	.then(func(challenge_info : Dictionary):
+		print("[challenges_get] RESPONSE: ", challenge_info)
+	)\
+	.error(func(challenge_info_err):
+		push_error("[challenges_get] ERROR: ", challenge_info_err)
+	)
 
 func _on_challenges_get_list_pressed():
-	pass # Replace with function body.
+	print("-------------------------------------")
+	print("challenges_get_list CALLED")
+	print("INPUT: ", challenges_get_list)
+	GDOculusPlatform.challenges_get_list(
+		challenges_get_list.limit,
+		challenges_get_list.challenge_options
+	)\
+	.then(func(challenge_array : GDOPChallengeArray):
+		print("[challenges_get_list] RESPONSE: ", await GDOP.challenge_array_get_all(challenge_array))
+	)\
+	.error(func(challenge_array_err):
+		push_error("[challenges_get_list] ERROR: ", challenge_array_err)
+	)
 
 func _on_challenges_get_entries_pressed():
-	pass # Replace with function body.
+	print("-------------------------------------")
+	print("challenges_get_entries CALLED")
+	print("INPUT: ", challenges_get_entries)
+	GDOculusPlatform.challenges_get_entries(\
+	challenges_get_entries.id,\
+	challenges_get_entries.limit,\
+	challenges_get_entries.filter,\
+	challenges_get_entries.start_at\
+	)\
+	.then(func(c_entries : GDOPChallengeEntries):
+
+		print("[challenges_get_entries] RESPONSE: ", await GDOP.challenge_entries_get_all(c_entries))
+
+	)\
+	.error(func(challenge_entries_err):
+		push_error("[challenges_get_entries] ERROR: ", challenge_entries_err)
+	)
 
 func _on_challenges_get_entries_after_rank_pressed():
-	pass # Replace with function body.
+	print("-------------------------------------")
+	print("challenges_get_entries_after_rank CALLED")
+	print("INPUT: ", challenges_get_entries_after_rank)
+	GDOculusPlatform.challenges_get_entries_after_rank(\
+	challenges_get_entries_after_rank.id,\
+	challenges_get_entries_after_rank.limit,\
+	challenges_get_entries_after_rank.start_at\
+	)\
+	.then(func(c_entries : GDOPChallengeEntries):
+
+		print("[challenges_get_entries_after_rank] RESPONSE: ", await GDOP.challenge_entries_get_all(c_entries))
+
+	)\
+	.error(func(challenge_entries_err):
+		push_error("[challenges_get_entries_after_rank] ERROR: ", challenge_entries_err)
+	)
 
 func _on_challenges_get_entries_by_ids_pressed():
-	pass # Replace with function body.
+	print("-------------------------------------")
+	print("challenges_get_entries_by_ids CALLED")
+	print("INPUT: ", challenges_get_entries_by_ids)
+	GDOculusPlatform.challenges_get_entries_by_ids(\
+	challenges_get_entries_by_ids.id,\
+	challenges_get_entries_by_ids.limit,\
+	challenges_get_entries_by_ids.user_ids,\
+	challenges_get_entries_by_ids.start_at\
+	)\
+	.then(func(c_entries : GDOPChallengeEntries):
+
+		print("[challenges_get_entries_by_ids] RESPONSE: ", await GDOP.challenge_entries_get_all(c_entries))
+
+	)\
+	.error(func(challenge_entries_err):
+		push_error("[challenges_get_entries_by_ids] ERROR: ", challenge_entries_err)
+	)
 
 func _on_challenges_join_pressed():
-	pass # Replace with function body.
+	print("-------------------------------------")
+	print("challenges_join CALLED")
+	print("INPUT: ", challenges_join)
+	GDOculusPlatform.challenges_join(challenges_join)\
+	.then(func(challenge_info : Dictionary):
+		print("[challenges_join] RESPONSE: ", challenge_info)
+	)\
+	.error(func(challenge_info_err):
+		push_error("[challenges_join] ERROR: ", challenge_info_err)
+	)
 
 func _on_challenges_leave_pressed():
-	pass # Replace with function body.
+	print("-------------------------------------")
+	print("challenges_leave CALLED")
+	print("INPUT: ", challenges_leave)
+	GDOculusPlatform.challenges_leave(challenges_leave)\
+	.then(func(challenge_info : Dictionary):
+		print("[challenges_leave] RESPONSE: ", challenge_info)
+	)\
+	.error(func(challenge_info_err):
+		push_error("[challenges_leave] ERROR: ", challenge_info_err)
+	)
 
 func _on_challenges_decline_invite_pressed():
-	pass # Replace with function body.
+	print("-------------------------------------")
+	print("challenges_decline_invite CALLED")
+	print("INPUT: ", challenges_decline_invite)
+	GDOculusPlatform.challenges_decline_invite(challenges_decline_invite)\
+	.then(func(challenge_info : Dictionary):
+		print("[challenges_decline_invite] RESPONSE: ", challenge_info)
+	)\
+	.error(func(challenge_info_err):
+		push_error("[challenges_decline_invite] ERROR: ", challenge_info_err)
+	)

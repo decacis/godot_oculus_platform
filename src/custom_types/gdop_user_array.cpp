@@ -14,7 +14,9 @@ void GDOPUserArray::_bind_methods() {
 
 GDOPUserArray::GDOPUserArray() {}
 GDOPUserArray::GDOPUserArray(ovrUserArrayHandle p_array_handle) {
-	array_handle = p_array_handle;
+	if (p_array_handle) {
+		array_handle = p_array_handle;
+	}
 }
 GDOPUserArray::~GDOPUserArray() {}
 

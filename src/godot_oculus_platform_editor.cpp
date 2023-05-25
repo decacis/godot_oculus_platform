@@ -90,7 +90,7 @@ void GDOculusPlatform::_bind_methods() {
 
 	// CHALLENGES
 	ClassDB::bind_method(D_METHOD("challenges_get", "challenge_id"), &GDOculusPlatform::challenges_get);
-	ClassDB::bind_method(D_METHOD("challenges_get_list", "limit", "challenge_options"), &GDOculusPlatform::challenges_get_list);
+	ClassDB::bind_method(D_METHOD("challenges_get_list", "limit", "challenge_options"), &GDOculusPlatform::challenges_get_list, DEFVAL(10), DEFVAL(Dictionary()));
 	ClassDB::bind_method(D_METHOD("challenges_get_entries", "challenge_id", "limit", "filter", "start_at"), &GDOculusPlatform::challenges_get_entries);
 	ClassDB::bind_method(D_METHOD("challenges_get_entries_after_rank", "challenge_id", "limit", "start_at"), &GDOculusPlatform::challenges_get_entries_after_rank);
 	ClassDB::bind_method(D_METHOD("challenges_get_entries_by_ids", "challenge_id", "limit", "start_at", "user_ids"), &GDOculusPlatform::challenges_get_entries_by_ids);

@@ -86,7 +86,7 @@ void GDOculusPlatform::_bind_methods() {
 
 	// CHALLENGES
 	ClassDB::bind_method(D_METHOD("challenges_get", "challenge_id"), &GDOculusPlatform::challenges_get);
-	ClassDB::bind_method(D_METHOD("challenges_get_list", "limit", "challenge_options"), &GDOculusPlatform::challenges_get_list);
+	ClassDB::bind_method(D_METHOD("challenges_get_list", "limit", "challenge_options"), &GDOculusPlatform::challenges_get_list, DEFVAL(10), DEFVAL(Dictionary()));
 	ClassDB::bind_method(D_METHOD("challenges_get_entries", "challenge_id", "limit", "filter", "start_at"), &GDOculusPlatform::challenges_get_entries);
 	ClassDB::bind_method(D_METHOD("challenges_get_entries_after_rank", "challenge_id", "limit", "start_at"), &GDOculusPlatform::challenges_get_entries_after_rank);
 	ClassDB::bind_method(D_METHOD("challenges_get_entries_by_ids", "challenge_id", "limit", "start_at", "user_ids"), &GDOculusPlatform::challenges_get_entries_by_ids);
@@ -2928,7 +2928,7 @@ Dictionary GDOculusPlatform::_get_challenge_information(ovrChallengeHandle &p_ch
 	char native_cl_id[OVRID_SIZE];
 	ovrID cl_id = ovr_Leaderboard_GetID(challenge_l);
 	ovrID_ToString(native_cl_id, OVRID_SIZE, cl_id);
-	challenge_leaderboard["id"] = native_cl_id;
+	challenge_leaderboard["id"] = String(native_cl_id);
 
 	challenge_leaderboard["api_name"] = ovr_Leaderboard_GetApiName(challenge_l);
 
@@ -2950,16 +2950,16 @@ Dictionary GDOculusPlatform::_get_challenge_information(ovrChallengeHandle &p_ch
 	Ref<GDOPUserArray> invited_users_array = memnew(GDOPUserArray(invited_users_arr_h));
 	if (invited_users_arr_h) {
 		size_t user_array_size = ovr_UserArray_GetSize(invited_users_arr_h);
-		Array users = Array();
+		Array invited_users = Array();
 
 		for (size_t i = 0; i < user_array_size; i++) {
 			ovrUserHandle user_handle = ovr_UserArray_GetElement(invited_users_arr_h, i);
 			Dictionary user_info = _get_user_information(user_handle);
 
-			users.push_back(user_info);
+			invited_users.push_back(user_info);
 		}
 
-		invited_users_array->set_users(users);
+		invited_users_array->set_users(invited_users);
 		invited_users_array->has_next_page = ovr_UserArray_HasNextPage(invited_users_arr_h);
 
 		challenge["invited_users"] = invited_users_array;
@@ -2972,16 +2972,16 @@ Dictionary GDOculusPlatform::_get_challenge_information(ovrChallengeHandle &p_ch
 	Ref<GDOPUserArray> participants_array = memnew(GDOPUserArray(participants_array_h));
 	if (participants_array_h) {
 		size_t user_array_size = ovr_UserArray_GetSize(participants_array_h);
-		Array users = Array();
+		Array participant_users = Array();
 
 		for (size_t i = 0; i < user_array_size; i++) {
 			ovrUserHandle user_handle = ovr_UserArray_GetElement(participants_array_h, i);
 			Dictionary user_info = _get_user_information(user_handle);
 
-			users.push_back(user_info);
+			participant_users.push_back(user_info);
 		}
 
-		participants_array->set_users(users);
+		participants_array->set_users(participant_users);
 		participants_array->has_next_page = ovr_UserArray_HasNextPage(participants_array_h);
 
 		challenge["participants"] = participants_array;
@@ -2989,6 +2989,8 @@ Dictionary GDOculusPlatform::_get_challenge_information(ovrChallengeHandle &p_ch
 		participants_array->set_users(Array());
 		challenge["participants"] = participants_array;
 	}
+
+	return challenge;
 }
 
 // Helper function to get information about a single challenge entry

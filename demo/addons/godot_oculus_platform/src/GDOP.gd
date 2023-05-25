@@ -1,12 +1,12 @@
 extends Node
 
-signal users_array_get_all_finished(event_id : int)
-signal leaderboard_entries_get_all_prev_finished(event_id : int)
-signal leaderboard_entries_get_all_next_finished(event_id : int)
-signal challenge_array_get_all_prev_finished(event_id : int)
-signal challenge_array_get_all_next_finished(event_id : int)
-signal challenge_entries_get_all_prev_finished(event_id : int)
-signal challenge_entries_get_all_next_finished(event_id : int)
+signal _users_array_get_all_finished(event_id : int)
+signal _leaderboard_entries_get_all_prev_finished(event_id : int)
+signal _leaderboard_entries_get_all_next_finished(event_id : int)
+signal _challenge_array_get_all_prev_finished(event_id : int)
+signal _challenge_array_get_all_next_finished(event_id : int)
+signal _challenge_entries_get_all_prev_finished(event_id : int)
+signal _challenge_entries_get_all_next_finished(event_id : int)
 
 var initialized : bool = false
 var quiet : bool = true
@@ -48,9 +48,9 @@ func users_array_get_all(user_array : GDOPUserArray) -> Array:
 			event_id = randi()
 		_users_array_get_all_helper(user_array, users, event_id)
 		
-		var returned_event_id = await users_array_get_all_finished
+		var returned_event_id = await _users_array_get_all_finished
 		while returned_event_id != event_id:
-			returned_event_id = await users_array_get_all_finished
+			returned_event_id = await _users_array_get_all_finished
 		
 		helper_events_ids.remove_at(helper_events_ids.find(event_id))
 		
@@ -65,7 +65,7 @@ func _users_array_get_all_helper(user_array : GDOPUserArray, users : Array, even
 		users.append_array(next_array.users)
 		
 		if not next_array.get_has_next_page():
-			emit_signal("users_array_get_all_finished", event_id)
+			emit_signal("_users_array_get_all_finished", event_id)
 			
 		else:
 			_users_array_get_all_helper(next_array, users, event_id)
@@ -73,7 +73,7 @@ func _users_array_get_all_helper(user_array : GDOPUserArray, users : Array, even
 	.error(func(next_array_err):
 		push_error(next_array_err)
 		# Don't stop the game
-		emit_signal("users_array_get_all_finished", event_id)
+		emit_signal("_users_array_get_all_finished", event_id)
 	)
 
 
@@ -87,9 +87,9 @@ func leaderboard_entries_get_all(leaderboard_entries : GDOPLeaderboardEntries) -
 			event_id = randi()
 		_leaderboard_entries_get_all_prev_helper(leaderboard_entries, entries, event_id)
 		
-		var returned_event_id = await leaderboard_entries_get_all_prev_finished
+		var returned_event_id = await _leaderboard_entries_get_all_prev_finished
 		while returned_event_id != event_id:
-			returned_event_id = await leaderboard_entries_get_all_prev_finished
+			returned_event_id = await _leaderboard_entries_get_all_prev_finished
 		
 		helper_events_ids.remove_at(helper_events_ids.find(event_id))
 		
@@ -99,9 +99,9 @@ func leaderboard_entries_get_all(leaderboard_entries : GDOPLeaderboardEntries) -
 			event_id_2 = randi()
 		_leaderboard_entries_get_all_next_helper(leaderboard_entries, entries, event_id_2)
 		
-		var returned_event_id_2 = await leaderboard_entries_get_all_next_finished
+		var returned_event_id_2 = await _leaderboard_entries_get_all_next_finished
 		while returned_event_id_2 != event_id_2:
-			returned_event_id_2 = await leaderboard_entries_get_all_next_finished
+			returned_event_id_2 = await _leaderboard_entries_get_all_next_finished
 		
 		helper_events_ids.remove_at(helper_events_ids.find(event_id_2))
 		
@@ -122,7 +122,7 @@ func _leaderboard_entries_get_all_prev_helper(leaderboard_entries : GDOPLeaderbo
 			entries = temp_array
 			
 			if not prev_array.get_has_prev_page():
-				emit_signal("leaderboard_entries_get_all_prev_finished", event_id)
+				emit_signal("_leaderboard_entries_get_all_prev_finished", event_id)
 				
 			else:
 				_leaderboard_entries_get_all_prev_helper(prev_array, entries, event_id)
@@ -130,11 +130,11 @@ func _leaderboard_entries_get_all_prev_helper(leaderboard_entries : GDOPLeaderbo
 		.error(func(next_array_err):
 			push_error(next_array_err)
 			# Don't stop the game
-			emit_signal("leaderboard_entries_get_all_prev_finished", event_id)
+			emit_signal("_leaderboard_entries_get_all_prev_finished", event_id)
 		)
 	
 	else:
-		emit_signal("leaderboard_entries_get_all_prev_finished", event_id)
+		emit_signal("_leaderboard_entries_get_all_prev_finished", event_id)
 
 func _leaderboard_entries_get_all_next_helper(leaderboard_entries : GDOPLeaderboardEntries, entries : Array, event_id : int) -> void:
 	
@@ -144,7 +144,7 @@ func _leaderboard_entries_get_all_next_helper(leaderboard_entries : GDOPLeaderbo
 			entries.append(next_array.entries)
 			
 			if not next_array.get_has_next_page():
-				emit_signal("leaderboard_entries_get_all_next_finished", event_id)
+				emit_signal("_leaderboard_entries_get_all_next_finished", event_id)
 				
 			else:
 				_leaderboard_entries_get_all_next_helper(next_array, entries, event_id)
@@ -152,11 +152,11 @@ func _leaderboard_entries_get_all_next_helper(leaderboard_entries : GDOPLeaderbo
 		.error(func(next_array_err):
 			push_error(next_array_err)
 			# Don't stop the game
-			emit_signal("leaderboard_entries_get_all_next_finished", event_id)
+			emit_signal("_leaderboard_entries_get_all_next_finished", event_id)
 		)
 	
 	else:
-		emit_signal("leaderboard_entries_get_all_next_finished", event_id)
+		emit_signal("_leaderboard_entries_get_all_next_finished", event_id)
 
 
 ## GDOPChallengeArray
@@ -169,9 +169,9 @@ func challenge_array_get_all(challenge_array : GDOPChallengeArray) -> Array:
 			event_id = randi()
 		_challenge_array_get_all_prev_helper(challenge_array, challenges, event_id)
 		
-		var returned_event_id = await challenge_array_get_all_prev_finished
+		var returned_event_id = await _challenge_array_get_all_prev_finished
 		while returned_event_id != event_id:
-			returned_event_id = await challenge_array_get_all_prev_finished
+			returned_event_id = await _challenge_array_get_all_prev_finished
 		
 		helper_events_ids.remove_at(helper_events_ids.find(event_id))
 		
@@ -181,9 +181,9 @@ func challenge_array_get_all(challenge_array : GDOPChallengeArray) -> Array:
 			event_id_2 = randi()
 		_challenge_array_get_all_next_helper(challenge_array, challenges, event_id_2)
 		
-		var returned_event_id_2 = await challenge_array_get_all_next_finished
+		var returned_event_id_2 = await _challenge_array_get_all_next_finished
 		while returned_event_id_2 != event_id_2:
-			returned_event_id_2 = await challenge_array_get_all_next_finished
+			returned_event_id_2 = await _challenge_array_get_all_next_finished
 			
 		helper_events_ids.remove_at(helper_events_ids.find(event_id_2))
 		
@@ -204,7 +204,7 @@ func _challenge_array_get_all_prev_helper(challenge_array : GDOPChallengeArray, 
 			challenges = temp_array
 			
 			if not prev_array.get_has_prev_page():
-				emit_signal("challenge_array_get_all_prev_finished", event_id)
+				emit_signal("_challenge_array_get_all_prev_finished", event_id)
 				
 			else:
 				_challenge_array_get_all_prev_helper(prev_array, challenges, event_id)
@@ -212,11 +212,11 @@ func _challenge_array_get_all_prev_helper(challenge_array : GDOPChallengeArray, 
 		.error(func(next_array_err):
 			push_error(next_array_err)
 			# Don't stop the game
-			emit_signal("challenge_array_get_all_prev_finished", event_id)
+			emit_signal("_challenge_array_get_all_prev_finished", event_id)
 		)
 	
 	else:
-		emit_signal("challenge_array_get_all_prev_finished", event_id)
+		emit_signal("_challenge_array_get_all_prev_finished", event_id)
 
 func _challenge_array_get_all_next_helper(challenge_array : GDOPChallengeArray, challenges : Array, event_id : int) -> void:
 	
@@ -226,7 +226,7 @@ func _challenge_array_get_all_next_helper(challenge_array : GDOPChallengeArray, 
 			challenges.append(next_array.challenges)
 			
 			if not next_array.get_has_next_page():
-				emit_signal("challenge_array_get_all_next_finished", event_id)
+				emit_signal("_challenge_array_get_all_next_finished", event_id)
 				
 			else:
 				_challenge_array_get_all_next_helper(next_array, challenges, event_id)
@@ -234,11 +234,11 @@ func _challenge_array_get_all_next_helper(challenge_array : GDOPChallengeArray, 
 		.error(func(next_array_err):
 			push_error(next_array_err)
 			# Don't stop the game
-			emit_signal("challenge_array_get_all_next_finished", event_id)
+			emit_signal("_challenge_array_get_all_next_finished", event_id)
 		)
 	
 	else:
-		emit_signal("challenge_array_get_all_next_finished", event_id)
+		emit_signal("_challenge_array_get_all_next_finished", event_id)
 
 
 ## GDOPChallengeEntries
@@ -251,9 +251,9 @@ func challenge_entries_get_all(challenge_entries : GDOPChallengeEntries) -> Arra
 			event_id = randi()
 		_challenge_entries_get_all_prev_helper(challenge_entries, entries, event_id)
 		
-		var returned_event_id = await challenge_entries_get_all_prev_finished
+		var returned_event_id = await _challenge_entries_get_all_prev_finished
 		while returned_event_id != event_id:
-			returned_event_id = await challenge_entries_get_all_prev_finished
+			returned_event_id = await _challenge_entries_get_all_prev_finished
 		
 		helper_events_ids.remove_at(helper_events_ids.find(event_id))
 		
@@ -263,9 +263,9 @@ func challenge_entries_get_all(challenge_entries : GDOPChallengeEntries) -> Arra
 			event_id_2 = randi()
 		_challenge_entries_get_all_next_helper(challenge_entries, entries, event_id_2)
 		
-		var returned_event_id_2 = await challenge_entries_get_all_next_finished
+		var returned_event_id_2 = await _challenge_entries_get_all_next_finished
 		while returned_event_id_2 != event_id_2:
-			returned_event_id_2 = await challenge_entries_get_all_next_finished
+			returned_event_id_2 = await _challenge_entries_get_all_next_finished
 			
 		helper_events_ids.remove_at(helper_events_ids.find(event_id_2))
 		
@@ -286,7 +286,7 @@ func _challenge_entries_get_all_prev_helper(challenge_entries : GDOPChallengeEnt
 			entries = temp_array
 			
 			if not prev_array.get_has_prev_page():
-				emit_signal("challenge_entries_get_all_prev_finished", event_id)
+				emit_signal("_challenge_entries_get_all_prev_finished", event_id)
 				
 			else:
 				_challenge_entries_get_all_prev_helper(prev_array, entries, event_id)
@@ -294,11 +294,11 @@ func _challenge_entries_get_all_prev_helper(challenge_entries : GDOPChallengeEnt
 		.error(func(next_array_err):
 			push_error(next_array_err)
 			# Don't stop the game
-			emit_signal("challenge_entries_get_all_prev_finished", event_id)
+			emit_signal("_challenge_entries_get_all_prev_finished", event_id)
 		)
 	
 	else:
-		emit_signal("challenge_entries_get_all_prev_finished", event_id)
+		emit_signal("_challenge_entries_get_all_prev_finished", event_id)
 
 func _challenge_entries_get_all_next_helper(challenge_entries : GDOPChallengeEntries, entries : Array, event_id : int) -> void:
 	
@@ -308,7 +308,7 @@ func _challenge_entries_get_all_next_helper(challenge_entries : GDOPChallengeEnt
 			entries.append(next_array.entries)
 			
 			if not next_array.get_has_next_page():
-				emit_signal("challenge_entries_get_all_next_finished", event_id)
+				emit_signal("_challenge_entries_get_all_next_finished", event_id)
 				
 			else:
 				_challenge_entries_get_all_next_helper(next_array, entries, event_id)
@@ -316,8 +316,8 @@ func _challenge_entries_get_all_next_helper(challenge_entries : GDOPChallengeEnt
 		.error(func(next_array_err):
 			push_error(next_array_err)
 			# Don't stop the game
-			emit_signal("challenge_entries_get_all_next_finished", event_id)
+			emit_signal("_challenge_entries_get_all_next_finished", event_id)
 		)
 	
 	else:
-		emit_signal("challenge_entries_get_all_next_finished", event_id)
+		emit_signal("_challenge_entries_get_all_next_finished", event_id)

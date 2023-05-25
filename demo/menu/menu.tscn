@@ -42,7 +42,7 @@ leaderboard_get_entries_by_ids = {
 "limit": 50,
 "name": "TEST_LEADERBOARD_0",
 "start_at": 2,
-"user_ids": ["00000"]
+"user_ids": ["6140779752677302"]
 }
 leaderboard_write_entry = {
 "extra": {
@@ -61,6 +61,31 @@ leaderboard_write_entry_with_supplementary_metric = {
 "name": "TEST_LEADERBOARD_0",
 "score": 2
 }
+challenges_get = "784406923231806"
+challenges_get_list = {
+"challenge_options": {},
+"limit": 5
+}
+challenges_get_entries = {
+"filter": 0,
+"id": "784406923231806",
+"limit": 50,
+"start_at": 0
+}
+challenges_get_entries_after_rank = {
+"id": "784406923231806",
+"limit": 10,
+"start_at": 0
+}
+challenges_get_entries_by_ids = {
+"id": "784406923231806",
+"limit": 10,
+"start_at": 0,
+"user_ids": ["6140779752677302"]
+}
+challenges_join = "784406923231806"
+challenges_leave = "784406923231806"
+challenges_decline_invite = "784406923231806"
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(900, 600)
@@ -71,7 +96,6 @@ offset_bottom = 40.0
 layout_mode = 2
 
 [node name="User" type="MarginContainer" parent="PanelContainer/TabContainer"]
-visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -494,6 +518,7 @@ size_flags_horizontal = 4
 text = "LeaderboardWriteEntryWithSupplementaryMetric"
 
 [node name="Challenges" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10

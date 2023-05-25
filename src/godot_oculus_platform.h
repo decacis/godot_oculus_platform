@@ -206,22 +206,22 @@ public:
 
 	// LEADERBOARD
 	Ref<GDOculusPlatformPromise> leaderboard_get(String p_leaderboard_name);
-	Ref<GDOculusPlatformPromise> leaderboard_get_entries(String p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter = LeaderboardFilterType::LEADERBOARD_FILTER_TYPE_NONE, LeaderboardStartAt p_start_at = LeaderboardStartAt::LEADERBOARD_START_AT_TOP);
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries(String p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at);
 	Ref<GDOculusPlatformPromise> leaderboard_get_entries_after_rank(String p_leaderboard_name, uint64_t p_limit, uint64_t p_after_rank);
-	Ref<GDOculusPlatformPromise> leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at = LeaderboardStartAt::LEADERBOARD_START_AT_TOP);
-	Ref<GDOculusPlatformPromise> leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update = false, Dictionary p_extra = Dictionary());
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at);
+	Ref<GDOculusPlatformPromise> leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, Dictionary p_extra);
 
 	// APPLICATION
 	Ref<GDOculusPlatformPromise> application_get_version();
-	Ref<GDOculusPlatformPromise> application_launch_other_app(String p_app_id, Dictionary p_deeplink_options = Dictionary());
+	Ref<GDOculusPlatformPromise> application_launch_other_app(String p_app_id, Dictionary p_deeplink_options);
 	Dictionary application_get_launch_details();
 
 	// CHALLENGES
 	Ref<GDOculusPlatformPromise> challenges_get(String p_challenge_id);
 	Ref<GDOculusPlatformPromise> challenges_get_list(uint64_t p_limit = 10, Dictionary p_challenge_options = Dictionary());
-	Ref<GDOculusPlatformPromise> challenges_get_entries(String p_challenge_id, uint64_t p_limit, LeaderboardFilterType p_filter = LeaderboardFilterType::LEADERBOARD_FILTER_TYPE_NONE, LeaderboardStartAt p_start_at = LeaderboardStartAt::LEADERBOARD_START_AT_TOP);
+	Ref<GDOculusPlatformPromise> challenges_get_entries(String p_challenge_id, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at);
 	Ref<GDOculusPlatformPromise> challenges_get_entries_after_rank(String p_challenge_id, uint64_t p_limit, uint64_t p_after_rank);
-	Ref<GDOculusPlatformPromise> challenges_get_entries_by_ids(String p_challenge_id, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at = LeaderboardStartAt::LEADERBOARD_START_AT_TOP);
+	Ref<GDOculusPlatformPromise> challenges_get_entries_by_ids(String p_challenge_id, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at);
 	Ref<GDOculusPlatformPromise> challenges_join(String p_challenge_id);
 	Ref<GDOculusPlatformPromise> challenges_leave(String p_challenge_id);
 	Ref<GDOculusPlatformPromise> challenges_decline_invite(String p_challenge_id);

@@ -18,7 +18,9 @@ void GDOPChallengeEntries::_bind_methods() {
 
 GDOPChallengeEntries::GDOPChallengeEntries() {}
 GDOPChallengeEntries::GDOPChallengeEntries(ovrChallengeEntryArrayHandle p_array_handle) {
-	array_handle = p_array_handle;
+	if (p_array_handle) {
+		array_handle = p_array_handle;
+	}
 }
 GDOPChallengeEntries::~GDOPChallengeEntries() {}
 

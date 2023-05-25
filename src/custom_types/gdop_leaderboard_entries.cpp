@@ -18,7 +18,9 @@ void GDOPLeaderboardEntries::_bind_methods() {
 
 GDOPLeaderboardEntries::GDOPLeaderboardEntries() {}
 GDOPLeaderboardEntries::GDOPLeaderboardEntries(ovrLeaderboardEntryArrayHandle p_array_handle) {
-	array_handle = p_array_handle;
+	if (p_array_handle) {
+		array_handle = p_array_handle;
+	}
 }
 GDOPLeaderboardEntries::~GDOPLeaderboardEntries() {}
 
