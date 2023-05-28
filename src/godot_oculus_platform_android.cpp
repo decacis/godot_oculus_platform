@@ -22,6 +22,7 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("challenge_array_get_next_page", "challenge_array"), &GDOculusPlatform::challenge_array_get_next_page);
 	ClassDB::bind_method(D_METHOD("challenge_entries_get_prev_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_prev_page);
 	ClassDB::bind_method(D_METHOD("challenge_entries_get_next_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_next_page);
+	ClassDB::bind_method(D_METHOD("app_invites_array_get_next_page", "app_invites_array"), &GDOculusPlatform::app_invites_array_get_next_page);
 
 	// INITIALIZATION
 	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
@@ -366,6 +367,25 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_prev_page(c
 	}
 }
 
+Ref<GDOculusPlatformPromise> GDOculusPlatform::app_invites_array_get_next_page(const Ref<GDOPAppInviteArray> &p_invites_array) {
+	if (p_invites_array->get_has_next_page()) {
+		ovrRequest req = ovr_GroupPresence_GetNextApplicationInviteArrayPage(p_invites_array->array_handle);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	} else {
+		WARN_PRINT_ED("GDOPAppInviteArray does not have a next page. Returning same GDOPAppInviteArray.");
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_fulfill_promise_id()));
+		return_promise->saved_fulfill_response = Array::make(p_invites_array);
+		_promises_to_fulfill.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
 /// Checks the OVR messages queue and handles them according to their type.
 void GDOculusPlatform::pump_messages() {
 	_fulfill_promises();
@@ -638,6 +658,66 @@ void GDOculusPlatform::pump_messages() {
 
 			case ovrMessage_Challenges_DeclineInvite:
 				_process_challenges_get(message);
+				break;
+
+			case ovrMessage_GroupPresence_Clear:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_Set:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_SetDeeplinkMessageOverride:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_SetDestination:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_SetIsJoinable:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_SetLobbySession:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_SetMatchSession:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_LaunchMultiplayerErrorDialog:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_LaunchRosterPanel:
+				_process_groupresence_no_payload(message);
+				break;
+
+			case ovrMessage_GroupPresence_SendInvites:
+				_process_groupresence_send_invites(message);
+				break;
+
+			case ovrMessage_GroupPresence_GetSentInvites:
+				_handle_process_app_invite_array(message);
+				break;
+
+			case ovrMessage_GroupPresence_GetNextApplicationInviteArrayPage:
+				_handle_process_app_invite_array(message);
+				break;
+
+			case ovrMessage_GroupPresence_GetInvitableUsers:
+				_process_user_get_next_array_page(message);
+				break;
+
+			case ovrMessage_GroupPresence_LaunchInvitePanel:
+				_process_groupresence_launch_invite_panel(message);
+				break;
+
+			case ovrMessage_GroupPresence_LaunchRejoinDialog:
+				_process_groupresence_launch_rejoin_panel(message);
 				break;
 
 			default:
@@ -1658,7 +1738,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get(const String &p_ch
 
 	} else {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-		String rejection_msg = "Invalid challenge id.";
+		String rejection_msg = "Invalid challenge ID.";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);
 		_promises_to_reject.push_back(return_promise);
 
@@ -1854,7 +1934,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries(const Stri
 
 	} else {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-		String rejection_msg = "Invalid challenge id.";
+		String rejection_msg = "Invalid challenge ID.";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);
 		_promises_to_reject.push_back(return_promise);
 
@@ -1882,7 +1962,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_after_rank
 
 	} else {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-		String rejection_msg = "Invalid challenge id.";
+		String rejection_msg = "Invalid challenge ID.";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);
 		_promises_to_reject.push_back(return_promise);
 
@@ -1936,7 +2016,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_by_ids(con
 
 	} else {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-		String rejection_msg = "Invalid challenge id.";
+		String rejection_msg = "Invalid challenge ID.";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);
 		_promises_to_reject.push_back(return_promise);
 
@@ -1958,7 +2038,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_join(const String &p_c
 
 	} else {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-		String rejection_msg = "Invalid challenge id.";
+		String rejection_msg = "Invalid challenge ID.";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);
 		_promises_to_reject.push_back(return_promise);
 
@@ -1980,7 +2060,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_leave(const String &p_
 
 	} else {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-		String rejection_msg = "Invalid challenge id.";
+		String rejection_msg = "Invalid challenge ID.";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);
 		_promises_to_reject.push_back(return_promise);
 
@@ -2002,7 +2082,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_decline_invite(const S
 
 	} else {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-		String rejection_msg = "Invalid challenge id.";
+		String rejection_msg = "Invalid challenge ID.";
 		return_promise->saved_rejection_response = Array::make(rejection_msg);
 		_promises_to_reject.push_back(return_promise);
 
@@ -2015,6 +2095,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_decline_invite(const S
 ///// GROUP PRESENCE
 /////////////////////////////////////////////////
 
+/// Ckears the group presence information.
+/// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_clear() {
 	ovrRequest req = ovr_GroupPresence_Clear();
 
@@ -2024,6 +2106,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_clear() {
 	return return_promise;
 }
 
+/// Sends invites to join the current user to an array of users by their IDs
+/// @returns A promise that will contain a GDOPAppInviteArray with the invites that were sent
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_send_invites(const Array &p_user_ids) {
 	int64_t ids_arr_size = p_user_ids.size();
 
@@ -2042,7 +2126,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_send_invites(const 
 		} else {
 			memdelete_arr(ovr_ids);
 			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-			String rejection_msg = "Invalid user ID found in array. All user IDs names must be Strings.";
+			String rejection_msg = "Invalid user ID found in array. All user IDs must be Strings.";
 			return_promise->saved_rejection_response = Array::make(rejection_msg);
 			_promises_to_reject.push_back(return_promise);
 
@@ -2059,6 +2143,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_send_invites(const 
 	return return_promise;
 }
 
+/// Sets the group presence.
+/// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set(const Dictionary &p_group_presence_options) {
 	ovrGroupPresenceOptionsHandle presence_opts = ovr_GroupPresenceOptions_Create();
 	if (p_group_presence_options.is_empty()) {
@@ -2151,6 +2237,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set(const Dictionar
 	return return_promise;
 }
 
+/// Overrides the deeplink message. The user must have a destination, otherwise there will be no deeplink message to override
+/// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_deeplink_message_override(const String &p_deeplink_message) {
 	ovrRequest req = ovr_GroupPresence_SetDeeplinkMessageOverride(p_deeplink_message.utf8().get_data());
 
@@ -2160,6 +2248,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_deeplink_messag
 	return return_promise;
 }
 
+/// Sets the destination from a given API name
+/// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_destination(const String &p_api_name) {
 	ovrRequest req = ovr_GroupPresence_SetDestination(p_api_name.utf8().get_data());
 
@@ -2169,6 +2259,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_destination(con
 	return return_promise;
 }
 
+/// Sets whether the current match/lobby is joinable
+/// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_is_joinable(bool p_is_joinable) {
 	ovrRequest req = ovr_GroupPresence_SetIsJoinable(p_is_joinable);
 
@@ -2178,6 +2270,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_is_joinable(boo
 	return return_promise;
 }
 
+/// Sets the lobby session from an ID
+/// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_lobby_session(const String &p_id) {
 	ovrRequest req = ovr_GroupPresence_SetLobbySession(p_id.utf8().get_data());
 
@@ -2187,6 +2281,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_lobby_session(c
 	return return_promise;
 }
 
+/// Sets the match session from an ID
+/// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_match_session(const String &p_id) {
 	ovrRequest req = ovr_GroupPresence_SetMatchSession(p_id.utf8().get_data());
 
@@ -2196,49 +2292,49 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_match_session(c
 	return return_promise;
 }
 
+/// Requests a list of users that can be invited to the current lobby/match.
+/// @returns A promise that will contain a GDOPUserArray with the users.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_invitable_users(const Dictionary &p_options) {
 	ovrInviteOptionsHandle invite_opts_h = ovr_InviteOptions_Create();
 
-	if (!p_options.is_empty()) {
-		if (p_options.has("suggested_users")) {
-			if (p_options.get("suggested_users", 0).get_type() == Variant::ARRAY) {
-				int64_t users_arr_s = ((Array)p_options.get("suggested_users", "")).size();
-				for (int64_t i = 0; i < users_arr_s; i++) {
-					if (((Array)p_options["suggested_users"])[i].get_type() == Variant::STRING) {
-						ovrID user_id;
-						if (ovrID_FromString(&user_id, ((String)((Array)p_options["suggested_users"])[i]).utf8().get_data())) {
-							ovr_InviteOptions_AddSuggestedUser(invite_opts_h, user_id);
-
-						} else {
-							ovr_InviteOptions_Destroy(invite_opts_h);
-							Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-							String rejection_msg = "Invalid user ID found in suggested_users.";
-							return_promise->saved_rejection_response = Array::make(rejection_msg);
-							_promises_to_reject.push_back(return_promise);
-
-							return return_promise;
-						}
+	if (p_options.has("suggested_users")) {
+		if (p_options.get("suggested_users", 0).get_type() == Variant::ARRAY) {
+			int64_t users_arr_s = ((Array)p_options.get("suggested_users", "")).size();
+			for (int64_t i = 0; i < users_arr_s; i++) {
+				if (((Array)p_options["suggested_users"])[i].get_type() == Variant::STRING) {
+					ovrID user_id;
+					if (ovrID_FromString(&user_id, ((String)((Array)p_options["suggested_users"])[i]).utf8().get_data())) {
+						ovr_InviteOptions_AddSuggestedUser(invite_opts_h, user_id);
 
 					} else {
 						ovr_InviteOptions_Destroy(invite_opts_h);
 						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-						String rejection_msg = "Invalid invitable users options suggested_users value. Must be an Array of Strings.";
+						String rejection_msg = "Invalid user ID found in suggested_users.";
 						return_promise->saved_rejection_response = Array::make(rejection_msg);
 						_promises_to_reject.push_back(return_promise);
 
 						return return_promise;
 					}
+
+				} else {
+					ovr_InviteOptions_Destroy(invite_opts_h);
+					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+					String rejection_msg = "Invalid invitable users options suggested_users value. Must be an Array of Strings.";
+					return_promise->saved_rejection_response = Array::make(rejection_msg);
+					_promises_to_reject.push_back(return_promise);
+
+					return return_promise;
 				}
-
-			} else {
-				ovr_InviteOptions_Destroy(invite_opts_h);
-				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-				String rejection_msg = "Invalid invitable users options suggested_users value. Must be an Array of Strings.";
-				return_promise->saved_rejection_response = Array::make(rejection_msg);
-				_promises_to_reject.push_back(return_promise);
-
-				return return_promise;
 			}
+
+		} else {
+			ovr_InviteOptions_Destroy(invite_opts_h);
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "Invalid invitable users options suggested_users value. Must be an Array of Strings.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
+
+			return return_promise;
 		}
 	}
 
@@ -2251,6 +2347,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_invitable_users
 	return return_promise;
 }
 
+/// Sends a request to get the invites sent by the user
+/// @returns A promise that will contain a GDOPAppInviteArray with the invites sent
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_sent_invites() {
 	ovrRequest req = ovr_GroupPresence_GetSentInvites();
 
@@ -2260,49 +2358,49 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_sent_invites() 
 	return return_promise;
 }
 
+/// Sends a request to launch an invite flow panel to invite other users to join the current user in their session.
+/// @returns A promise that will contain a bool indicating whether the user did send invites or not
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_invite_panel(const Dictionary &p_options) {
 	ovrInviteOptionsHandle invite_opts_h = ovr_InviteOptions_Create();
 
-	if (!p_options.is_empty()) {
-		if (p_options.has("suggested_users")) {
-			if (p_options.get("suggested_users", 0).get_type() == Variant::ARRAY) {
-				int64_t users_arr_s = ((Array)p_options.get("suggested_users", "")).size();
-				for (int64_t i = 0; i < users_arr_s; i++) {
-					if (((Array)p_options["suggested_users"])[i].get_type() == Variant::STRING) {
-						ovrID user_id;
-						if (ovrID_FromString(&user_id, ((String)((Array)p_options["suggested_users"])[i]).utf8().get_data())) {
-							ovr_InviteOptions_AddSuggestedUser(invite_opts_h, user_id);
-
-						} else {
-							ovr_InviteOptions_Destroy(invite_opts_h);
-							Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-							String rejection_msg = "Invalid user ID found in suggested_users.";
-							return_promise->saved_rejection_response = Array::make(rejection_msg);
-							_promises_to_reject.push_back(return_promise);
-
-							return return_promise;
-						}
+	if (p_options.has("suggested_users")) {
+		if (p_options.get("suggested_users", 0).get_type() == Variant::ARRAY) {
+			int64_t users_arr_s = ((Array)p_options.get("suggested_users", "")).size();
+			for (int64_t i = 0; i < users_arr_s; i++) {
+				if (((Array)p_options["suggested_users"])[i].get_type() == Variant::STRING) {
+					ovrID user_id;
+					if (ovrID_FromString(&user_id, ((String)((Array)p_options["suggested_users"])[i]).utf8().get_data())) {
+						ovr_InviteOptions_AddSuggestedUser(invite_opts_h, user_id);
 
 					} else {
 						ovr_InviteOptions_Destroy(invite_opts_h);
 						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-						String rejection_msg = "Invalid launch invite panel options suggested_users value. Must be an Array of Strings.";
+						String rejection_msg = "Invalid user ID found in suggested_users.";
 						return_promise->saved_rejection_response = Array::make(rejection_msg);
 						_promises_to_reject.push_back(return_promise);
 
 						return return_promise;
 					}
+
+				} else {
+					ovr_InviteOptions_Destroy(invite_opts_h);
+					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+					String rejection_msg = "Invalid launch invite panel options suggested_users value. Must be an Array of Strings.";
+					return_promise->saved_rejection_response = Array::make(rejection_msg);
+					_promises_to_reject.push_back(return_promise);
+
+					return return_promise;
 				}
-
-			} else {
-				ovr_InviteOptions_Destroy(invite_opts_h);
-				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-				String rejection_msg = "Invalid launch invite panel options suggested_users value. Must be an Array of Strings.";
-				return_promise->saved_rejection_response = Array::make(rejection_msg);
-				_promises_to_reject.push_back(return_promise);
-
-				return return_promise;
 			}
+
+		} else {
+			ovr_InviteOptions_Destroy(invite_opts_h);
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "Invalid launch invite panel options suggested_users value. Must be an Array of Strings.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
+
+			return return_promise;
 		}
 	}
 
@@ -2315,6 +2413,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_invite_panel
 	return return_promise;
 }
 
+/// Sends a request to launch an error dialog with predefined messages.
+/// @returns A promise that will contain a bool that will always be true in the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_multiplayer_error_dialog(MultiplayerErrorErrorKey p_error_key) {
 	ovrMultiplayerErrorOptionsHandle mult_err_opts_h = ovr_MultiplayerErrorOptions_Create();
 	ovr_MultiplayerErrorOptions_SetErrorKey(mult_err_opts_h, (ovrMultiplayerErrorErrorKey)p_error_key);
@@ -2328,6 +2428,8 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_multiplayer_
 	return return_promise;
 }
 
+/// Sends a request to launch a panel that lets the user rejoin a previous lobby/match
+/// @returns A promise that will contain a bool indicating whether the user did rejoin or not
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_rejoin_dialog(const String &p_lobby_session_id, const String &p_match_session_id, const String &p_destination_api_name) {
 	ovrRequest req = ovr_GroupPresence_LaunchRejoinDialog(p_lobby_session_id.utf8().get_data(), p_match_session_id.utf8().get_data(), p_destination_api_name.utf8().get_data());
 
@@ -2337,49 +2439,49 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_rejoin_dialo
 	return return_promise;
 }
 
+/// Sends a request to launch a panel that displays the current users in the roster.
+/// @returns A promise that will contain a bool that will always be true in the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_roster_panel(const Dictionary &p_options) {
 	ovrRosterOptionsHandle roster_opts_h = ovr_RosterOptions_Create();
 
-	if (!p_options.is_empty()) {
-		if (p_options.has("suggested_users")) {
-			if (p_options.get("suggested_users", 0).get_type() == Variant::ARRAY) {
-				int64_t users_arr_s = ((Array)p_options.get("suggested_users", "")).size();
-				for (int64_t i = 0; i < users_arr_s; i++) {
-					if (((Array)p_options["suggested_users"])[i].get_type() == Variant::STRING) {
-						ovrID user_id;
-						if (ovrID_FromString(&user_id, ((String)((Array)p_options["suggested_users"])[i]).utf8().get_data())) {
-							ovr_RosterOptions_AddSuggestedUser(roster_opts_h, user_id);
-
-						} else {
-							ovr_RosterOptions_Destroy(roster_opts_h);
-							Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-							String rejection_msg = "Invalid user ID found in suggested_users.";
-							return_promise->saved_rejection_response = Array::make(rejection_msg);
-							_promises_to_reject.push_back(return_promise);
-
-							return return_promise;
-						}
+	if (p_options.has("suggested_users")) {
+		if (p_options.get("suggested_users", 0).get_type() == Variant::ARRAY) {
+			int64_t users_arr_s = ((Array)p_options.get("suggested_users", "")).size();
+			for (int64_t i = 0; i < users_arr_s; i++) {
+				if (((Array)p_options["suggested_users"])[i].get_type() == Variant::STRING) {
+					ovrID user_id;
+					if (ovrID_FromString(&user_id, ((String)((Array)p_options["suggested_users"])[i]).utf8().get_data())) {
+						ovr_RosterOptions_AddSuggestedUser(roster_opts_h, user_id);
 
 					} else {
 						ovr_RosterOptions_Destroy(roster_opts_h);
 						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-						String rejection_msg = "Invalid launch roster panel options suggested_users value. Must be an Array of Strings.";
+						String rejection_msg = "Invalid user ID found in suggested_users.";
 						return_promise->saved_rejection_response = Array::make(rejection_msg);
 						_promises_to_reject.push_back(return_promise);
 
 						return return_promise;
 					}
+
+				} else {
+					ovr_RosterOptions_Destroy(roster_opts_h);
+					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+					String rejection_msg = "Invalid launch roster panel options suggested_users value. Must be an Array of Strings.";
+					return_promise->saved_rejection_response = Array::make(rejection_msg);
+					_promises_to_reject.push_back(return_promise);
+
+					return return_promise;
 				}
-
-			} else {
-				ovr_RosterOptions_Destroy(roster_opts_h);
-				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
-				String rejection_msg = "Invalid launch roster panel options suggested_users value. Must be an Array of Strings.";
-				return_promise->saved_rejection_response = Array::make(rejection_msg);
-				_promises_to_reject.push_back(return_promise);
-
-				return return_promise;
 			}
+
+		} else {
+			ovr_RosterOptions_Destroy(roster_opts_h);
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "Invalid launch roster panel options suggested_users value. Must be an Array of Strings.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
+
+			return return_promise;
 		}
 	}
 
@@ -3057,13 +3159,7 @@ void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
 
 		ovrDestinationHandle destination_handle = ovr_Leaderboard_GetDestination(leaderboard_handle);
 		if (destination_handle) {
-			Dictionary destination;
-
-			destination["display_name"] = ovr_Destination_GetDisplayName(destination_handle);
-			destination["api_name"] = ovr_Destination_GetApiName(destination_handle);
-			destination["deep_link_message"] = ovr_Destination_GetDeeplinkMessage(destination_handle);
-
-			leaderboard["destination"] = destination;
+			leaderboard["destination"] = _get_destionation_info(destination_handle);
 		} else {
 			leaderboard["destination"] = Dictionary();
 		}
@@ -3260,6 +3356,104 @@ void GDOculusPlatform::_process_challenges_get_entries(ovrMessageHandle p_messag
 	}
 }
 
+///// GROUP PRESENCE
+/////////////////////////////////////////////////
+
+// Used to handle a request that has no payload, but could have an error.
+void GDOculusPlatform::_process_groupresence_no_payload(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the response from a send_invites request. Will return a GDOPAppInviteArray with the invites that were created
+void GDOculusPlatform::_process_groupresence_send_invites(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrSendInvitesResultHandle result = ovr_Message_GetSendInvitesResult(p_message);
+		ovrApplicationInviteArrayHandle invites_arr_h = ovr_SendInvitesResult_GetInvites(result);
+
+		Ref<GDOPAppInviteArray> app_invite_array = memnew(GDOPAppInviteArray(invites_arr_h));
+		size_t app_inv_arr_s = ovr_ApplicationInviteArray_GetSize(invites_arr_h);
+		Array inv_array = Array();
+
+		for (size_t i = 0; i < app_inv_arr_s; i++) {
+			ovrApplicationInviteHandle app_inv_h = ovr_ApplicationInviteArray_GetElement(invites_arr_h, i);
+			Dictionary single_app_invite;
+
+			char native_id[OVRID_SIZE];
+			ovrID app_invite_id = ovr_ApplicationInvite_GetID(app_inv_h);
+			ovrID_ToString(native_id, OVRID_SIZE, app_invite_id);
+
+			single_app_invite["id"] = String(native_id);
+			single_app_invite["lobby_session_id"] = ovr_ApplicationInvite_GetLobbySessionId(app_inv_h);
+			single_app_invite["match_session_id"] = ovr_ApplicationInvite_GetMatchSessionId(app_inv_h);
+			single_app_invite["is_active"] = ovr_ApplicationInvite_GetIsActive(app_inv_h);
+
+			ovrUserHandle user_h = ovr_ApplicationInvite_GetRecipient(app_inv_h);
+			if (user_h) {
+				Dictionary user_info = _get_user_information(user_h);
+				single_app_invite["recipient"] = user_info;
+			} else {
+				single_app_invite["recipient"] = Dictionary();
+			}
+
+			ovrDestinationHandle dest_h = ovr_ApplicationInvite_GetDestination(app_inv_h);
+			if (dest_h) {
+				single_app_invite["destination"] = _get_destionation_info(dest_h);
+			} else {
+				single_app_invite["destination"] = Dictionary();
+			}
+
+			inv_array.push_back(single_app_invite);
+		}
+
+		app_invite_array->has_next_page = ovr_ApplicationInviteArray_HasNextPage(invites_arr_h);
+		app_invite_array->set_invites(inv_array);
+
+		_fulfill_promise(msg_id, Array::make(app_invite_array));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the response from a invite panel launch request. Will inform if the user did send the invites
+void GDOculusPlatform::_process_groupresence_launch_invite_panel(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrInvitePanelResultInfoHandle invite_panel_res_h = ovr_Message_GetInvitePanelResultInfo(p_message);
+		bool invites_sent = ovr_InvitePanelResultInfo_GetInvitesSent(invite_panel_res_h);
+
+		_fulfill_promise(msg_id, Array::make(invites_sent));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the response from a rejoin panel launch request. Will inform if the user did rejoin
+void GDOculusPlatform::_process_groupresence_launch_rejoin_panel(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrRejoinDialogResultHandle rejoin_panel_res_h = ovr_Message_GetRejoinDialogResult(p_message);
+		bool did_rejoin = ovr_RejoinDialogResult_GetRejoinSelected(rejoin_panel_res_h);
+
+		_fulfill_promise(msg_id, Array::make(did_rejoin));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
 ///// PROCESSING HELPERS
 /////////////////////////////////////////////////
 
@@ -3293,33 +3487,33 @@ void GDOculusPlatform::_handle_default_process_error(ovrMessageHandle p_message,
 }
 
 // Helper function to get a Dictionary with information about a single user.
-Dictionary GDOculusPlatform::_get_user_information(ovrUserHandle &p_user_handle) {
+Dictionary GDOculusPlatform::_get_user_information(const ovrUserHandle &p_user_h) {
 	Dictionary user_info_resp;
 	Dictionary user_info_presence;
 
-	user_info_resp["display_name"] = ovr_User_GetDisplayName(p_user_handle);
+	user_info_resp["display_name"] = ovr_User_GetDisplayName(p_user_h);
 
 	char native_id[OVRID_SIZE];
-	ovrID u_id = ovr_User_GetID(p_user_handle);
+	ovrID u_id = ovr_User_GetID(p_user_h);
 	ovrID_ToString(native_id, OVRID_SIZE, u_id);
 	user_info_resp["id"] = String(native_id);
 
-	user_info_resp["oculus_id"] = ovr_User_GetOculusID(p_user_handle);
-	user_info_resp["image_url"] = ovr_User_GetImageUrl(p_user_handle);
-	user_info_resp["small_image_url"] = ovr_User_GetSmallImageUrl(p_user_handle);
+	user_info_resp["oculus_id"] = ovr_User_GetOculusID(p_user_h);
+	user_info_resp["image_url"] = ovr_User_GetImageUrl(p_user_h);
+	user_info_resp["small_image_url"] = ovr_User_GetSmallImageUrl(p_user_h);
 
 	user_info_resp["presence"] = user_info_presence;
-	user_info_presence["presence_status"] = ovrUserPresenceStatus_ToString(ovr_User_GetPresenceStatus(p_user_handle));
-	user_info_presence["presence_deeplink_message"] = ovr_User_GetPresenceDeeplinkMessage(p_user_handle);
-	user_info_presence["presence_destination_api_name"] = ovr_User_GetPresenceDestinationApiName(p_user_handle);
-	user_info_presence["presence_lobby_session_id"] = ovr_User_GetPresenceLobbySessionId(p_user_handle);
-	user_info_presence["presence_match_session_id"] = ovr_User_GetPresenceMatchSessionId(p_user_handle);
+	user_info_presence["presence_status"] = ovrUserPresenceStatus_ToString(ovr_User_GetPresenceStatus(p_user_h));
+	user_info_presence["presence_deeplink_message"] = ovr_User_GetPresenceDeeplinkMessage(p_user_h);
+	user_info_presence["presence_destination_api_name"] = ovr_User_GetPresenceDestinationApiName(p_user_h);
+	user_info_presence["presence_lobby_session_id"] = ovr_User_GetPresenceLobbySessionId(p_user_h);
+	user_info_presence["presence_match_session_id"] = ovr_User_GetPresenceMatchSessionId(p_user_h);
 
 	return user_info_resp;
 }
 
 // Helper function to get information about a single challenge
-Dictionary GDOculusPlatform::_get_challenge_information(ovrChallengeHandle &p_challenge_h) {
+Dictionary GDOculusPlatform::_get_challenge_information(const ovrChallengeHandle &p_challenge_h) {
 	Dictionary challenge;
 
 	char native_id[OVRID_SIZE];
@@ -3352,12 +3546,7 @@ Dictionary GDOculusPlatform::_get_challenge_information(ovrChallengeHandle &p_ch
 
 	ovrDestinationHandle cl_destination_h = ovr_Leaderboard_GetDestination(challenge_l);
 	if (cl_destination_h) {
-		Dictionary cl_destination;
-		cl_destination["display_name"] = ovr_Destination_GetDisplayName(cl_destination_h);
-		cl_destination["api_name"] = ovr_Destination_GetApiName(cl_destination_h);
-		cl_destination["deeplink_message"] = ovr_Destination_GetDeeplinkMessage(cl_destination_h);
-
-		challenge_leaderboard["destination"] = cl_destination;
+		challenge_leaderboard["destination"] = _get_destionation_info(cl_destination_h);
 	} else {
 		challenge_leaderboard["destination"] = Dictionary();
 	}
@@ -3412,7 +3601,7 @@ Dictionary GDOculusPlatform::_get_challenge_information(ovrChallengeHandle &p_ch
 }
 
 // Helper function to get information about a single challenge entry
-Dictionary GDOculusPlatform::_get_challenge_entry_information(ovrChallengeEntryHandle &p_challenge_entry_h) {
+Dictionary GDOculusPlatform::_get_challenge_entry_information(const ovrChallengeEntryHandle &p_challenge_entry_h) {
 	Dictionary entry_data;
 
 	ovrID entry_id = ovr_ChallengeEntry_GetID(p_challenge_entry_h);
@@ -3474,14 +3663,14 @@ void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
 }
 
 /// Helper function to handle the entries array handle
-Array GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle &p_entries_arr_handle) {
+Array GDOculusPlatform::_handle_leaderboard_entries(const ovrLeaderboardEntryArrayHandle &p_entries_arr_h) {
 	Array entries = Array();
-	size_t entries_arr_s = ovr_LeaderboardEntryArray_GetSize(p_entries_arr_handle);
+	size_t entries_arr_s = ovr_LeaderboardEntryArray_GetSize(p_entries_arr_h);
 
 	for (size_t i = 0; i < entries_arr_s; i++) {
 		Dictionary entry_data;
 
-		ovrLeaderboardEntryHandle entry_handle = ovr_LeaderboardEntryArray_GetElement(p_entries_arr_handle, i);
+		ovrLeaderboardEntryHandle entry_handle = ovr_LeaderboardEntryArray_GetElement(p_entries_arr_h, i);
 
 		ovrID entry_id = ovr_LeaderboardEntry_GetID(entry_handle);
 		char native_id[OVRID_SIZE];
@@ -3519,6 +3708,69 @@ Array GDOculusPlatform::_handle_leaderboard_entries(ovrLeaderboardEntryArrayHand
 	}
 
 	return entries;
+}
+
+// Helper that returns a Dictionary with information about a given destination
+Dictionary GDOculusPlatform::_get_destionation_info(const ovrDestinationHandle &p_destination_h) {
+	Dictionary destination;
+
+	destination["display_name"] = ovr_Destination_GetDisplayName(p_destination_h);
+	destination["api_name"] = ovr_Destination_GetApiName(p_destination_h);
+	destination["deep_link_message"] = ovr_Destination_GetDeeplinkMessage(p_destination_h);
+
+	return destination;
+}
+
+// Processes the result mainly from a next_page request of a application invite array handle
+void GDOculusPlatform::_handle_process_app_invite_array(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrApplicationInviteArrayHandle invites_arr_h = ovr_Message_GetApplicationInviteArray(p_message);
+
+		Ref<GDOPAppInviteArray> app_invite_array = memnew(GDOPAppInviteArray(invites_arr_h));
+		size_t app_inv_arr_s = ovr_ApplicationInviteArray_GetSize(invites_arr_h);
+		Array inv_array = Array();
+
+		for (size_t i = 0; i < app_inv_arr_s; i++) {
+			ovrApplicationInviteHandle app_inv_h = ovr_ApplicationInviteArray_GetElement(invites_arr_h, i);
+			Dictionary single_app_invite;
+
+			char native_id[OVRID_SIZE];
+			ovrID app_invite_id = ovr_ApplicationInvite_GetID(app_inv_h);
+			ovrID_ToString(native_id, OVRID_SIZE, app_invite_id);
+
+			single_app_invite["id"] = String(native_id);
+			single_app_invite["lobby_session_id"] = ovr_ApplicationInvite_GetLobbySessionId(app_inv_h);
+			single_app_invite["match_session_id"] = ovr_ApplicationInvite_GetMatchSessionId(app_inv_h);
+			single_app_invite["is_active"] = ovr_ApplicationInvite_GetIsActive(app_inv_h);
+
+			ovrUserHandle user_h = ovr_ApplicationInvite_GetRecipient(app_inv_h);
+			if (user_h) {
+				Dictionary user_info = _get_user_information(user_h);
+				single_app_invite["recipient"] = user_info;
+			} else {
+				single_app_invite["recipient"] = Dictionary();
+			}
+
+			ovrDestinationHandle dest_h = ovr_ApplicationInvite_GetDestination(app_inv_h);
+			if (dest_h) {
+				single_app_invite["destination"] = _get_destionation_info(dest_h);
+			} else {
+				single_app_invite["destination"] = Dictionary();
+			}
+
+			inv_array.push_back(single_app_invite);
+		}
+
+		app_invite_array->has_next_page = ovr_ApplicationInviteArray_HasNextPage(invites_arr_h);
+		app_invite_array->set_invites(inv_array);
+
+		_fulfill_promise(msg_id, Array::make(app_invite_array));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
 }
 
 /////////////////////////////////////////////////

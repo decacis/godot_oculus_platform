@@ -88,6 +88,34 @@ challenges_get_entries_by_ids = {
 challenges_join = "784406923231806"
 challenges_leave = "784406923231806"
 challenges_decline_invite = "784406923231806"
+grouppresence_send_invites = Array[String](["6140779752677302"])
+grouppresence_set = {
+"deeplink_message_override": "MSG_OVERRIDE_0",
+"destination_api_name": "MY_DESTINATION_0",
+"is_joinable": true,
+"lobby_session_id": "123",
+"match_session_id": "456"
+}
+grouppresence_set_deeplimk_msg_override = "MSG_OVERRIDE"
+grouppresence_set_destination = "MY_DESTINATION_1"
+grouppresence_set_is_joinable = false
+grouppresence_set_lobby_session = "321"
+grouppresence_set_match_session = "654"
+grouppresence_get_invitable_users = {
+"suggested_users": ["6140779752677302"]
+}
+grouppresence_launch_invite_panel = {
+"suggested_users": ["6140779752677302"]
+}
+grouppresence_launch_multiplayer_error_dialog = 1
+grouppresence_launch_rejoin_dialog = {
+"destination_api_name": "MY_DESTINATION_0",
+"lobby_session_id": "123",
+"match_session_id": "456"
+}
+grouppresence_launch_roster_panel = {
+"suggested_users": ["6140779752677302"]
+}
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(900, 600)
@@ -591,6 +619,122 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "ChallengesDeclineInvite"
 
+[node name="GroupPresence" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/GroupPresence"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NoInputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer"]
+layout_mode = 2
+
+[node name="NoInputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+text = "No input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="GroupPresenceClear" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceClear"
+
+[node name="GroupPresenceGetSentInvites" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceGetSentInvites"
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="GroupPresenceSendInvites" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceSendInvites"
+
+[node name="GroupPresenceSet" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceSet"
+
+[node name="GroupPresenceSetDeeplinkMsgOverride" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceSetDeeplinkMsgOverride"
+
+[node name="GroupPresenceSetDestination" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceSetDestination"
+
+[node name="GroupPresenceSetIsJoinable" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceSetIsJoinable"
+
+[node name="GroupPresenceSetLobbySession" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceSetLobbySession"
+
+[node name="GroupPresenceSetMatchSession" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceSetMatchSession"
+
+[node name="GroupPresenceGetInvitableUsers" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceGetInvitableUsers"
+
+[node name="GroupPresenceLaunchInvitePanel" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceLaunchInvitePanel"
+
+[node name="GroupPresenceLaunchMultiplayerErrDialog" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceLaunchMultiplayerErrDialog"
+
+[node name="GroupPresenceLaunchRejoinDialog" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceLaunchRejoinDialog"
+
+[node name="GroupPresenceLaunchRosterPanel" type="Button" parent="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "GroupPresenceLaunchRosterPanel"
+
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserID" to="." method="_on_get_logged_in_user_id_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserLocale" to="." method="_on_get_logged_in_user_locale_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetIsViewerEntitled" to="." method="_on_get_is_viewer_entitled_pressed"]
@@ -639,3 +783,17 @@ text = "ChallengesDeclineInvite"
 [connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesJoin" to="." method="_on_challenges_join_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesLeave" to="." method="_on_challenges_leave_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesDeclineInvite" to="." method="_on_challenges_decline_invite_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/NoInputFuncs/HFlowContainer/GroupPresenceClear" to="." method="_on_group_presence_clear_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/NoInputFuncs/HFlowContainer/GroupPresenceGetSentInvites" to="." method="_on_group_presence_get_sent_invites_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSendInvites" to="." method="_on_group_presence_send_invites_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSet" to="." method="_on_group_presence_set_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetDeeplinkMsgOverride" to="." method="_on_group_presence_set_deeplink_msg_override_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetDestination" to="." method="_on_group_presence_set_destination_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetIsJoinable" to="." method="_on_group_presence_set_is_joinable_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetLobbySession" to="." method="_on_group_presence_set_lobby_session_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetMatchSession" to="." method="_on_group_presence_set_match_session_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceGetInvitableUsers" to="." method="_on_group_presence_get_invitable_users_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchInvitePanel" to="." method="_on_group_presence_launch_invite_panel_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchMultiplayerErrDialog" to="." method="_on_group_presence_launch_multiplayer_err_dialog_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchRejoinDialog" to="." method="_on_group_presence_launch_rejoin_dialog_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchRosterPanel" to="." method="_on_group_presence_launch_roster_panel_pressed"]

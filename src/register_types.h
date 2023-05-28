@@ -7,6 +7,7 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "custom_types/gdop_app_invite_array.h"
 #include "custom_types/gdop_challenge_array.h"
 #include "custom_types/gdop_challenge_entries.h"
 #include "custom_types/gdop_leaderboard_entries.h"

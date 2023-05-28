@@ -7,6 +7,7 @@ signal _challenge_array_get_all_prev_finished(event_id : int)
 signal _challenge_array_get_all_next_finished(event_id : int)
 signal _challenge_entries_get_all_prev_finished(event_id : int)
 signal _challenge_entries_get_all_next_finished(event_id : int)
+signal _app_invites_array_get_all_finished(event_id : int)
 
 var initialized : bool = false
 var quiet : bool = true
@@ -321,3 +322,42 @@ func _challenge_entries_get_all_next_helper(challenge_entries : GDOPChallengeEnt
 	
 	else:
 		emit_signal("_challenge_entries_get_all_next_finished", event_id)
+
+
+## GDOPAppInviteArray
+func app_invites_array_get_all(app_invite_array : GDOPAppInviteArray) -> Array:
+	if app_invite_array.get_has_next_page():
+		var invites : Array = app_invite_array.invites.duplicate(true)
+		
+		var event_id : int = randi()
+		while helper_events_ids.has(event_id):
+			event_id = randi()
+		_app_invites_array_get_all_helper(app_invite_array, invites, event_id)
+		
+		var returned_event_id = await _app_invites_array_get_all_finished
+		while returned_event_id != event_id:
+			returned_event_id = await _app_invites_array_get_all_finished
+		
+		helper_events_ids.remove_at(helper_events_ids.find(event_id))
+		
+		return invites
+		
+	else:
+		return app_invite_array.invites
+
+func _app_invites_array_get_all_helper(app_invite_array : GDOPAppInviteArray, invites : Array, event_id : int) -> void:
+	GDOculusPlatform.app_invites_array_get_next_page(app_invite_array)\
+	.then(func(next_array : GDOPAppInviteArray):
+		invites.append_array(next_array.invites)
+		
+		if not next_array.get_has_next_page():
+			emit_signal("_app_invites_array_get_all_finished", event_id)
+			
+		else:
+			_app_invites_array_get_all_helper(next_array, invites, event_id)
+	)\
+	.error(func(next_array_err):
+		push_error(next_array_err)
+		# Don't stop the game
+		emit_signal("_app_invites_array_get_all_finished", event_id)
+	)

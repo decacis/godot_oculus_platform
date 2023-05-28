@@ -9,6 +9,7 @@ void initialize_gdoculusplatform_module(ModuleInitializationLevel p_level) {
 		return;
 	}
 
+	ClassDB::register_class<GDOPAppInviteArray>();
 	ClassDB::register_class<GDOPUserArray>();
 	ClassDB::register_class<GDOPLeaderboardEntries>();
 	ClassDB::register_class<GDOPChallengeArray>();

@@ -6,6 +6,7 @@
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 
+#include "custom_types/gdop_app_invite_array.h"
 #include "custom_types/gdop_challenge_array.h"
 #include "custom_types/gdop_challenge_entries.h"
 #include "custom_types/gdop_leaderboard_entries.h"
@@ -95,18 +96,30 @@ private:
 	void _process_challenges_get_entries(ovrMessageHandle p_message);
 	void _process_challenges_join_leave_decline(ovrMessageHandle p_message);
 
+	// GROUP PRESENCE
+	void _process_groupresence_no_payload(ovrMessageHandle p_message);
+	void _process_groupresence_send_invites(ovrMessageHandle p_message);
+	void _process_groupresence_launch_invite_panel(ovrMessageHandle p_message);
+	void _process_groupresence_launch_rejoin_panel(ovrMessageHandle p_message);
+
 	// LEADERBOARD HELPERS
-	Array _handle_leaderboard_entries(ovrLeaderboardEntryArrayHandle &p_entries_arr_handle);
+	Array _handle_leaderboard_entries(const ovrLeaderboardEntryArrayHandle &p_entries_arr_h);
 
 	// ASSET FILE HELPERS
 	void _handle_download_update(ovrMessageHandle p_message);
 
 	// USER HELPERS
-	Dictionary _get_user_information(ovrUserHandle &p_user_handle);
+	Dictionary _get_user_information(const ovrUserHandle &p_user_h);
 
 	// CHALLENGE HELPERS
-	Dictionary _get_challenge_information(ovrChallengeHandle &p_challenge_h);
-	Dictionary _get_challenge_entry_information(ovrChallengeEntryHandle &p_challenge_entry_h);
+	Dictionary _get_challenge_information(const ovrChallengeHandle &p_challenge_h);
+	Dictionary _get_challenge_entry_information(const ovrChallengeEntryHandle &p_challenge_entry_h);
+
+	// DESTINATION HELPERS
+	Dictionary _get_destionation_info(const ovrDestinationHandle &p_destination_h);
+
+	// GROUP PRESENCE HELPERS
+	void _handle_process_app_invite_array(ovrMessageHandle p_message);
 
 	void _handle_unhandled_message(ovrMessageHandle p_message);
 	void _process_user_get_next_array_page(ovrMessageHandle p_message);
@@ -168,6 +181,7 @@ public:
 	Ref<GDOculusPlatformPromise> challenge_array_get_prev_page(const Ref<GDOPChallengeArray> &p_challenge_array);
 	Ref<GDOculusPlatformPromise> challenge_entries_get_next_page(const Ref<GDOPChallengeEntries> &p_challenge_entries);
 	Ref<GDOculusPlatformPromise> challenge_entries_get_prev_page(const Ref<GDOPChallengeEntries> &p_challenge_entries);
+	Ref<GDOculusPlatformPromise> app_invites_array_get_next_page(const Ref<GDOPAppInviteArray> &p_invites_array);
 
 	// INITIALIZATION
 	bool initialize_android(const String &p_app_id);

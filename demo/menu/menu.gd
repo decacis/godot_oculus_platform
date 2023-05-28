@@ -48,6 +48,20 @@ extends CanvasLayer
 @export var challenges_leave : String = ""
 @export var challenges_decline_invite : String = ""
 
+@export_group("Group Presence")
+@export var grouppresence_send_invites : Array[String]
+@export var grouppresence_set : Dictionary = {}
+@export var grouppresence_set_deeplimk_msg_override : String = ""
+@export var grouppresence_set_destination : String = ""
+@export var grouppresence_set_is_joinable : bool = true
+@export var grouppresence_set_lobby_session : String = ""
+@export var grouppresence_set_match_session : String = ""
+@export var grouppresence_get_invitable_users : Dictionary = {}
+@export var grouppresence_launch_invite_panel : Dictionary = {}
+@export var grouppresence_launch_multiplayer_error_dialog : GDOculusPlatform.MultiplayerErrorErrorKey = GDOculusPlatform.MULTIPLAYER_ERR_KEY_GENERAL
+@export var grouppresence_launch_rejoin_dialog : Dictionary = {}
+@export var grouppresence_launch_roster_panel : Dictionary = {}
+
 
 func _ready() -> void:
 	if !get_user_val.is_empty():
@@ -133,6 +147,28 @@ func _ready() -> void:
 		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesLeave.visible = true
 	if !challenges_decline_invite.is_empty():
 		$PanelContainer/TabContainer/Challenges/VBoxContainer/InputFuncs/HFlowContainer/ChallengesDeclineInvite.visible = true
+	
+	## GROUP PRESENCE
+	if !grouppresence_send_invites.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSendInvites.visible = true
+	if !grouppresence_set.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSet.visible = true
+	if !grouppresence_set_deeplimk_msg_override.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetDeeplinkMsgOverride.visible = true
+	if !grouppresence_set_destination.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetDestination.visible = true
+	if !grouppresence_set_lobby_session.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetLobbySession.visible = true
+	if !grouppresence_set_match_session.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceSetMatchSession.visible = true
+	if !grouppresence_get_invitable_users.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceGetInvitableUsers.visible = true
+	if !grouppresence_launch_invite_panel.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchInvitePanel.visible = true
+	if !grouppresence_launch_rejoin_dialog.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchRejoinDialog.visible = true
+	if !grouppresence_launch_roster_panel.is_empty():
+		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchRosterPanel.visible = true
 
 
 ## USER - NO INPUT FUNCS
@@ -783,4 +819,177 @@ func _on_challenges_decline_invite_pressed():
 	)\
 	.error(func(challenge_info_err):
 		push_error("[challenges_decline_invite] ERROR: ", challenge_info_err)
+	)
+
+
+## GROUP PRESENCE - NO INPUT FUNCS
+func _on_group_presence_clear_pressed():
+	print("-------------------------------------")
+	print("grouppresence_clear CALLED")
+	GDOculusPlatform.grouppresence_clear()\
+	.then(func(gp_clear_resp : bool):
+		print("[grouppresence_clear] RESPONSE: ", gp_clear_resp)
+	)\
+	.error(func(gp_clear_err):
+		push_error("[grouppresence_clear] ERROR: ", gp_clear_err)
+	)
+
+func _on_group_presence_get_sent_invites_pressed():
+	print("-------------------------------------")
+	print("grouppresence_get_sent_invites CALLED")
+	GDOculusPlatform.grouppresence_get_sent_invites()\
+	.then(func(sent_invites : GDOPAppInviteArray):
+		print("[grouppresence_get_sent_invites] RESPONSE: ", await GDOP.app_invites_array_get_all(sent_invites))
+	)\
+	.error(func(sent_invites_err):
+		push_error("[grouppresence_get_sent_invites] ERROR: ", sent_invites_err)
+	)
+
+## GROUP PRESENCE - INPUT FUNCS
+func _on_group_presence_send_invites_pressed():
+	print("-------------------------------------")
+	print("grouppresence_send_invites CALLED")
+	print("INPUT: ", grouppresence_send_invites)
+	GDOculusPlatform.grouppresence_send_invites(grouppresence_send_invites)\
+	.then(func(send_invites : GDOPAppInviteArray):
+		print("[grouppresence_send_invites] RESPONSE: ", await GDOP.app_invites_array_get_all(send_invites))
+	)\
+	.error(func(send_invites_err):
+		push_error("[grouppresence_send_invites] ERROR: ", send_invites_err)
+	)
+
+func _on_group_presence_set_pressed():
+	print("-------------------------------------")
+	print("grouppresence_set CALLED")
+	print("INPUT: ", grouppresence_set)
+	GDOculusPlatform.grouppresence_set(grouppresence_set)\
+	.then(func(gp_set_resp : bool):
+		print("[grouppresence_set] RESPONSE: ", gp_set_resp)
+	)\
+	.error(func(gp_set_err):
+		push_error("[grouppresence_set] ERROR: ", gp_set_err)
+	)
+
+func _on_group_presence_set_deeplink_msg_override_pressed():
+	print("-------------------------------------")
+	print("grouppresence_set_deeplink_message_override CALLED")
+	print("INPUT: ", grouppresence_set_deeplimk_msg_override)
+	GDOculusPlatform.grouppresence_set_deeplink_message_override(grouppresence_set_deeplimk_msg_override)\
+	.then(func(gp_set_resp : bool):
+		print("[grouppresence_set_deeplink_message_override] RESPONSE: ", gp_set_resp)
+	)\
+	.error(func(gp_set_err):
+		push_error("[grouppresence_set_deeplink_message_override] ERROR: ", gp_set_err)
+	)
+
+func _on_group_presence_set_destination_pressed():
+	print("-------------------------------------")
+	print("grouppresence_set_destination CALLED")
+	print("INPUT: ", grouppresence_set_destination)
+	GDOculusPlatform.grouppresence_set_destination(grouppresence_set_destination)\
+	.then(func(gp_set_resp : bool):
+		print("[grouppresence_set_destination] RESPONSE: ", gp_set_resp)
+	)\
+	.error(func(gp_set_err):
+		push_error("[grouppresence_set_destination] ERROR: ", gp_set_err)
+	)
+
+func _on_group_presence_set_is_joinable_pressed():
+	print("-------------------------------------")
+	print("grouppresence_set_is_joinable CALLED")
+	print("INPUT: ", grouppresence_set_is_joinable)
+	GDOculusPlatform.grouppresence_set_is_joinable(grouppresence_set_is_joinable)\
+	.then(func(gp_set_resp : bool):
+		print("[grouppresence_set_is_joinable] RESPONSE: ", gp_set_resp)
+	)\
+	.error(func(gp_set_err):
+		push_error("[grouppresence_set_is_joinable] ERROR: ", gp_set_err)
+	)
+
+func _on_group_presence_set_lobby_session_pressed():
+	print("-------------------------------------")
+	print("grouppresence_set_lobby_session CALLED")
+	print("INPUT: ", grouppresence_set_lobby_session)
+	GDOculusPlatform.grouppresence_set_lobby_session(grouppresence_set_lobby_session)\
+	.then(func(gp_set_resp : bool):
+		print("[grouppresence_set_lobby_session] RESPONSE: ", gp_set_resp)
+	)\
+	.error(func(gp_set_err):
+		push_error("[grouppresence_set_lobby_session] ERROR: ", gp_set_err)
+	)
+
+func _on_group_presence_set_match_session_pressed():
+	print("-------------------------------------")
+	print("grouppresence_set_match_session CALLED")
+	print("INPUT: ", grouppresence_set_match_session)
+	GDOculusPlatform.grouppresence_set_match_session(grouppresence_set_match_session)\
+	.then(func(gp_set_resp : bool):
+		print("[grouppresence_set_match_session] RESPONSE: ", gp_set_resp)
+	)\
+	.error(func(gp_set_err):
+		push_error("[grouppresence_set_match_session] ERROR: ", gp_set_err)
+	)
+
+func _on_group_presence_get_invitable_users_pressed():
+	print("-------------------------------------")
+	print("grouppresence_get_invitable_users CALLED")
+	print("INPUT: ", grouppresence_get_invitable_users)
+	GDOculusPlatform.grouppresence_get_invitable_users(grouppresence_get_invitable_users)\
+	.then(func(gp_invitable_users : GDOPUserArray):
+		print("[grouppresence_get_invitable_users] RESPONSE: ", await GDOP.users_array_get_all(gp_invitable_users))
+	)\
+	.error(func(gp_invitable_err):
+		push_error("[grouppresence_get_invitable_users] ERROR: ", gp_invitable_err)
+	)
+
+func _on_group_presence_launch_invite_panel_pressed():
+	print("-------------------------------------")
+	print("grouppresence_launch_invite_panel CALLED")
+	print("INPUT: ", grouppresence_launch_invite_panel)
+	GDOculusPlatform.grouppresence_launch_invite_panel(grouppresence_launch_invite_panel)\
+	.then(func(gp_launch_invite_resp : bool):
+		print("[grouppresence_launch_invite_panel] RESPONSE: ", gp_launch_invite_resp)
+	)\
+	.error(func(gp_launch_invite_err):
+		push_error("[grouppresence_launch_invite_panel] ERROR: ", gp_launch_invite_err)
+	)
+
+func _on_group_presence_launch_multiplayer_err_dialog_pressed():
+	print("-------------------------------------")
+	print("grouppresence_launch_multiplayer_error_dialog CALLED")
+	print("INPUT: ", grouppresence_launch_multiplayer_error_dialog)
+	GDOculusPlatform.grouppresence_launch_multiplayer_error_dialog(grouppresence_launch_multiplayer_error_dialog)\
+	.then(func(gp_launch_err_dialog_resp : bool):
+		print("[grouppresence_launch_multiplayer_error_dialog] RESPONSE: ", gp_launch_err_dialog_resp)
+	)\
+	.error(func(gp_launch_err_dialog_err):
+		push_error("[grouppresence_launch_multiplayer_error_dialog] ERROR: ", gp_launch_err_dialog_err)
+	)
+
+func _on_group_presence_launch_rejoin_dialog_pressed():
+	print("-------------------------------------")
+	print("grouppresence_launch_rejoin_dialog CALLED")
+	print("INPUT: ", grouppresence_launch_rejoin_dialog)
+	GDOculusPlatform.grouppresence_launch_rejoin_dialog(\
+	grouppresence_launch_rejoin_dialog.lobby_session_id,\
+	grouppresence_launch_rejoin_dialog.match_session_id,\
+	grouppresence_launch_rejoin_dialog.destination_api_name\
+	)\
+	.then(func(gp_launch_rejoin_resp : bool):
+		print("[grouppresence_launch_rejoin_dialog] RESPONSE: ", gp_launch_rejoin_resp)
+	)\
+	.error(func(gp_launch_rejoin_err):
+		push_error("[grouppresence_launch_rejoin_dialog] ERROR: ", gp_launch_rejoin_err)
+	)
+
+func _on_group_presence_launch_roster_panel_pressed():
+	print("-------------------------------------")
+	print("grouppresence_launch_roster_panel CALLED")
+	print("INPUT: ", grouppresence_launch_roster_panel)
+	GDOculusPlatform.grouppresence_launch_roster_panel(grouppresence_launch_roster_panel)\
+	.then(func(gp_launch_roster_resp : bool):
+		print("[grouppresence_launch_roster_panel] RESPONSE: ", gp_launch_roster_resp)
+	)\
+	.error(func(gp_launch_roster_err):
+		push_error("[grouppresence_launch_roster_panel] ERROR: ", gp_launch_roster_err)
 	)

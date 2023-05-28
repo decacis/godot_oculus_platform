@@ -26,6 +26,7 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("challenge_array_get_next_page", "challenge_array"), &GDOculusPlatform::challenge_array_get_next_page);
 	ClassDB::bind_method(D_METHOD("challenge_entries_get_prev_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_prev_page);
 	ClassDB::bind_method(D_METHOD("challenge_entries_get_next_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_next_page);
+	ClassDB::bind_method(D_METHOD("app_invites_array_get_next_page", "app_invites_array"), &GDOculusPlatform::app_invites_array_get_next_page);
 
 	// INITIALIZATION
 	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
@@ -193,6 +194,10 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_next_page(c
 	return _empty_func_helper();
 }
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_prev_page(const Ref<GDOPChallengeEntries> &p_challenge_entries) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::app_invites_array_get_next_page(const Ref<GDOPAppInviteArray> &p_invites_array) {
 	return _empty_func_helper();
 }
 
