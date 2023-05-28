@@ -29,8 +29,8 @@ private:
 
 	bool _get_promise(uint64_t p_promise_id, Ref<GDOculusPlatformPromise> &p_promise);
 
-	bool _fulfill_promise(uint64_t p_promise_id, Array val);
-	bool _reject_promise(uint64_t p_promise_id, Array val);
+	bool _fulfill_promise(uint64_t p_promise_id, const Array &val);
+	bool _reject_promise(uint64_t p_promise_id, const Array &val);
 
 	uint64_t _get_reject_promise_id();
 	uint64_t _get_fulfill_promise_id();
@@ -146,18 +146,32 @@ public:
 		CHALLENGE_VISIBILITY_PRIVATE = ovrChallengeVisibility_Private
 	};
 
+	enum MultiplayerErrorErrorKey {
+		MULTIPLAYER_ERR_KEY_DEST_UNAVAILABLE = ovrMultiplayerErrorErrorKey_DestinationUnavailable,
+		MULTIPLAYER_ERR_KEY_DLC_REQUIRED = ovrMultiplayerErrorErrorKey_DlcRequired,
+		MULTIPLAYER_ERR_KEY_GENERAL = ovrMultiplayerErrorErrorKey_General,
+		MULTIPLAYER_ERR_KEY_GROUP_FULL = ovrMultiplayerErrorErrorKey_GroupFull,
+		MULTIPLAYER_ERR_KEY_INVITER_NOT_JOINABLE = ovrMultiplayerErrorErrorKey_InviterNotJoinable,
+		MULTIPLAYER_ERR_KEY_LVL_NOT_HIGH_ENOUGH = ovrMultiplayerErrorErrorKey_LevelNotHighEnough,
+		MULTIPLAYER_ERR_KEY_LVL_NOT_UNLOCKED = ovrMultiplayerErrorErrorKey_LevelNotUnlocked,
+		MULTIPLAYER_ERR_KEY_NETWORK_TIMEOUT = ovrMultiplayerErrorErrorKey_NetworkTimeout,
+		MULTIPLAYER_ERR_KEY_NO_LONGER_AVAILABLE = ovrMultiplayerErrorErrorKey_NoLongerAvailable,
+		MULTIPLAYER_ERR_KEY_UPDATE_REQUIRED = ovrMultiplayerErrorErrorKey_UpdateRequired,
+		MULTIPLAYER_ERR_KEY_TUTORIAL_REQUIRED = ovrMultiplayerErrorErrorKey_TutorialRequired
+	};
+
 	// PAGINATION
-	Ref<GDOculusPlatformPromise> user_array_get_next_page(Ref<GDOPUserArray> p_user_array);
-	Ref<GDOculusPlatformPromise> leaderboard_entries_get_next_page(Ref<GDOPLeaderboardEntries> p_leaderboard_entries);
-	Ref<GDOculusPlatformPromise> leaderboard_entries_get_prev_page(Ref<GDOPLeaderboardEntries> p_leaderboard_entries);
-	Ref<GDOculusPlatformPromise> challenge_array_get_next_page(Ref<GDOPChallengeArray> p_challenge_array);
-	Ref<GDOculusPlatformPromise> challenge_array_get_prev_page(Ref<GDOPChallengeArray> p_challenge_array);
-	Ref<GDOculusPlatformPromise> challenge_entries_get_next_page(Ref<GDOPChallengeEntries> p_challenge_entries);
-	Ref<GDOculusPlatformPromise> challenge_entries_get_prev_page(Ref<GDOPChallengeEntries> p_challenge_entries);
+	Ref<GDOculusPlatformPromise> user_array_get_next_page(const Ref<GDOPUserArray> &p_user_array);
+	Ref<GDOculusPlatformPromise> leaderboard_entries_get_next_page(const Ref<GDOPLeaderboardEntries> &p_leaderboard_entries);
+	Ref<GDOculusPlatformPromise> leaderboard_entries_get_prev_page(const Ref<GDOPLeaderboardEntries> &p_leaderboard_entries);
+	Ref<GDOculusPlatformPromise> challenge_array_get_next_page(const Ref<GDOPChallengeArray> &p_challenge_array);
+	Ref<GDOculusPlatformPromise> challenge_array_get_prev_page(const Ref<GDOPChallengeArray> &p_challenge_array);
+	Ref<GDOculusPlatformPromise> challenge_entries_get_next_page(const Ref<GDOPChallengeEntries> &p_challenge_entries);
+	Ref<GDOculusPlatformPromise> challenge_entries_get_prev_page(const Ref<GDOPChallengeEntries> &p_challenge_entries);
 
 	// INITIALIZATION
-	bool initialize_android(String p_app_id);
-	Ref<GDOculusPlatformPromise> initialize_android_async(String p_app_id);
+	bool initialize_android(const String &p_app_id);
+	Ref<GDOculusPlatformPromise> initialize_android_async(const String &p_app_id);
 
 	// ABUSE REPORT
 	Ref<GDOculusPlatformPromise> abuse_report_request_handled(ReportRequestResponse p_report_req_resp);
@@ -166,65 +180,81 @@ public:
 	String user_get_logged_in_user_id();
 	String user_get_logged_in_user_locale();
 	Ref<GDOculusPlatformPromise> user_get_is_viewer_entitled();
-	Ref<GDOculusPlatformPromise> user_get_user(String p_user_id);
+	Ref<GDOculusPlatformPromise> user_get_user(const String &p_user_id);
 	Ref<GDOculusPlatformPromise> user_get_logged_in_user();
 	Ref<GDOculusPlatformPromise> user_get_user_proof();
 	Ref<GDOculusPlatformPromise> user_get_user_access_token();
 	Ref<GDOculusPlatformPromise> user_get_blocked_users();
 	Ref<GDOculusPlatformPromise> user_get_logged_in_user_friends();
-	Ref<GDOculusPlatformPromise> user_get_org_scoped_id(String p_user_id);
+	Ref<GDOculusPlatformPromise> user_get_org_scoped_id(const String &p_user_id);
 	Ref<GDOculusPlatformPromise> user_get_sdk_accounts();
-	Ref<GDOculusPlatformPromise> user_launch_block_flow(String p_user_id);
-	Ref<GDOculusPlatformPromise> user_launch_unblock_flow(String p_user_id);
-	Ref<GDOculusPlatformPromise> user_launch_friend_request_flow(String p_user_id);
+	Ref<GDOculusPlatformPromise> user_launch_block_flow(const String &p_user_id);
+	Ref<GDOculusPlatformPromise> user_launch_unblock_flow(const String &p_user_id);
+	Ref<GDOculusPlatformPromise> user_launch_friend_request_flow(const String &p_user_id);
 
 	// ACHIEVEMENTS
-	Ref<GDOculusPlatformPromise> achievements_add_count(String p_achievement_name, uint64_t p_count);
-	Ref<GDOculusPlatformPromise> achievements_add_fields(String p_achievement_name, String p_fields);
-	Ref<GDOculusPlatformPromise> achievements_unlock(String p_achievement_name);
+	Ref<GDOculusPlatformPromise> achievements_add_count(const String &p_achievement_name, uint64_t p_count);
+	Ref<GDOculusPlatformPromise> achievements_add_fields(const String &p_achievement_name, const String &p_fields);
+	Ref<GDOculusPlatformPromise> achievements_unlock(const String &p_achievement_name);
 	Ref<GDOculusPlatformPromise> achievements_get_all_definitions();
 	Ref<GDOculusPlatformPromise> achievements_get_all_progress();
-	Ref<GDOculusPlatformPromise> achievements_get_definitions_by_name(Array p_achievement_names);
-	Ref<GDOculusPlatformPromise> achievements_get_progress_by_name(Array p_achievement_names);
+	Ref<GDOculusPlatformPromise> achievements_get_definitions_by_name(const Array &p_achievement_names);
+	Ref<GDOculusPlatformPromise> achievements_get_progress_by_name(const Array &p_achievement_names);
 
 	// IAP
 	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases();
-	Ref<GDOculusPlatformPromise> iap_get_products_by_sku(Array p_sku_list);
-	Ref<GDOculusPlatformPromise> iap_consume_purchase(String p_sku);
-	Ref<GDOculusPlatformPromise> iap_launch_checkout_flow(String p_sku);
+	Ref<GDOculusPlatformPromise> iap_get_products_by_sku(const Array &p_sku_list);
+	Ref<GDOculusPlatformPromise> iap_consume_purchase(const String &p_sku);
+	Ref<GDOculusPlatformPromise> iap_launch_checkout_flow(const String &p_sku);
 
 	// ASSET FILE
 	Ref<GDOculusPlatformPromise> assetfile_get_list();
-	Ref<GDOculusPlatformPromise> assetfile_status_by_id(String p_asset_id);
-	Ref<GDOculusPlatformPromise> assetfile_status_by_name(String p_asset_name);
-	Ref<GDOculusPlatformPromise> assetfile_download_by_id(String p_asset_id);
-	Ref<GDOculusPlatformPromise> assetfile_download_by_name(String p_asset_name);
-	Ref<GDOculusPlatformPromise> assetfile_download_cancel_by_id(String p_asset_id);
-	Ref<GDOculusPlatformPromise> assetfile_download_cancel_by_name(String p_asset_name);
-	Ref<GDOculusPlatformPromise> assetfile_delete_by_id(String p_asset_id);
-	Ref<GDOculusPlatformPromise> assetfile_delete_by_name(String p_asset_name);
+	Ref<GDOculusPlatformPromise> assetfile_status_by_id(const String &p_asset_id);
+	Ref<GDOculusPlatformPromise> assetfile_status_by_name(const String &p_asset_name);
+	Ref<GDOculusPlatformPromise> assetfile_download_by_id(const String &p_asset_id);
+	Ref<GDOculusPlatformPromise> assetfile_download_by_name(const String &p_asset_name);
+	Ref<GDOculusPlatformPromise> assetfile_download_cancel_by_id(const String &p_asset_id);
+	Ref<GDOculusPlatformPromise> assetfile_download_cancel_by_name(const String &p_asset_name);
+	Ref<GDOculusPlatformPromise> assetfile_delete_by_id(const String &p_asset_id);
+	Ref<GDOculusPlatformPromise> assetfile_delete_by_name(const String &p_asset_name);
 
 	// LEADERBOARD
-	Ref<GDOculusPlatformPromise> leaderboard_get(String p_leaderboard_name);
-	Ref<GDOculusPlatformPromise> leaderboard_get_entries(String p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at);
-	Ref<GDOculusPlatformPromise> leaderboard_get_entries_after_rank(String p_leaderboard_name, uint64_t p_limit, uint64_t p_after_rank);
-	Ref<GDOculusPlatformPromise> leaderboard_get_entries_by_ids(String p_leaderboard_name, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at);
-	Ref<GDOculusPlatformPromise> leaderboard_write_entry(String p_leaderboard_name, uint64_t p_score, bool p_force_update, Dictionary p_extra);
+	Ref<GDOculusPlatformPromise> leaderboard_get(const String &p_leaderboard_name);
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries(const String &p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at);
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries_after_rank(const String &p_leaderboard_name, uint64_t p_limit, uint64_t p_after_rank);
+	Ref<GDOculusPlatformPromise> leaderboard_get_entries_by_ids(const String &p_leaderboard_name, uint64_t p_limit, const Array &p_user_ids, LeaderboardStartAt p_start_at);
+	Ref<GDOculusPlatformPromise> leaderboard_write_entry(const String &p_leaderboard_name, uint64_t p_score, bool p_force_update, const Dictionary &p_extra);
 
 	// APPLICATION
 	Ref<GDOculusPlatformPromise> application_get_version();
-	Ref<GDOculusPlatformPromise> application_launch_other_app(String p_app_id, Dictionary p_deeplink_options);
+	Ref<GDOculusPlatformPromise> application_launch_other_app(const String &p_app_id, const Dictionary &p_deeplink_options);
 	Dictionary application_get_launch_details();
 
 	// CHALLENGES
-	Ref<GDOculusPlatformPromise> challenges_get(String p_challenge_id);
-	Ref<GDOculusPlatformPromise> challenges_get_list(uint64_t p_limit = 10, Dictionary p_challenge_options = Dictionary());
-	Ref<GDOculusPlatformPromise> challenges_get_entries(String p_challenge_id, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at);
-	Ref<GDOculusPlatformPromise> challenges_get_entries_after_rank(String p_challenge_id, uint64_t p_limit, uint64_t p_after_rank);
-	Ref<GDOculusPlatformPromise> challenges_get_entries_by_ids(String p_challenge_id, uint64_t p_limit, Array p_user_ids, LeaderboardStartAt p_start_at);
-	Ref<GDOculusPlatformPromise> challenges_join(String p_challenge_id);
-	Ref<GDOculusPlatformPromise> challenges_leave(String p_challenge_id);
-	Ref<GDOculusPlatformPromise> challenges_decline_invite(String p_challenge_id);
+	Ref<GDOculusPlatformPromise> challenges_get(const String &p_challenge_id);
+	Ref<GDOculusPlatformPromise> challenges_get_list(uint64_t p_limit = 10, const Dictionary &p_challenge_options = Dictionary());
+	Ref<GDOculusPlatformPromise> challenges_get_entries(const String &p_challenge_id, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at);
+	Ref<GDOculusPlatformPromise> challenges_get_entries_after_rank(const String &p_challenge_id, uint64_t p_limit, uint64_t p_after_rank);
+	Ref<GDOculusPlatformPromise> challenges_get_entries_by_ids(const String &p_challenge_id, uint64_t p_limit, const Array &p_user_ids, LeaderboardStartAt p_start_at);
+	Ref<GDOculusPlatformPromise> challenges_join(const String &p_challenge_id);
+	Ref<GDOculusPlatformPromise> challenges_leave(const String &p_challenge_id);
+	Ref<GDOculusPlatformPromise> challenges_decline_invite(const String &p_challenge_id);
+
+	// GROUP PRESENCE
+	Ref<GDOculusPlatformPromise> grouppresence_clear();
+	Ref<GDOculusPlatformPromise> grouppresence_send_invites(const Array &p_user_ids);
+	Ref<GDOculusPlatformPromise> grouppresence_set(const Dictionary &p_group_presence_options);
+	Ref<GDOculusPlatformPromise> grouppresence_set_deeplink_message_override(const String &p_deeplink_message);
+	Ref<GDOculusPlatformPromise> grouppresence_set_destination(const String &p_api_name);
+	Ref<GDOculusPlatformPromise> grouppresence_set_is_joinable(bool p_is_joinable);
+	Ref<GDOculusPlatformPromise> grouppresence_set_lobby_session(const String &p_id);
+	Ref<GDOculusPlatformPromise> grouppresence_set_match_session(const String &p_id);
+	Ref<GDOculusPlatformPromise> grouppresence_get_invitable_users(const Dictionary &p_options = Dictionary());
+	Ref<GDOculusPlatformPromise> grouppresence_get_sent_invites();
+	Ref<GDOculusPlatformPromise> grouppresence_launch_invite_panel(const Dictionary &p_options = Dictionary());
+	Ref<GDOculusPlatformPromise> grouppresence_launch_multiplayer_error_dialog(MultiplayerErrorErrorKey p_error_key);
+	Ref<GDOculusPlatformPromise> grouppresence_launch_rejoin_dialog(const String &p_lobby_session_id, const String &p_match_session_id, const String &p_destination_api_name);
+	Ref<GDOculusPlatformPromise> grouppresence_launch_roster_panel(const Dictionary &p_options = Dictionary());
 
 	void pump_messages();
 };
@@ -236,5 +266,6 @@ VARIANT_ENUM_CAST(GDOculusPlatform::LeaderboardStartAt);
 VARIANT_ENUM_CAST(GDOculusPlatform::ReportRequestResponse);
 VARIANT_ENUM_CAST(GDOculusPlatform::ChallengeVisibilityViewerFilter);
 VARIANT_ENUM_CAST(GDOculusPlatform::ChallengeVisibility);
+VARIANT_ENUM_CAST(GDOculusPlatform::MultiplayerErrorErrorKey);
 
 #endif // GDOCULUSPLATFORM_H

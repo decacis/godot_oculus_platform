@@ -20,6 +20,10 @@ GDOPUserArray::GDOPUserArray(ovrUserArrayHandle p_array_handle) {
 }
 GDOPUserArray::~GDOPUserArray() {}
 
+String GDOPUserArray::_to_string() const {
+	return "[GDOPUserArray::" + uitos(get_instance_id()) + "]";
+}
+
 bool GDOPUserArray::get_has_next_page() const {
 	return has_next_page;
 }

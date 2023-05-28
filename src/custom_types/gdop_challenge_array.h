@@ -16,6 +16,8 @@ class GDOPChallengeArray : public RefCounted {
 protected:
 	static void _bind_methods();
 
+	String _to_string() const;
+
 private:
 	Array challenges;
 

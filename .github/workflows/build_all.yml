@@ -14,7 +14,7 @@ env:
 
 jobs:
   lint:
-    name: 🧹 Lint / 📜 C++
+    name: 🧹 Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,6 +24,10 @@ jobs:
           clang-format-version: '14'
           check-path: 'src'
           exclude-regex: 'include'
+      
+      - name: Cancelling parallel jobs
+        if: ${{ failure() }}
+        uses: andymckay/cancel-action@0.3
 
   build-all:
     runs-on: ${{ matrix.os }}

@@ -24,6 +24,10 @@ GDOPChallengeEntries::GDOPChallengeEntries(ovrChallengeEntryArrayHandle p_array_
 }
 GDOPChallengeEntries::~GDOPChallengeEntries() {}
 
+String GDOPChallengeEntries::_to_string() const {
+	return "[GDOPChallengeEntries::" + uitos(get_instance_id()) + "]";
+}
+
 uint64_t GDOPChallengeEntries::get_total_count() const {
 	return total_count;
 }
