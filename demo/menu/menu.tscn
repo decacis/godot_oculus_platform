@@ -4,6 +4,8 @@
 
 [node name="menu" type="CanvasLayer"]
 script = ExtResource("1_ag53n")
+get_user_val = "6140779752677302"
+get_org_scoped_id_val = "6140779752677302"
 achievements_add_count = {
 "achievement_name": "TEST_COUNT_ACHIEV_0",
 "count": 1

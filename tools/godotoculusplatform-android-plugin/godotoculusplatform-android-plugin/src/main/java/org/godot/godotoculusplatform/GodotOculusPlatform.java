@@ -2,10 +2,8 @@ package org.godot.godotoculusplatform;
 
 import android.app.Activity;
 import android.util.ArraySet;
-import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import org.godotengine.godot.Godot;
 import org.godotengine.godot.plugin.GodotPlugin;
@@ -42,11 +40,9 @@ public class GodotOculusPlatform extends GodotPlugin {
         return paths;
     }
 
-    @Nullable
     @Override
-    public View onMainCreate(Activity activity) {
-        initPlatform(activity);
-        return super.onMainCreate(activity);
+    public void onGodotSetupCompleted() {
+        initPlatform(getActivity());
     }
 
     private native void initPlatform(Activity activity);
