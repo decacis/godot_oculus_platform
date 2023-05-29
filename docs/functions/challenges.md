@@ -80,6 +80,8 @@ By default `challenge_options` is:
 
 ``` json linenums="1"
 {
+    "viewer_filter": GDOculusPlatform.CHALLENGE_VISIBILITY_VIEWER_ALL_VISIBLE,
+    "visibility": GDOculusPlatform.CHALLENGE_VISIBILITY_PUBLIC,
     "include_active_challenges": true,
     "include_future_challenges": false,
     "include_past_challenges": false

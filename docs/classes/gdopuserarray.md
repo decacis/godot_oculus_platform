@@ -3,6 +3,8 @@ Used in:
 
 - [User](/godot_oculus_platform/functions/user/)
 - [Application](/godot_oculus_platform/functions/application/)
+- [Challenges](/godot_oculus_platform/functions/challenges/)
+- [Group Presence](/godot_oculus_platform/functions/group-presence/)
 
 -----
 

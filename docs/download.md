@@ -10,7 +10,7 @@ The interactive list bellow will help you find all of the precompiled releases f
 </div>
 <script>
     const gdop_versions = {
-        "4.0.2": {
+        "4.0.x": {
             "51": [
                 {
                     "name": "v0.0.1-alpha",
@@ -18,6 +18,10 @@ The interactive list bellow will help you find all of the precompiled releases f
                 },
             ],
             "53": [
+                {
+                    "name": "v1.0.0-beta",
+                    "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v1.0.0-beta"
+                },
                 {
                     "name": "v0.2.5-alpha",
                     "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v0.2.5-alpha"
