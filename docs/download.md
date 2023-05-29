@@ -8,6 +8,14 @@ The interactive list bellow will help you find all of the precompiled releases f
     <ul id="gdop-dl-links">
     </ul>
 </div>
+<style>
+    .version-link {
+        transition: 0.15s;
+    }
+    .version-link:hover {
+        opacity: 1.0 !important;
+    }
+</style>
 <script>
     const gdop_versions = {
         "4.0.2": {
@@ -111,16 +119,23 @@ The interactive list bellow will help you find all of the precompiled releases f
             dl_links_el.removeChild(dl_links_el.lastChild);
         }
 
-        dl_links.forEach(link => {
+        const gradient_step = 0.7 / dl_links.length;
+
+        for (let i = 0; i < dl_links.length; i++) {
+            let temp_gradient_step = gradient_step * i;
+            
             let temp_li = document.createElement('li');
             let temp_a = document.createElement('a');
 
-            temp_a.href = link.url;
-            temp_a.innerText = link.name;
+            temp_a.href = dl_links[i].url;
+            temp_a.innerText = dl_links[i].name;
 
+            temp_li.classList.add('version-link');
             temp_li.appendChild(temp_a);
             dl_links_el.appendChild(temp_li);
-        });
+
+            temp_li.style.opacity = 1.0 - temp_gradient_step;
+        }
     }
 </script>
 
