@@ -1,6 +1,6 @@
 # Godot Oculus Platform
 An open-source implementation of the Oculus Platform SDK intended to be used with the Quest platform.
-Currently, **Oculus Platform SDK v53** and **Godot Engine 4.0.2** are supported.
+See the [download](https://decacis.github.io/godot_oculus_platform/download/) page of the documentation for a list of supported Godot Engine and Oculus Platform SDK versions.
 
 While you can use this plugin in the editor to get code suggestions, it **only works with the Meta Quest**, not PCVR. If you plan to develop for both the Quest and PCVR, you should add a platform check and only use this plugin when the platform is Android.
 
