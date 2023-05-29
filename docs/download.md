@@ -10,7 +10,7 @@ The interactive list bellow will help you find all of the precompiled releases f
 </div>
 <script>
     const gdop_versions = {
-        "4.0.x": {
+        "4.0.2": {
             "51": [
                 {
                     "name": "v0.0.1-alpha",
