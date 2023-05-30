@@ -18,14 +18,14 @@ The interactive list bellow will help you find all of the precompiled releases f
 </style>
 <script>
     const gdop_versions = {
-        "4.0.2": {
-            "51": [
+        "4.0.2-stable": {
+            "51.0": [
                 {
                     "name": "v0.0.1-alpha",
                     "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v0.0.1-alpha"
                 },
             ],
-            "53": [
+            "53.0": [
                 {
                     "name": "v1.0.0-beta",
                     "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v1.0.0-beta_godot-4.0.2-stable_sdk-53.0"
@@ -45,6 +45,14 @@ The interactive list bellow will help you find all of the precompiled releases f
                 {
                     "name": "v0.1.0-alpha",
                     "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v0.1.0-alpha"
+                },
+            ]
+        },
+        "4.0.3-stable": {
+            "53.0": [
+                {
+                    "name": "v1.0.0-beta",
+                    "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v1.0.0-beta_godot-4.0.3-stable_sdk-53.0"
                 },
             ]
         }
@@ -73,6 +81,12 @@ The interactive list bellow will help you find all of the precompiled releases f
 
     function renderGDVersions() {
         let gd_versions = Object.keys(gdop_versions);
+        gd_versions.sort((a, b) => {
+            let temp_a = Number(a.replace(/[^0-9]+/g, ''));
+            let temp_b = Number(b.replace(/[^0-9]+/g, ''));
+
+            return temp_b - temp_a;
+        });
 
         for (let i = 0; i < gd_versions.length; i++) {
             if(i == 0) selected_gd_version = gd_versions[i];
@@ -89,7 +103,7 @@ The interactive list bellow will help you find all of the precompiled releases f
 
     function renderOculusVersions() {
         let sdk_versions = Object.keys(gdop_versions[selected_gd_version]);
-        sdk_versions.sort((a, b) => b - a);
+        sdk_versions.sort((a, b) => Number(b) - Number(a));
 
         while (sdk_versions_el.hasChildNodes()) {
             sdk_versions_el.removeChild(sdk_versions_el.lastChild);
