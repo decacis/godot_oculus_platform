@@ -18,16 +18,6 @@ GDOculusPlatform *GDOculusPlatform::singleton = nullptr;
 void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("pump_messages"), &GDOculusPlatform::pump_messages);
 
-	// PAGINATION
-	ClassDB::bind_method(D_METHOD("user_array_get_next_page", "user_array"), &GDOculusPlatform::user_array_get_next_page);
-	ClassDB::bind_method(D_METHOD("leaderboard_entries_get_prev_page", "leaderboard_entries"), &GDOculusPlatform::leaderboard_entries_get_prev_page);
-	ClassDB::bind_method(D_METHOD("leaderboard_entries_get_next_page", "leaderboard_entries"), &GDOculusPlatform::leaderboard_entries_get_next_page);
-	ClassDB::bind_method(D_METHOD("challenge_array_get_prev_page", "challenge_array"), &GDOculusPlatform::challenge_array_get_prev_page);
-	ClassDB::bind_method(D_METHOD("challenge_array_get_next_page", "challenge_array"), &GDOculusPlatform::challenge_array_get_next_page);
-	ClassDB::bind_method(D_METHOD("challenge_entries_get_prev_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_prev_page);
-	ClassDB::bind_method(D_METHOD("challenge_entries_get_next_page", "challenge_entries"), &GDOculusPlatform::challenge_entries_get_next_page);
-	ClassDB::bind_method(D_METHOD("app_invites_array_get_next_page", "app_invites_array"), &GDOculusPlatform::app_invites_array_get_next_page);
-
 	// INITIALIZATION
 	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
 	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
@@ -170,35 +160,8 @@ void GDOculusPlatform::pump_messages() {}
 Ref<GDOculusPlatformPromise> _empty_func_helper() {
 	Ref<GDOculusPlatformPromise> promise;
 	ERR_FAIL_V_MSG(promise, "Godot Oculus Platform only works with the Meta Quest (android).");
-}
 
-Ref<GDOculusPlatformPromise> GDOculusPlatform::user_array_get_next_page(const Ref<GDOPUserArray> &p_user_array) {
-	return _empty_func_helper();
-}
-
-Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_entries_get_next_page(const Ref<GDOPLeaderboardEntries> &p_leaderboard_entries) {
-	return _empty_func_helper();
-}
-Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_entries_get_prev_page(const Ref<GDOPLeaderboardEntries> &p_leaderboard_entries) {
-	return _empty_func_helper();
-}
-
-Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_array_get_next_page(const Ref<GDOPChallengeArray> &p_challenge_array) {
-	return _empty_func_helper();
-}
-Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_array_get_prev_page(const Ref<GDOPChallengeArray> &p_challenge_array) {
-	return _empty_func_helper();
-}
-
-Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_next_page(const Ref<GDOPChallengeEntries> &p_challenge_entries) {
-	return _empty_func_helper();
-}
-Ref<GDOculusPlatformPromise> GDOculusPlatform::challenge_entries_get_prev_page(const Ref<GDOPChallengeEntries> &p_challenge_entries) {
-	return _empty_func_helper();
-}
-
-Ref<GDOculusPlatformPromise> GDOculusPlatform::app_invites_array_get_next_page(const Ref<GDOPAppInviteArray> &p_invites_array) {
-	return _empty_func_helper();
+	return promise;
 }
 
 /////////////////////////////////////////////////

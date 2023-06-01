@@ -6,11 +6,6 @@
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 
-#include "custom_types/gdop_app_invite_array.h"
-#include "custom_types/gdop_challenge_array.h"
-#include "custom_types/gdop_challenge_entries.h"
-#include "custom_types/gdop_leaderboard_entries.h"
-#include "custom_types/gdop_user_array.h"
 #include "gdop_promise.h"
 
 namespace godot {
@@ -172,16 +167,6 @@ public:
 		MULTIPLAYER_ERR_KEY_UPDATE_REQUIRED = ovrMultiplayerErrorErrorKey_UpdateRequired,
 		MULTIPLAYER_ERR_KEY_TUTORIAL_REQUIRED = ovrMultiplayerErrorErrorKey_TutorialRequired
 	};
-
-	// PAGINATION
-	Ref<GDOculusPlatformPromise> user_array_get_next_page(const Ref<GDOPUserArray> &p_user_array);
-	Ref<GDOculusPlatformPromise> leaderboard_entries_get_next_page(const Ref<GDOPLeaderboardEntries> &p_leaderboard_entries);
-	Ref<GDOculusPlatformPromise> leaderboard_entries_get_prev_page(const Ref<GDOPLeaderboardEntries> &p_leaderboard_entries);
-	Ref<GDOculusPlatformPromise> challenge_array_get_next_page(const Ref<GDOPChallengeArray> &p_challenge_array);
-	Ref<GDOculusPlatformPromise> challenge_array_get_prev_page(const Ref<GDOPChallengeArray> &p_challenge_array);
-	Ref<GDOculusPlatformPromise> challenge_entries_get_next_page(const Ref<GDOPChallengeEntries> &p_challenge_entries);
-	Ref<GDOculusPlatformPromise> challenge_entries_get_prev_page(const Ref<GDOPChallengeEntries> &p_challenge_entries);
-	Ref<GDOculusPlatformPromise> app_invites_array_get_next_page(const Ref<GDOPAppInviteArray> &p_invites_array);
 
 	// INITIALIZATION
 	bool initialize_android(const String &p_app_id);

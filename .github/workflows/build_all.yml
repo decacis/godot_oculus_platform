@@ -10,7 +10,7 @@ env:
   OCULUS_VERSION: 53
   GODOT_ENGINE_VERSION: "4.0.3"
   GODOT_ENGINE_STAGE: "stable"
-  INTEGRATION_VERSION: "v1.0.0-beta"
+  INTEGRATION_VERSION: "v1.1.0-beta"
 
 jobs:
   lint:
@@ -214,5 +214,5 @@ jobs:
       - name: Upload final artifact
         uses: actions/upload-artifact@v3
         with:
-          name: GodotOculusPlatform-${{ env.INTEGRATION_VERSION }}_for_Godot-${{ env.GODOT_ENGINE_VERSION }}-${{ env.GODOT_ENGINE_STAGE }}_with_SDK-${{ env.OCULUS_VERSION }}
+          name: GodotOculusPlatform-${{ env.INTEGRATION_VERSION }}_Godot-${{ env.GODOT_ENGINE_VERSION }}-${{ env.GODOT_ENGINE_STAGE }}_SDK-${{ env.OCULUS_VERSION }}
           path: ./

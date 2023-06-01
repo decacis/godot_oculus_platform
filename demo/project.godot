@@ -22,7 +22,7 @@ XRToolsUserSettings="*res://addons/godot-xr-tools/user_settings/user_settings.gd
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_oculus_platform/plugin.cfg", "res://addons/godot-xr-tools/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot-xr-tools/plugin.cfg", "res://addons/godot_oculus_platform/plugin.cfg")
 
 [rendering]
 

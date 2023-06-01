@@ -233,7 +233,7 @@ func _on_get_blocked_users_pressed():
 	print("-------------------------------------")
 	print("user_get_blocked_users CALLED")
 	GDOculusPlatform.user_get_blocked_users()\
-	.then(func(blocked_users : Array):
+	.then(func(blocked_users : Dictionary):
 		print("[user_get_blocked_users] RESPONSE: ", blocked_users)
 	)\
 	.error(func(blocked_users_err):
@@ -244,8 +244,8 @@ func _on_get_logged_in_user_friends_pressed():
 	print("-------------------------------------")
 	print("user_get_logged_in_user_friends CALLED")
 	GDOculusPlatform.user_get_logged_in_user_friends()\
-	.then(func(friends : GDOPUserArray):
-		print("[user_get_logged_in_user_friends] RESPONSE: ", await GDOP.users_array_get_all(friends))
+	.then(func(friends : Dictionary):
+		print("[user_get_logged_in_user_friends] RESPONSE: ", friends)
 		print("Has next page? ", friends.has_next_page)
 	)\
 	.error(func(friends_err):
@@ -330,8 +330,9 @@ func _on_achievements_get_all_definitions_pressed():
 	print("-------------------------------------")
 	print("achievements_get_all_definitions CALLED")
 	GDOculusPlatform.achievements_get_all_definitions()\
-	.then(func(achievements : Array):
-		print("[achievements_get_all_definitions] RESPONSE: ", achievements)
+	.then(func(achievements : Dictionary):
+		print(achievements)
+#		print("[achievements_get_all_definitions] RESPONSE: ", await GDOP.array_get_all(achievements))
 	)\
 	.error(func(achievements_err):
 		push_error("[achievements_get_all_definitions] ERROR: ", achievements_err)
@@ -341,7 +342,7 @@ func _on_achievements_get_all_progress_pressed():
 	print("-------------------------------------")
 	print("achievements_get_all_progress CALLED")
 	GDOculusPlatform.achievements_get_all_progress()\
-	.then(func(progress : Array):
+	.then(func(progress : Dictionary):
 		print("[achievements_get_all_progress] RESPONSE: ", progress)
 	)\
 	.error(func(progress_err):
@@ -390,7 +391,7 @@ func _on_achievements_get_definitions_by_name_pressed():
 	print("achievements_get_definitions_by_name CALLED")
 	print("INPUT: ", achievements_get_definitions_by_name)
 	GDOculusPlatform.achievements_get_definitions_by_name(achievements_get_definitions_by_name)\
-	.then(func(defs_by_name_resp : Array):
+	.then(func(defs_by_name_resp : Dictionary):
 		print("[achievements_get_definitions_by_name] RESPONSE: ", defs_by_name_resp)
 	)\
 	.error(func(defs_by_name_err):
@@ -402,7 +403,7 @@ func _on_achievements_get_progress_by_name_pressed():
 	print("achievements_get_progress_by_name CALLED")
 	print("INPUT: ", achievements_get_progress_by_name)
 	GDOculusPlatform.achievements_get_progress_by_name(achievements_get_progress_by_name)\
-	.then(func(prog_by_name_resp : Array):
+	.then(func(prog_by_name_resp : Dictionary):
 		print("[achievements_get_progress_by_name] RESPONSE: ", prog_by_name_resp)
 	)\
 	.error(func(prog_by_name_err):
@@ -415,7 +416,7 @@ func _on_iap_get_viewer_purchases_pressed():
 	print("-------------------------------------")
 	print("iap_get_viewer_purchases CALLED")
 	GDOculusPlatform.iap_get_viewer_purchases()\
-	.then(func(viewer_purchases : Array):
+	.then(func(viewer_purchases : Dictionary):
 		print("[iap_get_viewer_purchases] RESPONSE: ", viewer_purchases)
 	)\
 	.error(func(viewer_purchases_err):
@@ -428,7 +429,7 @@ func _on_iap_get_products_by_sku_pressed():
 	print("iap_get_products_by_sku CALLED")
 	print("INPUT: ", IAP_get_products_by_sku)
 	GDOculusPlatform.iap_get_products_by_sku(IAP_get_products_by_sku)\
-	.then(func(products : Array):
+	.then(func(products : Dictionary):
 		print("[iap_get_products_by_sku] RESPONSE: ", products)
 	)\
 	.error(func(products_err):
@@ -630,8 +631,8 @@ func _on_leaderboard_get_entries_pressed():
 	leaderboard_get_entries.filter,\
 	leaderboard_get_entries.start_at\
 	)\
-	.then(func(leaderboard_e_resp : GDOPLeaderboardEntries):
-		print("[leaderboard_get_entries] RESPONSE: ", await GDOP.leaderboard_entries_get_all(leaderboard_e_resp))
+	.then(func(leaderboard_e_resp : Dictionary):
+		print("[leaderboard_get_entries] RESPONSE: ", leaderboard_e_resp)
 	)\
 	.error(func(leaderboard_err):
 		push_error("[leaderboard_get_entries] ERROR: ", leaderboard_err)
@@ -645,8 +646,8 @@ func _on_leaderboard_get_entries_after_rank_pressed():
 	leaderboard_get_entries_after_rank.limit,\
 	leaderboard_get_entries_after_rank.after_rank\
 	)\
-	.then(func(leaderboard_e_resp : GDOPLeaderboardEntries):
-		print("[leaderboard_get_entries_after_rank] RESPONSE: ", await GDOP.leaderboard_entries_get_all(leaderboard_e_resp))
+	.then(func(leaderboard_e_resp : Dictionary):
+		print("[leaderboard_get_entries_after_rank] RESPONSE: ", leaderboard_e_resp)
 	)\
 	.error(func(leaderboard_err):
 		push_error("[leaderboard_get_entries_after_rank] ERROR: ", leaderboard_err)
@@ -661,8 +662,8 @@ func _on_leaderboard_get_entries_by_i_ds_pressed():
 	leaderboard_get_entries_by_ids.user_ids,\
 	leaderboard_get_entries_by_ids.start_at\
 	)\
-	.then(func(leaderboard_e_resp : GDOPLeaderboardEntries):
-		print("[leaderboard_get_entries_by_ids] RESPONSE: ", await GDOP.leaderboard_entries_get_all(leaderboard_e_resp))
+	.then(func(leaderboard_e_resp : Dictionary):
+		print("[leaderboard_get_entries_by_ids] RESPONSE: ", leaderboard_e_resp)
 	)\
 	.error(func(leaderboard_err):
 		push_error("[leaderboard_get_entries_by_ids] ERROR: ", leaderboard_err)
@@ -722,8 +723,8 @@ func _on_challenges_get_list_pressed():
 		challenges_get_list.limit,
 		challenges_get_list.challenge_options
 	)\
-	.then(func(challenge_array : GDOPChallengeArray):
-		print("[challenges_get_list] RESPONSE: ", await GDOP.challenge_array_get_all(challenge_array))
+	.then(func(challenge_array : Dictionary):
+		print("[challenges_get_list] RESPONSE: ", challenge_array)
 	)\
 	.error(func(challenge_array_err):
 		push_error("[challenges_get_list] ERROR: ", challenge_array_err)
@@ -739,9 +740,9 @@ func _on_challenges_get_entries_pressed():
 	challenges_get_entries.filter,\
 	challenges_get_entries.start_at\
 	)\
-	.then(func(c_entries : GDOPChallengeEntries):
+	.then(func(c_entries : Dictionary):
 
-		print("[challenges_get_entries] RESPONSE: ", await GDOP.challenge_entries_get_all(c_entries))
+		print("[challenges_get_entries] RESPONSE: ", c_entries)
 
 	)\
 	.error(func(challenge_entries_err):
@@ -757,9 +758,9 @@ func _on_challenges_get_entries_after_rank_pressed():
 	challenges_get_entries_after_rank.limit,\
 	challenges_get_entries_after_rank.start_at\
 	)\
-	.then(func(c_entries : GDOPChallengeEntries):
+	.then(func(c_entries : Dictionary):
 
-		print("[challenges_get_entries_after_rank] RESPONSE: ", await GDOP.challenge_entries_get_all(c_entries))
+		print("[challenges_get_entries_after_rank] RESPONSE: ", c_entries)
 
 	)\
 	.error(func(challenge_entries_err):
@@ -776,9 +777,9 @@ func _on_challenges_get_entries_by_ids_pressed():
 	challenges_get_entries_by_ids.user_ids,\
 	challenges_get_entries_by_ids.start_at\
 	)\
-	.then(func(c_entries : GDOPChallengeEntries):
+	.then(func(c_entries : Dictionary):
 
-		print("[challenges_get_entries_by_ids] RESPONSE: ", await GDOP.challenge_entries_get_all(c_entries))
+		print("[challenges_get_entries_by_ids] RESPONSE: ", c_entries)
 
 	)\
 	.error(func(challenge_entries_err):
@@ -838,8 +839,8 @@ func _on_group_presence_get_sent_invites_pressed():
 	print("-------------------------------------")
 	print("grouppresence_get_sent_invites CALLED")
 	GDOculusPlatform.grouppresence_get_sent_invites()\
-	.then(func(sent_invites : GDOPAppInviteArray):
-		print("[grouppresence_get_sent_invites] RESPONSE: ", await GDOP.app_invites_array_get_all(sent_invites))
+	.then(func(sent_invites : Dictionary):
+		print("[grouppresence_get_sent_invites] RESPONSE: ", sent_invites)
 	)\
 	.error(func(sent_invites_err):
 		push_error("[grouppresence_get_sent_invites] ERROR: ", sent_invites_err)
@@ -851,8 +852,8 @@ func _on_group_presence_send_invites_pressed():
 	print("grouppresence_send_invites CALLED")
 	print("INPUT: ", grouppresence_send_invites)
 	GDOculusPlatform.grouppresence_send_invites(grouppresence_send_invites)\
-	.then(func(send_invites : GDOPAppInviteArray):
-		print("[grouppresence_send_invites] RESPONSE: ", await GDOP.app_invites_array_get_all(send_invites))
+	.then(func(send_invites : Dictionary):
+		print("[grouppresence_send_invites] RESPONSE: ", send_invites)
 	)\
 	.error(func(send_invites_err):
 		push_error("[grouppresence_send_invites] ERROR: ", send_invites_err)
@@ -935,8 +936,8 @@ func _on_group_presence_get_invitable_users_pressed():
 	print("grouppresence_get_invitable_users CALLED")
 	print("INPUT: ", grouppresence_get_invitable_users)
 	GDOculusPlatform.grouppresence_get_invitable_users(grouppresence_get_invitable_users)\
-	.then(func(gp_invitable_users : GDOPUserArray):
-		print("[grouppresence_get_invitable_users] RESPONSE: ", await GDOP.users_array_get_all(gp_invitable_users))
+	.then(func(gp_invitable_users : Dictionary):
+		print("[grouppresence_get_invitable_users] RESPONSE: ", gp_invitable_users)
 	)\
 	.error(func(gp_invitable_err):
 		push_error("[grouppresence_get_invitable_users] ERROR: ", gp_invitable_err)
