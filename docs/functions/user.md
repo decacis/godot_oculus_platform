@@ -203,23 +203,50 @@ GDOculusPlatform.user_get_user_access_token()\
 
 Requests the user IDs of users blocked by the current user.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of user IDs as `String`s. The function will error with a message if an error occured.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with a `data` key that can contain an `Array` of user IDs as `String`s, if fulfilled. The function will error with a message if an error occured.
 
 Example response:
+
 ``` json linenums="1"
-[
-    "3141592653589793",
-    "2384626433832795",
-    "1288419716045741"
-]
+{
+    "data": [
+        {
+            "id": "2384626433832795",
+            "oculus_id": "some_id",
+            "display_name": "Steve",
+            "image_url": "https://example.org/some-image.png",
+            "small_image_url": "",
+            "presence": {
+                "presence_status": "OFFLINE",
+                "presence_deeplink_message": "",
+                "presence_destination_api_name": "",
+                "presence_lobby_session_id": "",
+                "presence_match_session_id": "",
+            }
+        }
+    ],
+    "next_page_url": ""
+}
 ```
+
+///// admonition | Note
+    type: warning
+
+The `next_page_url` key can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
+
+Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
+/////
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.user_get_blocked_users()\
-.then(func(blocked_users : Array):
-    for user_id in blocked_users:
+.then(func(blocked_users : Dictionary):
+    if not blocked_users.next_page_url.is_empty():
+        # Get next page
+        pass
+    
+    for user_id in blocked_users.data:
         print("Blocked user ID: ", user_id)
 )\
 .error(func(blocked_users_err):
@@ -235,16 +262,19 @@ GDOculusPlatform.user_get_blocked_users()\
 
 Requests the user IDs of the current user's friends.
 
-**Returns:** A `GDOculusPlatformPromise` will contain a [GDOPUserArray](/godot_oculus_platform/classes/gdopuserarray/) with information about each friend. Each element of the `Array` will have the same format as the `Dictionary` returned by [user_get_user](#user_get_user). The function will error with a message if an error occured.
+**Returns:** A `GDOculusPlatformPromise` will contain a `Dictionary` with two keys: `data` and `next_page_url`, please see the example response from [user_get_blocked_users](#user_get_blocked_users). The function will error with a message if an error occured.
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.user_get_logged_in_user_friends()\
-.then(func(friends_resp : GDOPUserArray):
+.then(func(friends_resp : Dictionary):
 
-    var friends : Array = await GDOP.users_array_get_all(friends_resp)
-    for friend_info in friends:
+    if not friends_resp.next_page_url.is_empty():
+        # Get next page of friends
+        pass
+    
+    for friend_info in friends_resp.data:
         print("Friend ID: ", friend_info.id)
         print("Friend image: ", friend_info.image_url)
     

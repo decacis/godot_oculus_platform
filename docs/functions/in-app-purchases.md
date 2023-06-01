@@ -10,42 +10,48 @@ Related Oculus Platform documentation:
 
 Requests all of the logged-in user purchases.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each purchase (both consumable and durable). The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` - the `data` key will contain information about each purchase (both consumable and durable). The promise will error if the request couldn't be fulfilled.
 
 Example response:
+
 ``` json linenums="1"
-[
-    {
-        "sku": "durable_product_sku",
-        "reporting_id": "154128782811",
-        "purchase_str_id": "332574476951",
-        "grant_time": 1683990516,
-        "expiration_time": 0,
-        "developer_payload": ""
-    },
-    {
-        "sku": "consumable_product_sku",
-        "reporting_id": "184128782822",
-        "purchase_str_id": "882574476943",
-        "grant_time": 1683990517,
-        "expiration_time": 1684004517,
-        "developer_payload": ""
-    }
-]
+{
+    "data": [
+        {
+            "sku": "durable_product_sku",
+            "reporting_id": "154128782811",
+            "purchase_str_id": "3325744768484514854951",
+            "grant_time": 1683990516,
+            "expiration_time": 0,
+            "developer_payload": ""
+        },
+        {
+            "sku": "consumable_product_sku",
+            "reporting_id": "184128782822",
+            "purchase_str_id": "8825744725484848476943",
+            "grant_time": 1683990517,
+            "expiration_time": 1684004517,
+            "developer_payload": ""
+        }
+    ],
+    "next_page_url": ""
+}
 ```
 
-/// admonition | Note
+///// admonition | Note
     type: warning
 
-Keys ending with `_time` like `grant_time` are in seconds. They are UNIX timestamps.
-///
+The `next_page_url` key can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
+
+Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
+/////
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.iap_get_viewer_purchases()\
-.then(func(user_purchases : Array):
-    for purchase in user_purchases:
+.then(func(user_purchases : Dictionary):
+    for purchase in user_purchases.data:
         print("Purchased at: ", purchase.grant_time)
 )\
 .error(func(user_purchases_err):
@@ -61,25 +67,37 @@ GDOculusPlatform.iap_get_viewer_purchases()\
 
 Requests product information of a list of SKUs. The `sku_list` `Array` must only contain `String`s.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain an `Array` of `Dictionaries` with information about each requested product. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dicitonary` - the `data` key will contain information about each product requested. The promise will error if the request couldn't be fulfilled.
 
 Example response:
+
 ``` json linenums="1"
-[
-    {
-        "sku": "gems_pack_10",
-        "name": "10 Gems",
-        "description": "This pack of shiny gems sure is worth!",
-        "formatted_price": "$9.99"
-    },
-    {
-        "sku": "gems_pack_50",
-        "name": "50 Gems",
-        "description": "This pack of shiny gems sure is even more worth!",
-        "formatted_price": "$39.99"
-    }
-]
+{
+    "data": [
+        {
+            "sku": "gems_pack_10",
+            "name": "10 Gems",
+            "description": "This pack of shiny gems sure is worth!",
+            "formatted_price": "$9.99"
+        },
+        {
+            "sku": "gems_pack_50",
+            "name": "50 Gems",
+            "description": "This pack of shiny gems sure is even more worth!",
+            "formatted_price": "$39.99"
+        }
+    ],
+    "next_page_url": ""
+}
 ```
+
+///// admonition | Note
+    type: warning
+
+The `next_page_url` key can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
+
+Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
+/////
 
 /// details | Example
     type: example
@@ -87,8 +105,12 @@ Example response:
 var sku_list : Array = ["gems_pack_10", "gems_pack_50"]
 
 GDOculusPlatform.iap_get_products_by_sku(sku_list)\
-.then(func(products : Array):
-    for product in products:
+.then(func(prods : Dictionary):
+    if not prods.next_page_url.is_empty():
+        # Get next page
+        pass
+    
+    for product in prods.data:
         print("Product info: ", product)
 )\
 .error(func(products_err):
@@ -159,7 +181,7 @@ Sometimes, after the user makes a purchase, the `iap_status` key from the [asset
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.iap_launch_checkout_flow("my_product_sku")\
-.then(func(product : Dictionaty):
+.then(func(product : Dictionary):
     
     if product.purchase_str_id != "":
         print("User completed the purchase!")

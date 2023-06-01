@@ -40,30 +40,79 @@ GDOculusPlatform.leaderboard_get("MY_LEADERBOARD_0")\
 
 Requests the entries of the leaderboard with the given `leaderboard_name` (API name). The `limit` argument defines the number of entries to return and **must be more than 0**.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPLeaderboardEntries](/godot_oculus_platform/classes/gdopleaderboardentries/) with information about a block of entries from the leaderboard. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` - the `data` key will contain the information about a block of entries from the leaderboard. The promise will error if the request couldn't be fulfilled.
 
-Enums:
+Example response:
+``` json linenums="1"
+{
+    "data": [
+        {
+            "id": "36310577835242",
+            "rank": 3,
+            "score": 500,
+            "timestamp": 1684639488,
+            "display_score": "500 pts",
+            "extra_data": "",
+            "supplementary_metric": {
+                "id": "5614515145111",
+                "metric": 16674
+            },
+            "user": { 
+                "display_name": "Steve",
+                "id": "4238760617434810",
+                "oculus_id": "user_oculus_id",
+                "image_url": "https://example.org/user_image.png",
+                "small_image_url": "https://example.org/user_image_small.png",
+                "presence": {
+                    "presence_status": "ONLINE",
+                    "presence_deeplink_message": "",
+                    "presence_destination_api_name": "",
+                    "presence_lobby_session_id": "",
+                    "presence_match_session_id": "" 
+                }
+            }
+        }
+    ],
+    "previous_page_url": "",
+    "next_page_url": "",
+    "total_count": 1
+}
+```
 
-**LeaderboardFilterType**
+///// admonition | Note
+    type: warning
+
+The `next_page_url` and `previous_page_url` keys can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
+
+Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
+/////
+
+/// admonition | Note
+    type: warning
+
+The `total_count` key is the total count of leaderboard entries, not only the total count returned by this function.
+
+The `timestamp` key is a UNIX timestamp (in seconds).
+
+The `supplementary_metric` key can be an empty `Dictionary`.
+///
+
+**Enums:**
+
+*LeaderboardFilterType*
 
 | Name                             |  Value  | Description                                                                                                                 |
 |----------------------------------|:-------:|-----------------------------------------------------------------------------------------------------------------------------|
 | LEADERBOARD_FILTER_TYPE_NONE     |    0    | Will return all players in the leaderboard (within the other limits).
 | LEADERBOARD_FILTER_TYPE_FRIENDS  |    1    | Will return only players who are bidirectional friends of the current user/player. Each entry will still have their absolute rank. |
 
-**LeaderboardStartAt**
+*LeaderboardStartAt*
 
 | Name                                           |  Value  | Description                                                                                           |
 |------------------------------------------------|:-------:|-------------------------------------------------------------------------------------------------------|
 | LEADERBOARD_START_AT_TOP                       |    0    | Default behavior. Will return results starting with the player that is ranked 1st on the leaderboard. |
 | LEADERBOARD_START_AT_CENTERED_ON_VIEWER        |    1    | Will try to start from the user's rank on the leaderboard and center the leaderboard entries around that.  Example:  If the user is rank 10th and the request is to fetch 3 entries centered on the user, it'll return the entries ranked 9th, 10th, and 11th. If the user is not ranked on the requested leaderboard, this will return an error. |
 | LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP |    2    | Will try center on viewer, but if it can it will fallback to LEADERBOARD_START_AT_TOP |
-
-///// admonition | Note
-    type: warning
-
-Please see the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
-/////
 
 /// details | Example
     type: example
@@ -81,10 +130,16 @@ leaderboard_info.limit,\
 leaderboard_info.filter,\
 leaderboard_info.start_at\
 )\
-.then(func(l_entries : GDOPLeaderboardEntries):
+.then(func(l_entries : Dictionary):
 
-    var all_entries : Array = await GDOP.leaderboard_entries_get_all(l_entries)
-    for entry in all_entries:
+    if not l_entries.previous_page_url.is_empty():
+        # Get previous entries
+        pass
+    if not l_entries.next_page_url.is_empty():
+        # Get next entries
+        pass
+    
+    for entry in l_entries.data:
         print("User: ", entry.user.oculus_id)
         print("Rank: ", entry.rank)
         print("------------------")
@@ -105,12 +160,12 @@ Requests the entries of the leaderboard with the given `leaderboard_name` (API n
 
 The `after_rank` argument is exclusive, meaning that if for example you call this function with a `limit` of 3 and `after_rank` of 5, the response will include the 6th, 7th and 8th ranks/entries.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPLeaderboardEntries](/godot_oculus_platform/classes/gdopleaderboardentries/) with information about a block of entries from the leaderboard after a given rank. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about a block of entries from the leaderboard after a given rank. The promise will error if the request couldn't be fulfilled.
 
 ///// admonition | Note
     type: warning
 
-Please see the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
+Take a look at the example response and the note from the [leaderboard_get_entries](/godot_oculus_platform/functions/leaderboards/#leaderboard_get_entries) function to know more details about the possible response from this function.
 /////
 
 /// details | Example
@@ -127,10 +182,16 @@ leaderboard_info.name,\
 leaderboard_info.limit,\
 leaderboard_info.after_rank\
 )\
-.then(func(l_entries : GDOPLeaderboardEntries):
+.then(func(l_entries : Dictionary):
 
-    var all_entries : Array = await GDOP.leaderboard_entries_get_all(l_entries)
-    for entry in all_entries:
+    if not l_entries.previous_page_url.is_empty():
+        # Get previous entries
+        pass
+    if not l_entries.next_page_url.is_empty():
+        # Get next entries
+        pass
+    
+    for entry in l_entries.data:
         print("User: ", entry.user.oculus_id)
         print("Rank: ", entry.rank)
         print("------------------")
@@ -151,12 +212,12 @@ Requests the entries of the leaderboard with the given `leaderboard_name` (API n
 
 As an example use case, you can use this function to get a list of users that are competing and compare their ranks.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPLeaderboardEntries](/godot_oculus_platform/classes/gdopleaderboardentries/) with information about a block of entries from the leaderboard (only including the `user_ids` you defined). The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about a block of entries from the leaderboard (only including the `user_ids` you defined). The promise will error if the request couldn't be fulfilled.
 
 ///// admonition | Note
     type: warning
 
-Please see the example of the `entries` property from the `GDOPLeaderboardEntries` class [**here**](/godot_oculus_platform/classes/gdopleaderboardentries/#entries) for an idea of the format of each entry.
+Take a look at the example response and the note from the [leaderboard_get_entries](/godot_oculus_platform/functions/leaderboards/#leaderboard_get_entries) function to know more details about the possible response from this function.
 /////
 
 /// details | Example
@@ -178,10 +239,9 @@ leaderboard_info.limit,\
 leaderboard_info.user_ids,\
 leaderboard_info.start_at\
 )\
-.then(func(l_entries : GDOPLeaderboardEntries):
+.then(func(l_entries : Dictionary):
 
-    var all_entries : Array = await GDOP.leaderboard_entries_get_all(l_entries)
-    for entry in all_entries:
+    for entry in l_entries.data:
         print("User: ", entry.user.oculus_id)
         print("Rank: ", entry.rank)
         print("Score: ", entry.display_score)

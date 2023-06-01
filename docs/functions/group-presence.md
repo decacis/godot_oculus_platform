@@ -33,12 +33,55 @@ GDOculusPlatform.grouppresence_clear()\
 
 Sends an invite to the specified users to join the current user session. Note that you must have ser the group presence information before to be allowed to send invites.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a `GDOPAppInviteArray` which will contain a list of the invites that were sent, if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` which will contain a list of the invites that were sent, if fulfilled. The promise will error if the request couldn't be completed.
+
+Example response:
+
+``` json linenums="1"
+{
+    "data": [
+        {
+            "id": "818518747157704",
+            "lobby_session_id": "some_custom_id_1877",
+            "match_session_id": "some_custom_id_0544",
+            "is_active": true,
+            "recipient": {
+                "display_name": "username",
+                "id": "51054474470074144",
+                "oculus_id": "user_id",
+                "image_url": "https://example.org/some_url",
+                "small_image_url": "https://example.org/some_other_url",
+                "presence": {
+                    "presence_status": "OFFLINE",
+                    "presence_deeplink_message": "",
+                    "presence_destination_api_name": "",
+                    "presence_lobby_session_id": "",
+                    "presence_match_session_id": ""
+                }
+            }, 
+            "destination": {
+                "display_name": "My Destination",
+                "api_name": "MY_DESTINATION_0",
+                "deep_link_message": "MY_DESTINATION_0_DL"
+            }
+        }
+    ],
+    "next_page_url": ""
+}
+```
 
 ///// admonition | Note
     type: warning
 
-Please see the example of the `invites` property from the `GDOPAppInviteArray` class [**here**](/godot_oculus_platform/classes/gdopappinvitearray/#invites) for an idea of the format of each invite.
+The `next_page_url` key can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
+
+Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
+/////
+
+///// admonition | Another note
+    type: warning
+
+The `recipient` and `destination` can be empty `Dictionaries` in some cases.
 /////
 
 /// details | Example
@@ -47,9 +90,13 @@ Please see the example of the `invites` property from the `GDOPAppInviteArray` c
 var user_ids : Array = ["12184515760568", "92059382048201"]
 
 GDOculusPlatform.grouppresence_send_invites(user_ids)\
-.then(func(invites_array : GDOPAppInviteArray):
-    var all_invites : Array = await GDOP.app_invites_array_get_all(invites_array)
-    for invite in all_invites:
+.then(func(invites_array : Dictionary):
+
+    if not invites_array.next_page_url.is_empty():
+        # Get next page
+        pass
+    
+    for invite in invites_array.data:
         if invite.is_active:
             print("Invite is active!")
 )\
@@ -215,7 +262,7 @@ GDOculusPlatform.grouppresence_set_match_session("my_match_651475")\
 
 Requests a list of invitable users that can be invited to the current session. The list includes the user's bidirectional followers and other recently met users. The `options` argument is optional, and a list of allowed keys and examples is shown bellow.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a `GDOPUserArray` that contains a list of users, if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with two keys: `data` and `next_page_url`. The `data` key will contain a list of users, if fulfilled. The promise will error if the request couldn't be completed.
 
 Available options for `options`:
 
@@ -228,15 +275,17 @@ Each element of the `suggested_users` `Array` should be a user ID as a `String`.
 ///// admonition | Note
     type: warning
 
-Please see the example of the `users` property from the `GDOPUserArray` class [**here**](/godot_oculus_platform/classes/gdopuserarray/#users) for an idea of the format of each user.
+Take a look at the example response and the note from the [user_get_blocked_users](/godot_oculus_platform/functions/user/#user_get_blocked_users) function to know more details about the possible response from this function.
 /////
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.grouppresence_get_invitable_users()\
-.then(func(user_array : GDOPUserArray):
-    var all_users : Array = await GDOP.users_array_get_all(user_array)
+.then(func(users : Dictionary):
+    
+    for user in users.data:
+        print("User: ", user.display_name)
 )\
 .error(func(gp_invitable_users_err):
     print("Unable to get a list of invitable users: ", gp_invitable_users_err)
@@ -251,21 +300,24 @@ GDOculusPlatform.grouppresence_get_invitable_users()\
 
 Requests a list of invites sent by the current user.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a `GDOPAppInviteArray` which will contain a list of the invites that have been sent by the user, if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` which will contain a list of the invites that have been sent by the user, if fulfilled. The promise will error if the request couldn't be completed.
 
 ///// admonition | Note
     type: warning
 
-Please see the example of the `invites` property from the `GDOPAppInviteArray` class [**here**](/godot_oculus_platform/classes/gdopappinvitearray/#invites) for an idea of the format of each invite.
+Take a look at the example response and the note from the [grouppresence_send_invites](#grouppresence_send_invites) function to know more details about the possible response from this function.
 /////
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.grouppresence_get_sent_invites()\
-.then(func(invites_array : GDOPAppInviteArray):
-    var all_invites : Array = await GDOP.app_invites_array_get_all(invites_array)
-    for invite in all_invites:
+.then(func(invites_array : Dictionary):
+    if not invites_array.next_page_url.is_empty():
+        # Get next page
+         pass
+
+    for invite in invites_array.data:
         if not invite.is_active:
             print("Invite is inactive!")
 )\

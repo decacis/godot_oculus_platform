@@ -31,21 +31,42 @@ Example response:
             "deeplink_message": "MY_DESTINATION_0_RUSH"
         }
     },
-    "invited_users": GDOPUserArray,
-    "participants": GDOPUserArray
+    "invited_users": {
+        "data": [],
+        "next_page_url": ""
+    },
+    "participants": {
+        "data": [
+            {
+                "id": "2384626433832795",
+                "oculus_id": "some_id",
+                "display_name": "Steve",
+                "image_url": "https://example.org/some-image.png",
+                "small_image_url": "",
+                "presence": {
+                    "presence_status": "OFFLINE",
+                    "presence_deeplink_message": "",
+                    "presence_destination_api_name": "",
+                    "presence_lobby_session_id": "",
+                    "presence_match_session_id": "",
+                }
+            }
+        ],
+        "next_page_url": ""
+    }
 }
 ```
 
 /// admonition | Notes
     type: warning
 
-Take a look at the [GDOPUserArray](/godot_oculus_platform/classes/gdopuserarray/) documentation to know how to extact its data.
+Take a look at the example response and the note from the [user_get_blocked_users](/godot_oculus_platform/functions/user/#user_get_blocked_users) function to know more details about the `invited_users` and `participants` keys.
 
 The `visibility` field can be `PUBLIC`, `PRIVATE`, `INVITE_ONLY` or `UNKNOWN`.
 
 The `type` field can be `USER_CREATED`, `DEVELOPER_CREATED` or `UNKNOWN`.
 
-The `leaderboard` field can be an empty `Dictionaty`.
+The `leaderboard` field can be an empty `Dictionary`.
 
 The `destination` field of `leaderboard` can be an empty `Dictionary`.
 ///
@@ -70,9 +91,64 @@ GDOculusPlatform.challenges_get("511854451440")\
 
 Requests a list of challenges. You can pass various filters to narrow down the response - see bellow. The `limit` is the maximum number of challenges that this function can return.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPChallengeArray](/godot_oculus_platform/classes/gdopchallengearray/) with information about a block of challenges if fulfilled. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about a block of challenges if fulfilled. The promise will error if the request couldn't be completed.
 
-Default values:
+Example response:
+
+``` json linenums="1"
+{
+    "data": [
+        {
+            "id": "21541874514770",
+            "title": "My Challenge",
+            "description": "Collect the most coins in rush mode",
+            "start_date": 1684639488,
+            "end_date": 1671659703,
+            "visibility": "PUBLIC",
+            "type": "DEVELOPER_CREATED",
+            "leaderboard": {
+                "id": "4238760617434810",
+                "api_name": "MY_LEADERBOARD_0",
+                "destination": {
+                    "display_name": "Rush Mountain",
+                    "api_name": "MY_DESTINATION_0",
+                    "deeplink_message": "MY_DESTINATION_0_RUSH"
+                }
+            },
+            "invited_users": {
+                "data": [],
+                "next_page_url": ""
+            },
+            "participants": {
+                "data": [
+                    {
+                        "id": "2384626433832795",
+                        "oculus_id": "some_id",
+                        "display_name": "Steve",
+                        "image_url": "https://example.org/some-image.png",
+                        "small_image_url": "",
+                        "presence": {
+                            "presence_status": "OFFLINE",
+                            "presence_deeplink_message": "",
+                            "presence_destination_api_name": "",
+                            "presence_lobby_session_id": "",
+                            "presence_match_session_id": "",
+                        }
+                    }
+                ],
+                "next_page_url": ""
+            }
+        }
+    ],
+    "previous_page_url": "",
+    "next_page_url": "",
+    "total_count": 1
+}
+```
+
+The `total_count` key is not necessarily the total count of challenges in this block, but the total count of challenges that satisfy this query.
+
+**Default values:**
 
 `limit` defaults to `10`.
 
@@ -103,9 +179,9 @@ By default `challenge_options` is:
 | include_future_challenges |               bool              | false                                                    |
 | include_past_challenges   |               bool              | true                                                     |
 
-Enums:
+**Enums:**
 
-**ChallengeVisibilityViewerFilter**
+*ChallengeVisibilityViewerFilter*
 
 | Name                                                 |  Value  | Description                                                               |
 |------------------------------------------------------|:-------:|---------------------------------------------------------------------------|
@@ -114,7 +190,7 @@ Enums:
 | CHALLENGE_VISIBILITY_VIEWER_INVITED                  |    3    | Will return only challenges where the viewer is invited.                  |
 | CHALLENGE_VISIBILITY_VIEWER_PARTICIPATING_OR_INVITED |    4    | Will return only challenges where the viewer is participating or invited. |
 
-**ChallengeVisibility**
+*ChallengeVisibility*
 
 | Name                             |  Value  | Description                                                               |
 |----------------------------------|:-------:|---------------------------------------------------------------------------|
@@ -125,7 +201,9 @@ Enums:
 ///// admonition | Note
     type: warning
 
-Please see the example of the `challenges` property from the `GDOPChallengeArray` class [**here**](/godot_oculus_platform/classes/gdopchallengearray/#challenges) for an idea of the format of each challenge. Or the [challenges_get](#challenges_get) function as well.
+The `next_page_url` and `previous_page_url` keys can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
+
+Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
 /////
 
 /// details | Example
@@ -139,10 +217,16 @@ var challenge_filters : Dictionary = {
 }
 
 GDOculusPlatform.challenges_get_list(10, challenge_filters)\
-.then(func(ch_array : GDOPChallengeArray):
+.then(func(ch_array : Dictionary):
 
-    var all_challenges : Array = await GDOP.challenge_array_get_all(ch_array)
-    for challenge in all_challenges:
+    if not ch_array.previous_page_array.is_empty():
+        # Get previous page
+        pass
+    if not ch_array.next_page_array.is_empty():
+        # Get next page
+        pass
+    
+    for challenge in ch_array.data:
         print("Title: ", challenge.title)
         
         if not challenge.leaderboard.is_empty():
@@ -162,15 +246,57 @@ GDOculusPlatform.challenges_get_list(10, challenge_filters)\
 
 Requests the entries of the challenge with the given `challenge_id`. The `limit` argument defines the number of entries to return and **must be more than 0**. If you set the `filter` to `GDOculusPlatform.LEADERBOARD_FILTER_TYPE_FRIENDS` you can restrict the result to bidirectional followers, for example.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPChallengeEntries](/godot_oculus_platform/classes/gdopchallengeentries/) with information about a block of entries from the challenge. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about a block of entries from the challenge. The promise will error if the request couldn't be fulfilled.
 
 You can check the `enums` from [leaderboard_get_entries](/godot_oculus_platform/functions/leaderboards/#leaderboard_get_entries) to know what values you are allowed to use.
+
+``` json linenums="1"
+{
+    "data": [
+        {
+            "id": "5118451178741",
+            "rank": 10,
+            "score": 500,
+            "timestamp": 1684639488,
+            "display_score": "500 pts",
+            "extra_data": "some custom data",
+            "user": { 
+                "display_name": "Steve",
+                "id": "4238760617434810",
+                "oculus_id": "user_oculus_id",
+                "image_url": "https://example.org/user_image.png",
+                "small_image_url": "https://example.org/user_image_small.png",
+                "presence": {
+                    "presence_status": "OFFLINE",
+                    "presence_deeplink_message": "",
+                    "presence_destination_api_name": "",
+                    "presence_lobby_session_id": "",
+                    "presence_match_session_id": "" 
+                }
+            }
+        }
+    ],
+    "previous_page_url": "",
+    "next_page_url": "",
+    "total_count": 1,
+}
+```
 
 ///// admonition | Note
     type: warning
 
-Please see the example of the `entries` property from the `GDOPChallengeEntries` class [**here**](/godot_oculus_platform/classes/gdopchallengeentries/#entries) for an idea of the format of each entry.
+The `next_page_url` and `previous_page_url` keys can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
+
+Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
 /////
+
+/// admonition | Another note
+    type: warning
+
+The `total_count` key is not the total count of elements in this page/block, but the total count of entries that satisfy the query/request. They can be the same if there are no more entries, but they don't have to.
+
+The `timestamp` key is a UNIX timestamp (in seconds).
+///
 
 /// details | Example
     type: example
@@ -188,10 +314,8 @@ leaderboard_info.limit,\
 leaderboard_info.filter,\
 leaderboard_info.start_at\
 )\
-.then(func(c_entries : GDOPChallengeEntries):
-
-    var all_entries : Array = await GDOP.challenge_entries_get_all(c_entries)
-    for entry in all_entries:
+.then(func(c_entries : Dictionary):
+    for entry in c_entries.data:
         print("User: ", entry.user.oculus_id)
         print("Score: ", entry.score)
         print("------------------")
@@ -212,12 +336,12 @@ Requests the entries of the challenge with the given `challenge_id` after a give
 
 The `after_rank` argument is exclusive, meaning that if for example you call this function with a `limit` of 3 and `after_rank` of 5, the response will include the 6th, 7th and 8th ranks/entries.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPChallengeEntries](/godot_oculus_platform/classes/gdopchallengeentries/) with information about a block of entries from the challenge. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about a block of entries from the challenge. The promise will error if the request couldn't be fulfilled.
 
 ///// admonition | Note
     type: warning
 
-Please see the example of the `entries` property from the `GDOPChallengeEntries` class [**here**](/godot_oculus_platform/classes/gdopchallengeentries/#entries) for an idea of the format of each entry.
+Take a look at the example response and the note from the [challenges_get_entries](#challenges_get_entries) function to know more details about the possible response from this function.
 /////
 
 /// details | Example
@@ -234,10 +358,16 @@ challenge_info.id,\
 challenge_info.limit,\
 challenge_info.after_rank\
 )\
-.then(func(c_entries : GDOPChallengeEntries):
+.then(func(c_entries : Dictionary):
 
-    var all_entries : Array = await GDOP.challenge_entries_get_all(c_entries)
-    for entry in all_entries:
+    if not c_entries.previous_page_url.is_empty():
+        # Get previous page
+        pass
+    if not c_entries.next_page_url.is_empty():
+        # Get next page
+        pass
+    
+    for entry in c_entries.data:
         print("User: ", entry.user.oculus_id)
         print("Rank: ", entry.rank)
         print("------------------")
@@ -256,12 +386,12 @@ challenge_info.after_rank\
 
 Requests the entries of the challenge with the given `challenge_id` and only entries that match the given `user_ids`. The `limit` argument defines the number of entries to return and **must be more than 0**. If the `start_at` argument is `LEADERBOARD_START_AT_CENTERED_ON_VIEWER` or `LEADERBOARD_START_AT_CENTERED_ON_VIEWER_OR_TOP` the current user/player ID will be automatically added to the request.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a [GDOPChallengeEntries](/godot_oculus_platform/classes/gdopchallengeentries/) with information about a block of entries from the challenge. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about a block of entries from the challenge. The promise will error if the request couldn't be fulfilled.
 
 ///// admonition | Note
     type: warning
 
-Please see the example of the `entries` property from the `GDOPChallengeEntries` class [**here**](/godot_oculus_platform/classes/gdopchallengeentries/#entries) for an idea of the format of each entry.
+Take a look at the example response and the note from the [challenges_get_entries](#challenges_get_entries) function to know more details about the possible response from this function.
 /////
 
 /// details | Example
@@ -283,10 +413,9 @@ challenge_info.limit,\
 challenge_info.user_ids,\
 challenge_info.start_at\
 )\
-.then(func(c_entries : GDOPChallengeEntries):
+.then(func(c_entries : Dictionary):
 
-    var all_entries : Array = await GDOP.challenge_entries_get_all(c_entries)
-    for entry in all_entries:
+    for entry in c_entries.data:
         print("User: ", entry.user.oculus_id)
         print("Rank: ", entry.rank)
         print("Score: ", entry.display_score)

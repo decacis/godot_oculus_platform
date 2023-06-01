@@ -22,12 +22,6 @@ nav:
     - Leaderboards: 'functions/leaderboards.md'
     - Challenges: 'functions/challenges.md'
     - Group Presence: 'functions/group-presence.md'
-  - Classes:
-    - GDOPUserArray: 'classes/gdopuserarray.md'
-    - GDOPLeaderboardEntries: 'classes/gdopleaderboardentries.md'
-    - GDOPChallengeArray: 'classes/gdopchallengearray.md'
-    - GDOPChallengeEntries: 'classes/gdopchallengeentries.md'
-    - GDOPAppInviteArray: 'classes/gdopappinvitearray.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg

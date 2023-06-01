@@ -107,18 +107,38 @@ Example response:
     "tracking_id": "574371645284520",
     "launch_source": "events",
     "launch_type": "DEEPLINK",
-    "users": GDOPUserArray
+    "users": {
+        "data": [
+            {
+                "id": "2384626433832795",
+                "oculus_id": "some_id",
+                "display_name": "Steve",
+                "image_url": "https://example.org/some-image.png",
+                "small_image_url": "",
+                "presence": {
+                    "presence_status": "ONLINE",
+                    "presence_deeplink_message": "",
+                    "presence_destination_api_name": "",
+                    "presence_lobby_session_id": "",
+                    "presence_match_session_id": "",
+                }
+            }
+        ],
+        "next_page_url": ""
+    }
 }
 ```
 
 - `launch_type` can be: `DEEPLINK`, `COORDINATED`, `INVITE`, `NORMAL` or `UNKNOWN`.
 - `launch_source` can be used to distinguish where the deeplink came from. For example, a `DEEPLINK` launch type could be coming from events or rich presence.
-- `users` is an `Array` that could be populated with other users the current user may want to be with.
+- `users` is a `Dictionary` that could be populated with other users the current user may want to be with.
 
 ///// admonition | Note
     type: warning
 
-The `users` field will contain a [GDOPUserArray](/godot_oculus_platform/classes/gdopuserarray/), please take a look at the documentation from the `GDOPUserArray` class for examples of how to extract the users it contains.
+The `Dictionary` of the `users` key can theoretically contain a URL as the value of the `next_page_url` key, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
+
+Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
 /////
 
 /// details | Example
