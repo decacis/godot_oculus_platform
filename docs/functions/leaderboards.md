@@ -260,7 +260,7 @@ leaderboard_info.start_at\
 
 Sends a request to write a new entry to the leaderboard with the given `leaderboard_name` (API name). You can pass an empty `Dictionary` for `extra` if you don't want to include extra data. See bellow for optional values for the `extra` `Dictionary`.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about request status. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about the status of the request. The promise will error if the request couldn't be completed.
 
 **Note:** if `force_update` is true, then the new ranking will replace the previous ranking even if the new score is lower (assuming the leaderboard's sort order is higher is better).
 

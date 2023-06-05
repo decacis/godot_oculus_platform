@@ -36,3 +36,4 @@ The following table tracks the supported functions from the Oculus Platform SDK:
 | [Leaderboards](/godot_oculus_platform/functions/leaderboards/)              |   ✔️   |
 | [Challenges](/godot_oculus_platform/functions/challenges/)                  |   ✔️   |
 | [Group Presence](/godot_oculus_platform/functions/group-presence/)          |   ✔️   |
+| [Media](/godot_oculus_platform/functions/media/)                            |   ✔️   |

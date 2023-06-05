@@ -3,9 +3,8 @@ Here are some examples of using this asset. For more details make sure to check 
 
 ### Entitlement check
 An entitlement check allows you to quickly check if the user that launched the app actually is entitled to it.
-``` gdscript linenums="1"
-GDOP.initialize(false) # We have to initialize this plugin first
 
+``` gdscript linenums="1"
 # Initializing android platform with the APP_ID as a parameter
 GDOculusPlatform.initialize_android_async("314159265358979")\
 .then(func(_initialization_resp):
@@ -27,18 +26,10 @@ GDOculusPlatform.initialize_android_async("314159265358979")\
 )
 ```
 
-You may notice something odd on the first line:
-``` gdscript linenums="1"
-GDOP.initialize(false) # We have to initialize this plugin first
-```
-
-`GDOP` is different from the singleton we use for the other functions (`GDOculusPlatform`). `GDOP` is only used to initialize the plugin and the only parameter it takes is a boolean to initialize in `quiet mode` or not. Setting it to false will print unhandled messages sent from the Oculus Platform.
-
 ### Getting logged in user information
 Since the promises (`then` and `error` functions) take a `Callable` you can do something like this:
-``` gdscript linenums="1"
-GDOP.initialize()
 
+``` gdscript linenums="1"
 GDOculusPlatform.initialize_android_async("6324217457624418")\
 .then(func(_initialization_resp):
     print("Oculus Platform initialized")

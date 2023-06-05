@@ -22,6 +22,7 @@ nav:
     - Leaderboards: 'functions/leaderboards.md'
     - Challenges: 'functions/challenges.md'
     - Group Presence: 'functions/group-presence.md'
+    - Media: 'functions/media.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg

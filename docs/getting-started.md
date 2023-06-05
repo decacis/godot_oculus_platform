@@ -37,12 +37,10 @@ First, [download this asset](/godot_oculus_platform/download/) and place the add
 
 You can take a look at the [examples](/godot_oculus_platform/examples/) to get an idea of how to interact with the Oculus Platform.
 
-A concept we use is the use of promises or more specifically `GDOculusPlatformPromise`s. These promises basically help you perform actions in an asynchronous manner. Take a look at the following example:
+A concept we use is the use of *promises* or more specifically `GDOculusPlatformPromise`s. These promises basically help you perform actions in an asynchronous manner. Take a look at the following example:
 
 ``` gdscript linenums="1"
 print("Godot")
-
-GDOP.initialize()
 
 GDOculusPlatform.initialize_android_async("314159265358979")\
 .then(func(_initialization_resp):
