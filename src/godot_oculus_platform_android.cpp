@@ -161,6 +161,15 @@ GDOculusPlatform::~GDOculusPlatform() {
 ///// INTERNAL METHODS
 /////////////////////////////////////////////////
 
+bool GDOculusPlatform::_try_connecting_process() {
+	if (!progress_connected) {
+		Error resp = Engine::get_singleton()->get_main_loop()->connect("process_frame", Callable(this, "pump_messages"));
+		ERR_FAIL_COND_V_MSG(resp != OK, false, "Unable to connect pump_messages to process_frame signal.");
+		progress_connected = true;
+	}
+	return progress_connected;
+}
+
 /// Retrieve existing promise from ID.
 bool GDOculusPlatform::_get_promise(uint64_t p_promise_id, Ref<GDOculusPlatformPromise> &p_promise) {
 	for (auto &p : _promises) {
@@ -583,7 +592,10 @@ void GDOculusPlatform::pump_messages() {
 /// Initialize Android Oculus Platform synchronously.
 bool GDOculusPlatform::initialize_android(const String &p_app_id) {
 	if (!ovr_IsPlatformInitialized()) {
-		Engine::get_singleton()->get_main_loop()->connect("process_frame", Callable(this, "pump_messages"));
+		// Try to connect pump_messages to process
+		if (!_try_connecting_process()) {
+			return false;
+		}
 
 		JNIEnv *gdjenv;
 		_get_env(&gdjenv);
@@ -604,7 +616,15 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id) {
 /// @return Promise to be resolved when the platform finishes initializing
 Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(const String &p_app_id) {
 	if (!ovr_IsPlatformInitialized()) {
-		Engine::get_singleton()->get_main_loop()->connect("process_frame", Callable(this, "pump_messages"));
+		// Try to connect pump_messages to process
+		if (!_try_connecting_process()) {
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "Oculus Platform not initialized because pump_messages couldn't be connected to process.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
+
+			return return_promise;
+		}
 
 		JNIEnv *gdjenv;
 		_get_env(&gdjenv);

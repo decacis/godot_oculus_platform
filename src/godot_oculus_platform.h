@@ -21,6 +21,8 @@ protected:
 
 #ifdef __ANDROID__
 private:
+	bool progress_connected = false;
+
 	Vector<Ref<GDOculusPlatformPromise>> _promises;
 	Vector<Ref<GDOculusPlatformPromise>> _promises_to_reject;
 	Vector<Ref<GDOculusPlatformPromise>> _promises_to_fulfill;
@@ -44,6 +46,8 @@ private:
 	void _handle_default_process_error(ovrMessageHandle p_message, ovrRequest p_msg_id);
 
 	void _process_initialize_android_async(ovrMessageHandle p_message);
+
+	bool _try_connecting_process();
 
 	// USER
 	void _process_user_get_is_viewer_entitled(ovrMessageHandle p_message);

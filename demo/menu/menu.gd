@@ -486,7 +486,7 @@ func _on_asset_file_update(asset_file_update : Dictionary) -> void:
 	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer/DownloadProgressValLbl.text = update_txt
 	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/VBoxContainer/ProgressBar.value = asset_file_update.transferred_bytes
 
-func _on_asset_file_downloaded(asset_id : String):
+func _on_asset_file_downloaded(_asset_id : String):
 	print("[ASSET FILE DOWNLOAD] Finished!")
 	$PanelContainer/TabContainer/AssetFiles/VBoxContainer/DownloadStatus/HBoxContainer/DownloadFinishedLbl.visible = true
 
@@ -993,7 +993,3 @@ func _on_group_presence_launch_roster_panel_pressed():
 	.error(func(gp_launch_roster_err):
 		push_error("[grouppresence_launch_roster_panel] ERROR: ", gp_launch_roster_err)
 	)
-
-
-func _on_pause_pressed():
-	get_tree().paused = !get_tree().paused
