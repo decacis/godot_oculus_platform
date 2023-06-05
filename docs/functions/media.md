@@ -16,7 +16,7 @@ Sends a request to initiate a flow to share media to Facebook. At the moment, on
 
 | Name                     |  Value  | Description                  |
 |--------------------------|:-------:|------------------------------|
-| MEDIA_CONTENT_TYPE_PHOTO |    0    | The content/file is a photo. |
+| MEDIA_CONTENT_TYPE_PHOTO |    1    | The content/file is a photo. |
 
 Example response:
 ``` json linenums="1"
