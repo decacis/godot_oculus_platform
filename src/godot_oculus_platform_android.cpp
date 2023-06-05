@@ -101,6 +101,9 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("grouppresence_launch_rejoin_dialog", "lobby_session_id", "match_session_id", "destination_api_name"), &GDOculusPlatform::grouppresence_launch_rejoin_dialog);
 	ClassDB::bind_method(D_METHOD("grouppresence_launch_roster_panel", "options"), &GDOculusPlatform::grouppresence_launch_roster_panel, DEFVAL(Dictionary()));
 
+	// MEDIA
+	ClassDB::bind_method(D_METHOD("media_share_to_facebook", "post_text_suggestion", "file_path", "content_type"), &GDOculusPlatform::media_share_to_facebook);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
@@ -137,6 +140,8 @@ void GDOculusPlatform::_bind_methods() {
 	BIND_ENUM_CONSTANT(MULTIPLAYER_ERR_KEY_NO_LONGER_AVAILABLE); // 9
 	BIND_ENUM_CONSTANT(MULTIPLAYER_ERR_KEY_UPDATE_REQUIRED); // 10
 	BIND_ENUM_CONSTANT(MULTIPLAYER_ERR_KEY_TUTORIAL_REQUIRED); // 11
+
+	BIND_ENUM_CONSTANT(MEDIA_CONTENT_TYPE_PHOTO); // 1
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -558,6 +563,10 @@ void GDOculusPlatform::pump_messages() {
 				_process_groupresence_launch_rejoin_panel(message);
 				break;
 
+			case ovrMessage_Media_ShareToFacebook:
+				_process_media_share_to_facebook(message);
+				break;
+
 			default:
 				_handle_unhandled_message(message);
 		}
@@ -574,6 +583,8 @@ void GDOculusPlatform::pump_messages() {
 /// Initialize Android Oculus Platform synchronously.
 bool GDOculusPlatform::initialize_android(const String &p_app_id) {
 	if (!ovr_IsPlatformInitialized()) {
+		Engine::get_singleton()->get_main_loop()->connect("process_frame", Callable(this, "pump_messages"));
+
 		JNIEnv *gdjenv;
 		_get_env(&gdjenv);
 
@@ -592,15 +603,27 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id) {
 /// @param p_app_id App ID
 /// @return Promise to be resolved when the platform finishes initializing
 Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(const String &p_app_id) {
-	JNIEnv *gdjenv;
-	_get_env(&gdjenv);
+	if (!ovr_IsPlatformInitialized()) {
+		Engine::get_singleton()->get_main_loop()->connect("process_frame", Callable(this, "pump_messages"));
 
-	ovrRequest req = ovr_PlatformInitializeAndroidAsynchronous(p_app_id.utf8().get_data(), jactivity, gdjenv);
+		JNIEnv *gdjenv;
+		_get_env(&gdjenv);
 
-	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
-	_promises.push_back(return_promise);
+		ovrRequest req = ovr_PlatformInitializeAndroidAsynchronous(p_app_id.utf8().get_data(), jactivity, gdjenv);
 
-	return return_promise;
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+
+	} else {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Oculus Platform already initialized";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
 }
 
 /////////////////////////////////////////////////
@@ -1587,7 +1610,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get(const String &p_ch
 }
 
 /// Requests information about a list challenges. Several filters can be applied.
-/// @return A GDOPChallengeArray with info about the challenges.
+/// @return A Dictionary with info about the challenges.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_list(uint64_t p_limit, const Dictionary &p_challenge_options) {
 	if (p_limit < 0) {
 		p_limit = 0;
@@ -1755,7 +1778,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_list(uint64_t p_li
 }
 
 /// Requests the entries from a challenge. Several filters can be applied.
-/// @return A GDOPChallengeEntries that contains an array of entries.
+/// @return A Dictionary that contains an array of entries.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries(const String &p_challenge_id, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at) {
 	if (p_limit < 0) {
 		p_limit = 0;
@@ -1783,7 +1806,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries(const Stri
 }
 
 /// Requests the entries from a challenge after a given rank.
-/// @return A GDOPChallengeEntries that contains an array of entries.
+/// @return A Dictionary that contains an array of entries.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_after_rank(const String &p_challenge_id, uint64_t p_limit, uint64_t p_after_rank) {
 	if (p_limit < 0) {
 		p_limit = 0;
@@ -1811,7 +1834,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_after_rank
 }
 
 /// Requests the entries from a challenge, but only including entries of the given user ids.
-/// @return A GDOPChallengeEntries that contains an array of entries.
+/// @return A Dictionary that contains an array of entries.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_by_ids(const String &p_challenge_id, uint64_t p_limit, const Array &p_user_ids, LeaderboardStartAt p_start_at) {
 	if (p_limit < 0) {
 		p_limit = 0;
@@ -1947,7 +1970,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_clear() {
 }
 
 /// Sends invites to join the current user to an array of users by their IDs
-/// @returns A promise that will contain a GDOPAppInviteArray with the invites that were sent
+/// @returns A promise that will contain a Dictionary with the invites that were sent
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_send_invites(const Array &p_user_ids) {
 	int64_t ids_arr_size = p_user_ids.size();
 
@@ -2133,7 +2156,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_match_session(c
 }
 
 /// Requests a list of users that can be invited to the current lobby/match.
-/// @returns A promise that will contain a GDOPUserArray with the users.
+/// @returns A promise that will contain a Dictionary with the users.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_invitable_users(const Dictionary &p_options) {
 	ovrInviteOptionsHandle invite_opts_h = ovr_InviteOptions_Create();
 
@@ -2188,7 +2211,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_invitable_users
 }
 
 /// Sends a request to get the invites sent by the user
-/// @returns A promise that will contain a GDOPAppInviteArray with the invites sent
+/// @returns A promise that will contain a Dictionary with the invites sent
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_sent_invites() {
 	ovrRequest req = ovr_GroupPresence_GetSentInvites();
 
@@ -2327,6 +2350,22 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_roster_panel
 
 	ovrRequest req = ovr_GroupPresence_LaunchRosterPanel(roster_opts_h);
 	ovr_RosterOptions_Destroy(roster_opts_h);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// MEDIA
+/////////////////////////////////////////////////
+
+/// Sends a request to share a photo to facebook.
+/// @returns A promise that will contain a Dictionary with information about the request to share media to facebook.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::media_share_to_facebook(const String &p_post_text_suggestion, const String &p_file_path, MediaContentType p_content_type) {
+	ovrRequest req = ovr_Media_ShareToFacebook(p_post_text_suggestion.utf8().get_data(), p_file_path.utf8().get_data(), (ovrMediaContentType)p_content_type);
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);
@@ -3167,7 +3206,7 @@ void GDOculusPlatform::_process_groupresence_no_payload(ovrMessageHandle p_messa
 	}
 }
 
-// Processes the response from a send_invites request. Will return a GDOPAppInviteArray with the invites that were created
+// Processes the response from a send_invites request. Will return a Dictionary with the invites that were created
 void GDOculusPlatform::_process_groupresence_send_invites(ovrMessageHandle p_message) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
@@ -3243,6 +3282,29 @@ void GDOculusPlatform::_process_groupresence_launch_rejoin_panel(ovrMessageHandl
 		bool did_rejoin = ovr_RejoinDialogResult_GetRejoinSelected(rejoin_panel_res_h);
 
 		_fulfill_promise(msg_id, Array::make(did_rejoin));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+///// MEDIA
+/////////////////////////////////////////////////
+
+// Processes the response from a request to share media to facebook
+void GDOculusPlatform::_process_media_share_to_facebook(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrShareMediaResultHandle share_media_result_h = ovr_Message_GetShareMediaResult(p_message);
+		ovrShareMediaStatus share_media_status = ovr_ShareMediaResult_GetStatus(share_media_result_h);
+
+		Dictionary share_media_resp;
+
+		// UNKNOWN, SHARED, CANCELED
+		share_media_resp["share_media_status"] = ovrShareMediaStatus_ToString(share_media_status);
+
+		_fulfill_promise(msg_id, Array::make(share_media_resp));
 
 	} else {
 		_handle_default_process_error(p_message, msg_id);

@@ -16,8 +16,6 @@ Quick links:
 After you have everything [setup](https://decacis.github.io/godot_oculus_platform/getting-started/), you can start interacting with the Oculus Platform with the singleton `GDOculusPlatform`. Here's an example of an [Entitlement Check](https://developer.oculus.com/documentation/native/ps-entitlement-check/):
 
 ```python
-GDOP.initialize(false) # We have to initialize this plugin first
-
 # Initializing android platform with the APP_ID as a parameter
 GDOculusPlatform.initialize_android_async("314159265358979")\
 .then(func(_initialization_resp):

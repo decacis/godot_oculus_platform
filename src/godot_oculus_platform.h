@@ -2,7 +2,9 @@
 #define GDOCULUSPLATFORM_H
 
 #include <include/OVR_Platform.h>
+#include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/object.hpp>
+#include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 
@@ -97,6 +99,9 @@ private:
 	void _process_groupresence_launch_invite_panel(ovrMessageHandle p_message);
 	void _process_groupresence_launch_rejoin_panel(ovrMessageHandle p_message);
 
+	// MEDIA
+	void _process_media_share_to_facebook(ovrMessageHandle p_message);
+
 	// LEADERBOARD HELPERS
 	Array _handle_leaderboard_entries(const ovrLeaderboardEntryArrayHandle &p_entries_arr_h);
 
@@ -166,6 +171,10 @@ public:
 		MULTIPLAYER_ERR_KEY_NO_LONGER_AVAILABLE = ovrMultiplayerErrorErrorKey_NoLongerAvailable,
 		MULTIPLAYER_ERR_KEY_UPDATE_REQUIRED = ovrMultiplayerErrorErrorKey_UpdateRequired,
 		MULTIPLAYER_ERR_KEY_TUTORIAL_REQUIRED = ovrMultiplayerErrorErrorKey_TutorialRequired
+	};
+
+	enum MediaContentType {
+		MEDIA_CONTENT_TYPE_PHOTO = ovrMediaContentType_Photo
 	};
 
 	// INITIALIZATION
@@ -255,6 +264,9 @@ public:
 	Ref<GDOculusPlatformPromise> grouppresence_launch_rejoin_dialog(const String &p_lobby_session_id, const String &p_match_session_id, const String &p_destination_api_name);
 	Ref<GDOculusPlatformPromise> grouppresence_launch_roster_panel(const Dictionary &p_options = Dictionary());
 
+	// MEDIA
+	Ref<GDOculusPlatformPromise> media_share_to_facebook(const String &p_post_text_suggestion, const String &p_file_path, MediaContentType p_content_type);
+
 	void pump_messages();
 };
 
@@ -266,5 +278,6 @@ VARIANT_ENUM_CAST(GDOculusPlatform::ReportRequestResponse);
 VARIANT_ENUM_CAST(GDOculusPlatform::ChallengeVisibilityViewerFilter);
 VARIANT_ENUM_CAST(GDOculusPlatform::ChallengeVisibility);
 VARIANT_ENUM_CAST(GDOculusPlatform::MultiplayerErrorErrorKey);
+VARIANT_ENUM_CAST(GDOculusPlatform::MediaContentType);
 
 #endif // GDOCULUSPLATFORM_H

@@ -105,6 +105,9 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("grouppresence_launch_rejoin_dialog", "lobby_session_id", "match_session_id", "destination_api_name"), &GDOculusPlatform::grouppresence_launch_rejoin_dialog);
 	ClassDB::bind_method(D_METHOD("grouppresence_launch_roster_panel", "options"), &GDOculusPlatform::grouppresence_launch_roster_panel, DEFVAL(Dictionary()));
 
+	// MEDIA
+	ClassDB::bind_method(D_METHOD("media_share_to_facebook", "post_text_suggestion", "file_path", "content_type"), &GDOculusPlatform::media_share_to_facebook);
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
@@ -141,6 +144,8 @@ void GDOculusPlatform::_bind_methods() {
 	BIND_ENUM_CONSTANT(MULTIPLAYER_ERR_KEY_NO_LONGER_AVAILABLE); // 9
 	BIND_ENUM_CONSTANT(MULTIPLAYER_ERR_KEY_UPDATE_REQUIRED); // 10
 	BIND_ENUM_CONSTANT(MULTIPLAYER_ERR_KEY_TUTORIAL_REQUIRED); // 11
+
+	BIND_ENUM_CONSTANT(MEDIA_CONTENT_TYPE_PHOTO); // 1
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -481,5 +486,14 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_rejoin_dialo
 }
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_roster_panel(const Dictionary &p_options) {
+	return _empty_func_helper();
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// MEDIA
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::media_share_to_facebook(const String &p_post_text_suggestion, const String &p_file_path, MediaContentType p_content_type) {
 	return _empty_func_helper();
 }

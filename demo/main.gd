@@ -6,7 +6,6 @@ var initialized : bool = false
 func _on_xr_started():
 	if not initialized:
 		initialized = true
-		GDOP.initialize(false)
 
 		# REPLACE APP ID!
 		GDOculusPlatform.initialize_android("6324217457624418")

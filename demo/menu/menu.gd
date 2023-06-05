@@ -332,7 +332,6 @@ func _on_achievements_get_all_definitions_pressed():
 	GDOculusPlatform.achievements_get_all_definitions()\
 	.then(func(achievements : Dictionary):
 		print(achievements)
-#		print("[achievements_get_all_definitions] RESPONSE: ", await GDOP.array_get_all(achievements))
 	)\
 	.error(func(achievements_err):
 		push_error("[achievements_get_all_definitions] ERROR: ", achievements_err)
@@ -994,3 +993,7 @@ func _on_group_presence_launch_roster_panel_pressed():
 	.error(func(gp_launch_roster_err):
 		push_error("[grouppresence_launch_roster_panel] ERROR: ", gp_launch_roster_err)
 	)
+
+
+func _on_pause_pressed():
+	get_tree().paused = !get_tree().paused
