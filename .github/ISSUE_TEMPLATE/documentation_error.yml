@@ -1,5 +1,6 @@
 name: Documentation error
 description: Inform us about errors in the documentation
+labels: ["documentation"]
 body:
 
 - type: markdown

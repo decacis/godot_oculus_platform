@@ -1,5 +1,6 @@
 name: Bug report
 description: Report a bug in the Godot Oculus Platform
+labels: ["bug"]
 body:
 
 - type: markdown
@@ -14,7 +15,7 @@ body:
     description: >
       Specify the version of the Godot Oculus Platform you are using.
       You can also enter a commit hash.
-    placeholder: OculusPlatformSDK-53-for-godot-4.0.2-stable_v0.1.0-alpha
+    placeholder: v1.2.0-beta_godot-4.0.3-stable_sdk-53.0
   validations:
     required: true
 
