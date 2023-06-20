@@ -226,6 +226,10 @@ The response only includes achievements where the user is "participating", meani
 ``` gdscript linenums="1"
 GDOculusPlatform.achievements_get_all_progress()\
 .then(func(achievements_prog : Dictionary):
+    if not achievements_prog.next_page_url.is_empty():
+        # Get next page
+        pass
+
     for achievement_progress in achievements_prog.data:
         print("Achievement name: ", achievement_progress.name)
         print("Unlocked? ", achievement_progress.is_unlocked)
