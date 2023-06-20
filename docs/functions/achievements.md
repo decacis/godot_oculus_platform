@@ -225,9 +225,8 @@ The response only includes achievements where the user is "participating", meani
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.achievements_get_all_progress()\
-.then(func(achievements_prog : GDOPAchievementProgArray):
-    var achievements_progress : Array = await GDOP.array_get_all(achievements_prog)
-    for achievement_progress in achievements_progress:
+.then(func(achievements_prog : Dictionary):
+    for achievement_progress in achievements_prog.data:
         print("Achievement name: ", achievement_progress.name)
         print("Unlocked? ", achievement_progress.is_unlocked)
 )\
