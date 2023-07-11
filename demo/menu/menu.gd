@@ -246,7 +246,7 @@ func _on_get_logged_in_user_friends_pressed():
 	GDOculusPlatform.user_get_logged_in_user_friends()\
 	.then(func(friends : Dictionary):
 		print("[user_get_logged_in_user_friends] RESPONSE: ", friends)
-		print("Has next page? ", friends.has_next_page)
+		print("Has next page? ", !friends.next_page_url.is_empty())
 	)\
 	.error(func(friends_err):
 		push_error("[user_get_logged_in_user_friends] ERROR: ", friends_err)

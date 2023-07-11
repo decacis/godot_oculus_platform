@@ -5,7 +5,7 @@ ext {
             compileSdk         : 32,
             minSdk             : 24,
             targetSdk          : 32,
-            godotLibVersion       : '4.0.3.stable',
+            godotLibVersion       : '4.1.0.stable',
             javaVersion           : JavaVersion.VERSION_11,
     ]
 }

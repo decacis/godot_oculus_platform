@@ -15,7 +15,25 @@ env = SConscript("godot-cpp/SConstruct")
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/", "src/include/"])
 
-if env["platform"] != "android":
+if env["platform"] == "android":
+    sources = Glob("src/*.cpp", exclude=["src/*editor.cpp"])
+
+    env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/android/libs/arm64-v8a/"])
+    env.Append(LIBS=["libovrplatformloader"])
+
+    if env["target"] != "template_debug":
+        library = env.SharedLibrary(
+            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformA",
+            source=sources,
+        )
+    else:
+        # Unused
+        library = env.SharedLibrary(
+            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformAD",
+            source=sources,
+        )
+
+else:
     sources = Glob("src/*.cpp", exclude=["src/*android.cpp"])
 
     if env["platform"] == "macos":
@@ -29,7 +47,7 @@ if env["platform"] != "android":
                 "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformMD",
                 source=sources,
             )
-
+    
     elif env["platform"] == "windows":
         if env["target"] != "template_debug":
             library = env.SharedLibrary(
@@ -53,23 +71,5 @@ if env["platform"] != "android":
                 "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformLD",
                 source=sources,
             )
-
-else:
-    sources = Glob("src/*.cpp", exclude=["src/*editor.cpp"])
-
-    env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/android/libs/arm64-v8a/"])
-    env.Append(LIBS=["libovrplatformloader"])
-
-    if env["target"] != "template_debug":
-        library = env.SharedLibrary(
-            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformA",
-            source=sources,
-        )
-    else:
-        # Unused
-        library = env.SharedLibrary(
-            "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformAD",
-            source=sources,
-        )
 
 Default(library)
