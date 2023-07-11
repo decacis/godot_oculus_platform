@@ -262,7 +262,7 @@ GDOculusPlatform.user_get_blocked_users()\
 
 Requests the user IDs of the current user's friends.
 
-**Returns:** A `GDOculusPlatformPromise` will contain a `Dictionary` with two keys: `data` and `next_page_url`, please see the example response from [user_get_blocked_users](#user_get_blocked_users). The function will error with a message if an error occured.
+**Returns:** A `GDOculusPlatformPromise` will contain a `Dictionary` with two keys: `data` and `next_page_url`, please see the example response from [user_get_blocked_users](#user_get_blocked_users) as they return the same type of response (a list of users). The function will error with a message if an error occured.
 
 /// details | Example
     type: example
