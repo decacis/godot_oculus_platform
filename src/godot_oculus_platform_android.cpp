@@ -15,6 +15,7 @@ void GDOculusPlatform::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("pump_messages"), &GDOculusPlatform::pump_messages);
 
 	// INITIALIZATION
+	ClassDB::bind_method(D_METHOD("is_platform_initialized"), &GDOculusPlatform::is_platform_initialized);
 	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
 	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
 
@@ -107,7 +108,7 @@ void GDOculusPlatform::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
-	ADD_SIGNAL(MethodInfo("abouse_report_form_requested"));
+	ADD_SIGNAL(MethodInfo("abuse_report_form_requested"));
 	ADD_SIGNAL(MethodInfo("app_launch_intent_changed", PropertyInfo(Variant::STRING, "intent_type")));
 
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE); // 0
@@ -445,7 +446,7 @@ void GDOculusPlatform::pump_messages() {
 				break;
 
 			case ovrMessage_Notification_AbuseReport_ReportButtonPressed:
-				emit_signal("abouse_report_form_requested");
+				emit_signal("abuse_report_form_requested");
 				break;
 
 			case ovrMessage_AbuseReport_ReportRequestHandled:
@@ -588,6 +589,10 @@ void GDOculusPlatform::pump_messages() {
 /////////////////////////////////////////////////
 ///// PLATFORM INITIALIZATION
 /////////////////////////////////////////////////
+
+bool GDOculusPlatform::is_platform_initialized() {
+	return ovr_IsPlatformInitialized();
+}
 
 /// Initialize Android Oculus Platform synchronously.
 bool GDOculusPlatform::initialize_android(const String &p_app_id) {

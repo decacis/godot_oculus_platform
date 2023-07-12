@@ -182,6 +182,7 @@ public:
 	};
 
 	// INITIALIZATION
+	bool is_platform_initialized();
 	bool initialize_android(const String &p_app_id);
 	Ref<GDOculusPlatformPromise> initialize_android_async(const String &p_app_id);
 
