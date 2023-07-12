@@ -11,7 +11,8 @@ Related Oculus Platform documentation:
 ### abuse_report_form_requested
 //// admonition | About
     type: abstract
-This signal will be emitted when the user presses the abuse report button. You have to then let the Oculus Platform if you handled the notification or not. See 
+
+This signal will be emitted when the user presses the abuse report button. You then have to let the Oculus Platform know if you handled the notification or not. See [abuse_report_request_handled](#abuse_report_request_handled) for details on how to handle this request.
 ////
 
 ------
