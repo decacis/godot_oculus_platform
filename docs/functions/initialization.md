@@ -2,18 +2,37 @@
 
 -----
 
+## is_platform_initialized
+//// admonition | is_platform_initialized()
+    type: abstract
+
+**Returns:** A `bool` that is `true` if the platform is already initialized and `false` otherwise.
+
+/// details | Example
+    type: example
+``` gdscript linenums="1"
+if not GDOculusPlatform.is_platform_initialized():
+    # Try to initialize the platform synchronously.
+    var platform_initialized : bool = GDOculusPlatform.initialize_android("31415926535")
+
+    if not platform_initialized:
+        print("Unable to initialize Oculus Platform")
+```
+///
+////
+
 ## initialize_android
 //// admonition | initialize_android(app_id : `String`)
     type: abstract
 
-Requests the Oculus Platform initialization.
+Requests the Oculus Platform initialization synchronously. Keep in mind that this function will block the main loop until this function returns.
 
 **Returns:** A `bool` that is `true` if the platform was initialized correctly or `false` otherwise.
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
-var platform_initialized : bool = GDOculusPlatform.initialize_android("31415926535");
+var platform_initialized : bool = GDOculusPlatform.initialize_android("31415926535")
 ```
 ///
 ////

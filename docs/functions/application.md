@@ -95,7 +95,7 @@ GDOculusPlatform.application_launch_other_app("50125468232421", deeplink_options
 
 Used to retrieve information about the launch. Can be used to deep link applications and know if another app requested the launch, among other things.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about the app's launch. The promise will error if the request couldn't be completed.
+**Returns:** A `Dictionary` with information about the app's launch.
 
 Example response:
 ``` json linenums="1"
@@ -144,21 +144,15 @@ Also, if you happen to get this URL, please report it on the [issues page](https
 /// details | Example
     type: example
 ``` gdscript linenums="1"
-GDOculusPlatform.application_get_launch_details()\
-.then(func(launch_details : Dictionary):
-    
-    if launch_details.launch_type == "DEEPLINK":
+var launch_details : Dictionary = GDOculusPlatform.application_get_launch_details()
 
-        match launch_details.deeplink_message:
-            "GO_TO_MAIN_LOBBY":
-                _handle_dl_main_lobby()
-            "GO_TO_STORE":
-                _handle_dl_store()
-    
-)\
-.error(func(launch_details_err):
-    print("Unable to get launch details: ", launch_details_err)
-)
+if launch_details.launch_type == "DEEPLINK":
+
+    match launch_details.deeplink_message:
+        "GO_TO_MAIN_LOBBY":
+            _handle_dl_main_lobby()
+        "GO_TO_STORE":
+            _handle_dl_store()
 ```
 ///
 ////
