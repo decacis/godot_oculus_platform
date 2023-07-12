@@ -8,7 +8,7 @@ Related Oculus Platform documentation:
 ------
 ## Signals
 
-### abouse_report_form_requested
+### abuse_report_form_requested
 //// admonition | About
     type: abstract
 This signal will be emitted when the user presses the abuse report button. You have to then let the Oculus Platform if you handled the notification or not. See 
