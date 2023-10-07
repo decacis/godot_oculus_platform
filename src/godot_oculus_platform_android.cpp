@@ -483,19 +483,19 @@ void GDOculusPlatform::pump_messages() {
 			case ovrMessage_Application_LaunchOtherApp:
 				_process_application_launch_other_app(message);
 				break;
-			
+
 			case ovrMessage_Application_StartAppDownload:
 				_process_application_start_app_download(message);
 				break;
-			
+
 			case ovrMessage_Application_CheckAppDownloadProgress:
 				_process_application_check_app_download_progress(message);
 				break;
-			
+
 			case ovrMessage_Application_CancelAppDownload:
 				_process_application_start_app_download(message);
 				break;
-			
+
 			case ovrMessage_Application_InstallAppUpdateAndRelaunch:
 				_process_application_start_app_download(message);
 				break;
@@ -615,15 +615,15 @@ void GDOculusPlatform::pump_messages() {
 			case ovrMessage_Media_ShareToFacebook:
 				_process_media_share_to_facebook(message);
 				break;
-			
+
 			case ovrMessage_UserAgeCategory_Get:
 				_process_useragecategory_get(message);
 				break;
-			
+
 			case ovrMessage_UserAgeCategory_Report:
 				_process_useragecategory_report(message);
 				break;
-			
+
 			case ovrMessage_DeviceApplicationIntegrity_GetIntegrityToken:
 				_process_deviceappintegrity_get_integrity_token(message);
 				break;
@@ -650,7 +650,7 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictiona
 	if (ovr_IsPlatformInitialized()) {
 		return true;
 	}
-		
+
 	// No initialization options defined
 	if (p_initialization_options.is_empty()) {
 		JNIEnv *gdjenv;
@@ -666,7 +666,7 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictiona
 		ERR_FAIL_COND_V_MSG(init_result != ovrPlatformInitialize_Success, false, vformat("[GDOP] Error initializing platform: %s", ovrPlatformInitializeResult_ToString(init_result)));
 
 		return true;
-	
+
 	} else {
 		ovrKeyValuePair config_options[1];
 
