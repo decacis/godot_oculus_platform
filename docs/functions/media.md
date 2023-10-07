@@ -25,11 +25,7 @@ Example response:
 }
 ```
 
-///// admonition | Note
-    type: warning
-
-`share_media_status` can be `UNKNOWN`, `SHARED` or `CANCELED`.
-/////
+- `share_media_status` can be `UNKNOWN`, `SHARED` or `CANCELED`.
 
 /// details | Example
     type: example

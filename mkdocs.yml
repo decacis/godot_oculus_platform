@@ -23,6 +23,8 @@ nav:
     - Challenges: 'functions/challenges.md'
     - Group Presence: 'functions/group-presence.md'
     - Media: 'functions/media.md'
+    - User Age Category: 'functions/user-age-category.md'
+    - Attestation API: 'functions/attestation-api.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg
