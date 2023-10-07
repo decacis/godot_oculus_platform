@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+@export_group("Application")
+@export var application_install_app_update_and_relaunch : Dictionary = {}
 
 @export_group("User")
 @export var get_user_val : String = ""
@@ -62,8 +64,23 @@ extends CanvasLayer
 @export var grouppresence_launch_rejoin_dialog : Dictionary = {}
 @export var grouppresence_launch_roster_panel : Dictionary = {}
 
+@export_group("User Age Category")
+@export var useragecategory_report : GDOculusPlatform.AppAgeCategory = GDOculusPlatform.APPAGECATEGORY_NON_CHILD
+
 
 func _ready() -> void:
+	
+	## SIGNALS
+	GDOculusPlatform.abuse_report_form_requested.connect(_handle_abuse_report_form_request)
+	
+	GDOculusPlatform.assetfile_download_update.connect(_on_asset_file_update)
+	GDOculusPlatform.assetfile_download_finished.connect(_on_asset_file_downloaded)
+	
+	## APPLICATION
+	if !application_install_app_update_and_relaunch.is_empty():
+		$PanelContainer/TabContainer/Application/VBoxContainer/InputFuncs/HFlowContainer/ApplicationInstallAppUpdateAndRelaunch.visible = true
+	
+	## USER
 	if !get_user_val.is_empty():
 		$PanelContainer/TabContainer/User/VBoxContainer/InputFuncs/HFlowContainer/GetUser.visible = true
 	if !get_org_scoped_id_val.is_empty():
@@ -96,9 +113,6 @@ func _ready() -> void:
 		$PanelContainer/TabContainer/IAP/VBoxContainer/InputFuncs/HFlowContainer/IAPLaunchCheckoutFlow.visible = true
 	
 	## ASSET FILES
-	GDOculusPlatform.assetfile_download_update.connect(_on_asset_file_update)
-	GDOculusPlatform.assetfile_download_finished.connect(_on_asset_file_downloaded)
-	
 	if !assetfile_status_by_id.is_empty():
 		$PanelContainer/TabContainer/AssetFiles/VBoxContainer/InputFuncs/HFlowContainer/AssetfileStatusByID.visible = true
 	if !assetfile_status_by_name.is_empty():
@@ -169,6 +183,69 @@ func _ready() -> void:
 		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchRejoinDialog.visible = true
 	if !grouppresence_launch_roster_panel.is_empty():
 		$PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchRosterPanel.visible = true
+	
+	## USER AGE CATEGORY
+	if useragecategory_report:
+		$PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/InputFuncs/HFlowContainer/UserAgeCategoryReport.visible = true
+
+
+## USER - NO INPUT FUNCS
+func _on_application_get_version_pressed():
+	print("-------------------------------------")
+	print("application_get_version CALLED")
+	GDOculusPlatform.application_get_version()\
+	.then(func(app_version_resp : Dictionary):
+		print("[application_get_version] RESPONSE: ", app_version_resp)
+	)\
+	.error(func(app_version_err):
+		push_error("[application_get_version] ERROR: ", app_version_err)
+	)
+
+func _on_application_start_app_download_pressed():
+	print("-------------------------------------")
+	print("application_start_app_download CALLED")
+	GDOculusPlatform.application_start_app_download()\
+	.then(func(app_download_resp : int):
+		print("[application_start_app_download] RESPONSE: ", app_download_resp)
+	)\
+	.error(func(app_download_err):
+		push_error("[application_start_app_download] ERROR: ", app_download_err)
+	)
+
+func _on_application_check_app_download_progress_pressed():
+	print("-------------------------------------")
+	print("application_check_app_download_progress CALLED")
+	GDOculusPlatform.application_check_app_download_progress()\
+	.then(func(app_download_prog_resp : Dictionary):
+		print("[application_check_app_download_progress] RESPONSE: ", app_download_prog_resp)
+	)\
+	.error(func(app_download_prog_err):
+		push_error("[application_check_app_download_progress] ERROR: ", app_download_prog_err)
+	)
+
+func _on_application_cancel_app_download_pressed():
+	print("-------------------------------------")
+	print("application_cancel_app_download CALLED")
+	GDOculusPlatform.application_cancel_app_download()\
+	.then(func(app_download_cancel_resp : int):
+		print("[application_cancel_app_download] RESPONSE: ", app_download_cancel_resp)
+	)\
+	.error(func(app_download_cancel_err):
+		push_error("[application_cancel_app_download] ERROR: ", app_download_cancel_err)
+	)
+
+## APPLICATION - INPUT FUNCS
+func _on_application_install_app_update_and_relaunch_pressed():
+	print("-------------------------------------")
+	print("application_install_app_update_and_relaunch CALLED")
+	print("INPUT: ", application_install_app_update_and_relaunch)
+	GDOculusPlatform.application_install_app_update_and_relaunch(application_install_app_update_and_relaunch)\
+	.then(func(install_app_and_relaunch_resp : int):
+		print("[application_install_app_update_and_relaunch] RESPONSE: ", install_app_and_relaunch_resp)
+	)\
+	.error(func(install_app_and_relaunch_err):
+		push_error("[application_install_app_update_and_relaunch] ERROR: ", install_app_and_relaunch_err)
+	)
 
 
 ## USER - NO INPUT FUNCS
@@ -205,7 +282,6 @@ func _on_get_logged_in_user_pressed():
 	.error(func(get_user_err):
 		push_error("[user_get_logged_in_user] ERROR: ", get_user_err)
 	)
-
 
 func _on_get_user_proof_pressed():
 	print("-------------------------------------")
@@ -992,4 +1068,44 @@ func _on_group_presence_launch_roster_panel_pressed():
 	)\
 	.error(func(gp_launch_roster_err):
 		push_error("[grouppresence_launch_roster_panel] ERROR: ", gp_launch_roster_err)
+	)
+
+
+## ABUSE REPORT
+func _handle_abuse_report_form_request() -> void:
+	print("abuse_report_form_requested")
+	
+	await get_tree().create_timer(1.0).timeout
+	
+	GDOculusPlatform.abuse_report_request_handled(GDOculusPlatform.REPORT_REQUEST_UNHANDLED)\
+	.then(func(abuse_report_req_resp):
+		print("[abuse_report_request_handled] RESPONSE: ", abuse_report_req_resp)
+	)\
+	.error(func(abuse_report_req_err):
+		print("[abuse_report_request_handled] ERROR: ", abuse_report_req_err)
+	)
+
+
+## USER AGE CATEGORY - NO INPUT FUNCS
+func _on_useragecategory_get_pressed():
+	print("-------------------------------------")
+	print("useragecategory_get CALLED")
+	GDOculusPlatform.useragecategory_get()\
+	.then(func(useragecategory_get_resp : GDOculusPlatform.AccountAgeCategory):
+		print("[useragecategory_get] RESPONSE: ", useragecategory_get_resp)
+	)\
+	.error(func(useragecategory_get_err):
+		push_error("[useragecategory_get] ERROR: ", useragecategory_get_err)
+	)
+
+## USER AGE CATEGORY - INPUT FUNCS
+func _on_useragecategory_report_pressed():
+	print("-------------------------------------")
+	print("useragecategory_report CALLED")
+	GDOculusPlatform.useragecategory_get()\
+	.then(func(useragecategory_report_resp : bool):
+		print("[useragecategory_report] RESPONSE: ", useragecategory_report_resp)
+	)\
+	.error(func(useragecategory_report_err):
+		push_error("[useragecategory_report] ERROR: ", useragecategory_report_err)
 	)

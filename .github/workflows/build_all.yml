@@ -7,10 +7,10 @@ on:
     branches: [ "main" ]
 
 env:
-  OCULUS_VERSION: 53
-  GODOT_ENGINE_VERSION: "4.1.0"
+  OCULUS_VERSION: 56
+  GODOT_ENGINE_VERSION: "4.1.2"
   GODOT_ENGINE_STAGE: "stable"
-  INTEGRATION_VERSION: "v1.2.2-beta"
+  INTEGRATION_VERSION: "v1.3.0-beta"
 
 jobs:
   lint:

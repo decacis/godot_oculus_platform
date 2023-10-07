@@ -20,7 +20,7 @@ void GDOculusPlatform::_bind_methods() {
 
 	// INITIALIZATION
 	ClassDB::bind_method(D_METHOD("is_platform_initialized"), &GDOculusPlatform::is_platform_initialized);
-	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
+	ClassDB::bind_method(D_METHOD("initialize_android", "app_id", "options"), &GDOculusPlatform::initialize_android, DEFVAL(Dictionary()));
 	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
 
 	// USER
@@ -77,8 +77,12 @@ void GDOculusPlatform::_bind_methods() {
 
 	// APPLICATION
 	ClassDB::bind_method(D_METHOD("application_get_version"), &GDOculusPlatform::application_get_version);
-	ClassDB::bind_method(D_METHOD("application_launch_other_app", "app_id", "deeplink_options"), &GDOculusPlatform::application_launch_other_app);
+	ClassDB::bind_method(D_METHOD("application_launch_other_app", "app_id", "deeplink_options"), &GDOculusPlatform::application_launch_other_app, DEFVAL(Dictionary()));
 	ClassDB::bind_method(D_METHOD("application_get_launch_details"), &GDOculusPlatform::application_get_launch_details);
+	ClassDB::bind_method(D_METHOD("application_start_app_download"), &GDOculusPlatform::application_start_app_download);
+	ClassDB::bind_method(D_METHOD("application_check_app_download_progress"), &GDOculusPlatform::application_check_app_download_progress);
+	ClassDB::bind_method(D_METHOD("application_cancel_app_download"), &GDOculusPlatform::application_cancel_app_download);
+	ClassDB::bind_method(D_METHOD("application_install_app_update_and_relaunch", "deeplink_options"), &GDOculusPlatform::application_install_app_update_and_relaunch, DEFVAL(Dictionary()));
 
 	// CHALLENGES
 	ClassDB::bind_method(D_METHOD("challenges_get", "challenge_id"), &GDOculusPlatform::challenges_get);
@@ -109,11 +113,22 @@ void GDOculusPlatform::_bind_methods() {
 	// MEDIA
 	ClassDB::bind_method(D_METHOD("media_share_to_facebook", "post_text_suggestion", "file_path", "content_type"), &GDOculusPlatform::media_share_to_facebook);
 
+	// USER AGE CATEGORY
+	ClassDB::bind_method(D_METHOD("useragecategory_get"), &GDOculusPlatform::useragecategory_get);
+	ClassDB::bind_method(D_METHOD("useragecategory_report", "app_age_category"), &GDOculusPlatform::useragecategory_report);
+
+	// DEVICE APPLICATION INTEGRITY
+	ClassDB::bind_method(D_METHOD("deviceappintegrity_get_integrity_token", "challenge_nonce"), &GDOculusPlatform::deviceappintegrity_get_integrity_token);
+
+	// SIGNALS
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
 	ADD_SIGNAL(MethodInfo("abuse_report_form_requested"));
 	ADD_SIGNAL(MethodInfo("app_launch_intent_changed", PropertyInfo(Variant::STRING, "intent_type")));
+
+	// ENUMS
 
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE); // 0
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS); // 1
@@ -147,6 +162,14 @@ void GDOculusPlatform::_bind_methods() {
 	BIND_ENUM_CONSTANT(MULTIPLAYER_ERR_KEY_TUTORIAL_REQUIRED); // 11
 
 	BIND_ENUM_CONSTANT(MEDIA_CONTENT_TYPE_PHOTO); // 1
+
+	BIND_ENUM_CONSTANT(ACCOUNTAGECATEGORY_UNKNOWN); // 0
+	BIND_ENUM_CONSTANT(ACCOUNTAGECATEGORY_CHILD); // 1
+	BIND_ENUM_CONSTANT(ACCOUNTAGECATEGORY_TEEN); // 2
+	BIND_ENUM_CONSTANT(ACCOUNTAGECATEGORY_ADULT); // 3
+
+	BIND_ENUM_CONSTANT(APPAGECATEGORY_CHILD); // 1
+	BIND_ENUM_CONSTANT(APPAGECATEGORY_NON_CHILD); // 2
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -179,7 +202,7 @@ bool GDOculusPlatform::is_platform_initialized() {
 	return false;
 }
 
-bool GDOculusPlatform::initialize_android(const String &p_app_id) {
+bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictionary &p_initialization_options = Dictionary()) {
 	return false;
 }
 
@@ -396,6 +419,22 @@ Dictionary GDOculusPlatform::application_get_launch_details() {
 	return Dictionary();
 };
 
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_start_app_download() {
+	return _empty_func_helper();
+};
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_check_app_download_progress() {
+	return _empty_func_helper();
+};
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_cancel_app_download() {
+	return _empty_func_helper();
+};
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_and_relaunch(const Dictionary &p_deeplink_options) {
+	return _empty_func_helper();
+};
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 ///// CHALLENGES
@@ -500,5 +539,27 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_roster_panel
 /////////////////////////////////////////////////
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::media_share_to_facebook(const String &p_post_text_suggestion, const String &p_file_path, MediaContentType p_content_type) {
+	return _empty_func_helper();
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// USER AGE CATEGORY
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_get() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_report(AppAgeCategory p_app_age_category) {
+	return _empty_func_helper();
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// DEVICE APPLICATION INTEGRITY
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::deviceappintegrity_get_integrity_token(const String &p_challenge_nonce) {
 	return _empty_func_helper();
 }

@@ -8,6 +8,8 @@
 #include "OVR_AchievementDefinitionArray.h"
 #include "OVR_AchievementProgressArray.h"
 #include "OVR_AchievementUpdate.h"
+#include "OVR_AppDownloadProgressResult.h"
+#include "OVR_AppDownloadResult.h"
 #include "OVR_ApplicationInviteArray.h"
 #include "OVR_ApplicationVersion.h"
 #include "OVR_AssetDetails.h"
@@ -65,6 +67,7 @@
 #include "OVR_SystemVoipState.h"
 #include "OVR_Types.h"
 #include "OVR_User.h"
+#include "OVR_UserAccountAgeCategory.h"
 #include "OVR_UserArray.h"
 #include "OVR_UserCapabilityArray.h"
 #include "OVR_UserDataStoreUpdateResponse.h"
@@ -78,6 +81,8 @@ OVRP_PUBLIC_FUNCTION(ovrAbuseReportRecordingHandle)               ovr_Message_Ge
 OVRP_PUBLIC_FUNCTION(ovrAchievementDefinitionArrayHandle)         ovr_Message_GetAchievementDefinitionArray(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrAchievementProgressArrayHandle)           ovr_Message_GetAchievementProgressArray(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrAchievementUpdateHandle)                  ovr_Message_GetAchievementUpdate(const ovrMessageHandle obj);
+OVRP_PUBLIC_FUNCTION(ovrAppDownloadProgressResultHandle)          ovr_Message_GetAppDownloadProgressResult(const ovrMessageHandle obj);
+OVRP_PUBLIC_FUNCTION(ovrAppDownloadResultHandle)                  ovr_Message_GetAppDownloadResult(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrApplicationInviteArrayHandle)             ovr_Message_GetApplicationInviteArray(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrApplicationVersionHandle)                 ovr_Message_GetApplicationVersion(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrAssetDetailsHandle)                       ovr_Message_GetAssetDetails(const ovrMessageHandle obj);
@@ -137,6 +142,7 @@ OVRP_PUBLIC_FUNCTION(const char *)                                ovr_Message_Ge
 OVRP_PUBLIC_FUNCTION(ovrSystemVoipStateHandle)                    ovr_Message_GetSystemVoipState(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrMessageType)                              ovr_Message_GetType(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrUserHandle)                               ovr_Message_GetUser(const ovrMessageHandle obj);
+OVRP_PUBLIC_FUNCTION(ovrUserAccountAgeCategoryHandle)             ovr_Message_GetUserAccountAgeCategory(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrUserArrayHandle)                          ovr_Message_GetUserArray(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrUserCapabilityArrayHandle)                ovr_Message_GetUserCapabilityArray(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrUserDataStoreUpdateResponseHandle)        ovr_Message_GetUserDataStoreUpdateResponse(const ovrMessageHandle obj);

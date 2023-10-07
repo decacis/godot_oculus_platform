@@ -90,6 +90,8 @@ private:
 	// APPLICATION
 	void _process_application_get_version(ovrMessageHandle p_message);
 	void _process_application_launch_other_app(ovrMessageHandle p_message);
+	void _process_application_start_app_download(ovrMessageHandle p_message);
+	void _process_application_check_app_download_progress(ovrMessageHandle p_message);
 
 	// CHALLENGES
 	void _process_challenges_get(ovrMessageHandle p_message);
@@ -105,6 +107,13 @@ private:
 
 	// MEDIA
 	void _process_media_share_to_facebook(ovrMessageHandle p_message);
+
+	// USER AGE GROUP
+	void _process_useragecategory_get(ovrMessageHandle p_message);
+	void _process_useragecategory_report(ovrMessageHandle p_message);
+
+	// DEVICE APPLICATION INTEGRITY
+	void _process_deviceappintegrity_get_integrity_token(ovrMessageHandle p_message);
 
 	// LEADERBOARD HELPERS
 	Array _handle_leaderboard_entries(const ovrLeaderboardEntryArrayHandle &p_entries_arr_h);
@@ -181,9 +190,21 @@ public:
 		MEDIA_CONTENT_TYPE_PHOTO = ovrMediaContentType_Photo
 	};
 
+	enum AccountAgeCategory {
+		ACCOUNTAGECATEGORY_UNKNOWN = ovrAccountAgeCategory_Unknown,
+		ACCOUNTAGECATEGORY_CHILD = ovrAccountAgeCategory_Ch,
+		ACCOUNTAGECATEGORY_TEEN = ovrAccountAgeCategory_Tn,
+		ACCOUNTAGECATEGORY_ADULT = ovrAccountAgeCategory_Ad
+	};
+
+	enum AppAgeCategory {
+		APPAGECATEGORY_CHILD = ovrAppAgeCategory_Ch,
+		APPAGECATEGORY_NON_CHILD = ovrAppAgeCategory_Nch
+	};
+
 	// INITIALIZATION
 	bool is_platform_initialized();
-	bool initialize_android(const String &p_app_id);
+	bool initialize_android(const String &p_app_id, const Dictionary &p_initialization_options);
 	Ref<GDOculusPlatformPromise> initialize_android_async(const String &p_app_id);
 
 	// ABUSE REPORT
@@ -241,6 +262,10 @@ public:
 	// APPLICATION
 	Ref<GDOculusPlatformPromise> application_get_version();
 	Ref<GDOculusPlatformPromise> application_launch_other_app(const String &p_app_id, const Dictionary &p_deeplink_options);
+	Ref<GDOculusPlatformPromise> application_start_app_download();
+	Ref<GDOculusPlatformPromise> application_check_app_download_progress();
+	Ref<GDOculusPlatformPromise> application_cancel_app_download();
+	Ref<GDOculusPlatformPromise> application_install_app_update_and_relaunch(const Dictionary &p_deeplink_options);
 	Dictionary application_get_launch_details();
 
 	// CHALLENGES
@@ -272,6 +297,13 @@ public:
 	// MEDIA
 	Ref<GDOculusPlatformPromise> media_share_to_facebook(const String &p_post_text_suggestion, const String &p_file_path, MediaContentType p_content_type);
 
+	// USER AGE CATEGORY
+	Ref<GDOculusPlatformPromise> useragecategory_get();
+	Ref<GDOculusPlatformPromise> useragecategory_report(AppAgeCategory p_app_age_category);
+
+	// DEVICE APPLICATION INTEGRITY
+	Ref<GDOculusPlatformPromise> deviceappintegrity_get_integrity_token(const String &p_challenge_nonce);
+
 	void pump_messages();
 };
 
@@ -284,5 +316,7 @@ VARIANT_ENUM_CAST(GDOculusPlatform::ChallengeVisibilityViewerFilter);
 VARIANT_ENUM_CAST(GDOculusPlatform::ChallengeVisibility);
 VARIANT_ENUM_CAST(GDOculusPlatform::MultiplayerErrorErrorKey);
 VARIANT_ENUM_CAST(GDOculusPlatform::MediaContentType);
+VARIANT_ENUM_CAST(GDOculusPlatform::AccountAgeCategory);
+VARIANT_ENUM_CAST(GDOculusPlatform::AppAgeCategory);
 
 #endif // GDOCULUSPLATFORM_H

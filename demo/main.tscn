@@ -36,6 +36,8 @@ pose = &"aim"
 
 [node name="LeftHand" parent="XROrigin3D/LeftHand" instance=ExtResource("2_xsrcq")]
 
+[node name="FunctionPointer" parent="XROrigin3D/LeftHand" instance=ExtResource("4_07sh7")]
+
 [node name="RightHand" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 tracker = &"right_hand"

@@ -16,7 +16,7 @@ achievements_add_fields = {
 }
 achievements_unlock = "TEST_SIMPLE_ACHIEV_0"
 achievements_get_definitions_by_name = Array[String](["TEST_BITFIELD_ACHIEV_0", "TEST_SIMPLE_ACHIEV_0"])
-achievements_get_progress_by_name = Array[String](["TEST_COUNT_ACHIEV_0", "TEST_BITFIELD_ACHIEV_0"])
+achievements_get_progress_by_name = Array[String](["TEST_COUNT_ACHIEV_0", "TEST_SIMPLE_ACHIEV_0"])
 IAP_get_products_by_sku = Array[String](["test_consumable_0", "test_durable_0"])
 IAP_consume_purchase = "test_consumable_0"
 IAP_launch_checkout_flow = "test_durable_0"
@@ -125,7 +125,69 @@ offset_bottom = 40.0
 [node name="TabContainer" type="TabContainer" parent="PanelContainer"]
 layout_mode = 2
 
+[node name="Application" type="MarginContainer" parent="PanelContainer/TabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/Application"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NoInputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/Application/VBoxContainer"]
+layout_mode = 2
+
+[node name="NoInputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+text = "No input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="ApplicationGetVersion" type="Button" parent="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ApplicationGetVersion"
+
+[node name="ApplicationStartAppDownload" type="Button" parent="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ApplicationStartAppDownload"
+
+[node name="ApplicationCheckAppDownloadProgress" type="Button" parent="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ApplicationCheckAppDownloadProgress"
+
+[node name="ApplicationCancelAppDownload" type="Button" parent="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ApplicationCancelAppDownload"
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/Application/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/Application/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/Application/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="ApplicationInstallAppUpdateAndRelaunch" type="Button" parent="PanelContainer/TabContainer/Application/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ApplicationInstallAppUpdateAndRelaunch"
+
 [node name="User" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -735,6 +797,58 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "GroupPresenceLaunchRosterPanel"
 
+[node name="UserAgeCategory" type="MarginContainer" parent="PanelContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/UserAgeCategory"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NoInputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer"]
+layout_mode = 2
+
+[node name="NoInputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+text = "No input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/NoInputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="UserAgeCategoryGet" type="Button" parent="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/NoInputFuncs/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "UserAgeCategoryGet"
+
+[node name="InputFuncs" type="VBoxContainer" parent="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputFuncsLbl" type="Label" parent="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/InputFuncs"]
+layout_mode = 2
+text = "Input functions:"
+
+[node name="HFlowContainer" type="HFlowContainer" parent="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/InputFuncs"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+
+[node name="UserAgeCategoryReport" type="Button" parent="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/InputFuncs/HFlowContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "UserAgeCategoryReport"
+
+[connection signal="pressed" from="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer/ApplicationGetVersion" to="." method="_on_application_get_version_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer/ApplicationStartAppDownload" to="." method="_on_application_start_app_download_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer/ApplicationCheckAppDownloadProgress" to="." method="_on_application_check_app_download_progress_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer/ApplicationCancelAppDownload" to="." method="_on_application_cancel_app_download_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Application/VBoxContainer/InputFuncs/HFlowContainer/ApplicationInstallAppUpdateAndRelaunch" to="." method="_on_application_install_app_update_and_relaunch_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserID" to="." method="_on_get_logged_in_user_id_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetLoggedInUserLocale" to="." method="_on_get_logged_in_user_locale_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/User/VBoxContainer/NoInputFuncs/HFlowContainer/GetIsViewerEntitled" to="." method="_on_get_is_viewer_entitled_pressed"]
@@ -797,3 +911,5 @@ text = "GroupPresenceLaunchRosterPanel"
 [connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchMultiplayerErrDialog" to="." method="_on_group_presence_launch_multiplayer_err_dialog_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchRejoinDialog" to="." method="_on_group_presence_launch_rejoin_dialog_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/GroupPresence/VBoxContainer/InputFuncs/HFlowContainer/GroupPresenceLaunchRosterPanel" to="." method="_on_group_presence_launch_roster_panel_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/NoInputFuncs/HFlowContainer/UserAgeCategoryGet" to="." method="_on_useragecategory_get_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/UserAgeCategory/VBoxContainer/InputFuncs/HFlowContainer/UserAgeCategoryReport" to="." method="_on_useragecategory_report_pressed"]

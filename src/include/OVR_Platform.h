@@ -19,6 +19,8 @@
 #include "OVR_AchievementProgress.h"
 #include "OVR_AchievementProgressArray.h"
 #include "OVR_AchievementUpdate.h"
+#include "OVR_AppDownloadProgressResult.h"
+#include "OVR_AppDownloadResult.h"
 #include "OVR_ApplicationInvite.h"
 #include "OVR_ApplicationInviteArray.h"
 #include "OVR_ApplicationVersion.h"
@@ -93,6 +95,7 @@
 #include "OVR_SupplementaryMetric.h"
 #include "OVR_SystemVoipState.h"
 #include "OVR_User.h"
+#include "OVR_UserAccountAgeCategory.h"
 #include "OVR_UserArray.h"
 #include "OVR_UserCapability.h"
 #include "OVR_UserCapabilityArray.h"
@@ -109,6 +112,7 @@
 #include "OVR_Requests_AssetFile.h"
 #include "OVR_Requests_Avatar.h"
 #include "OVR_Requests_Challenges.h"
+#include "OVR_Requests_DeviceApplicationIntegrity.h"
 #include "OVR_Requests_Entitlement.h"
 #include "OVR_Requests_GroupPresence.h"
 #include "OVR_Requests_IAP.h"
@@ -119,6 +123,7 @@
 #include "OVR_Requests_Party.h"
 #include "OVR_Requests_RichPresence.h"
 #include "OVR_Requests_User.h"
+#include "OVR_Requests_UserAgeCategory.h"
 #include "OVR_Requests_UserDataStore.h"
 #include "OVR_Requests_Voip.h"
 #include "OVR_AbuseReportOptions.h"
@@ -142,7 +147,15 @@ OVRP_PUBLIC_FUNCTION(bool) ovr_IsPlatformInitialized();
 #ifdef __ANDROID__
 #include <jni.h>
 OVRP_PUBLIC_FUNCTION(ovrPlatformInitializeResult) ovr_PlatformInitializeAndroid(const char* appId, jobject activityObject, JNIEnv * jni);
-
+/// Same functionality as ovr_PlatformInitializeAndroid, but with additional
+/// config options to pass in.
+///
+/// Ex:
+///
+/// ovrKeyValuePair options[1];
+/// options[0] = ovr_InitConfigOption_CreateBool(ovrInitConfigOption_DisableP2pNetworking, true);
+/// ovr_PlatformInitializeAndroidWithOptions(..., ..., options, 1);
+OVRP_PUBLIC_FUNCTION(ovrPlatformInitializeResult) ovr_PlatformInitializeAndroidWithOptions(const char* appId, jobject activityObject, JNIEnv * jni, ovrKeyValuePair* configOptions, size_t numConfigOptions);
 // Asynchronously Initialize Platform SDK. The result will be put on the message
 // queue with the message type: ovrMessage_PlatformInitializeAndroidAsynchronous
 //

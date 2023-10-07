@@ -16,7 +16,7 @@ void GDOculusPlatform::_bind_methods() {
 
 	// INITIALIZATION
 	ClassDB::bind_method(D_METHOD("is_platform_initialized"), &GDOculusPlatform::is_platform_initialized);
-	ClassDB::bind_method(D_METHOD("initialize_android", "app_id"), &GDOculusPlatform::initialize_android);
+	ClassDB::bind_method(D_METHOD("initialize_android", "app_id", "options"), &GDOculusPlatform::initialize_android, DEFVAL(Dictionary()));
 	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
 
 	// USER
@@ -73,8 +73,12 @@ void GDOculusPlatform::_bind_methods() {
 
 	// APPLICATION
 	ClassDB::bind_method(D_METHOD("application_get_version"), &GDOculusPlatform::application_get_version);
-	ClassDB::bind_method(D_METHOD("application_launch_other_app", "app_id", "deeplink_options"), &GDOculusPlatform::application_launch_other_app);
+	ClassDB::bind_method(D_METHOD("application_launch_other_app", "app_id", "deeplink_options"), &GDOculusPlatform::application_launch_other_app, DEFVAL(Dictionary()));
 	ClassDB::bind_method(D_METHOD("application_get_launch_details"), &GDOculusPlatform::application_get_launch_details);
+	ClassDB::bind_method(D_METHOD("application_start_app_download"), &GDOculusPlatform::application_start_app_download);
+	ClassDB::bind_method(D_METHOD("application_check_app_download_progress"), &GDOculusPlatform::application_check_app_download_progress);
+	ClassDB::bind_method(D_METHOD("application_cancel_app_download"), &GDOculusPlatform::application_cancel_app_download);
+	ClassDB::bind_method(D_METHOD("application_install_app_update_and_relaunch", "deeplink_options"), &GDOculusPlatform::application_install_app_update_and_relaunch, DEFVAL(Dictionary()));
 
 	// CHALLENGES
 	ClassDB::bind_method(D_METHOD("challenges_get", "challenge_id"), &GDOculusPlatform::challenges_get);
@@ -105,11 +109,22 @@ void GDOculusPlatform::_bind_methods() {
 	// MEDIA
 	ClassDB::bind_method(D_METHOD("media_share_to_facebook", "post_text_suggestion", "file_path", "content_type"), &GDOculusPlatform::media_share_to_facebook);
 
+	// USER AGE CATEGORY
+	ClassDB::bind_method(D_METHOD("useragecategory_get"), &GDOculusPlatform::useragecategory_get);
+	ClassDB::bind_method(D_METHOD("useragecategory_report", "app_age_category"), &GDOculusPlatform::useragecategory_report);
+
+	// DEVICE APPLICATION INTEGRITY
+	ClassDB::bind_method(D_METHOD("deviceappintegrity_get_integrity_token", "challenge_nonce"), &GDOculusPlatform::deviceappintegrity_get_integrity_token);
+
+	// SIGNALS
+
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_update", PropertyInfo(Variant::DICTIONARY, "download_info")));
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
 	ADD_SIGNAL(MethodInfo("abuse_report_form_requested"));
 	ADD_SIGNAL(MethodInfo("app_launch_intent_changed", PropertyInfo(Variant::STRING, "intent_type")));
+
+	// ENUMS
 
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_NONE); // 0
 	BIND_ENUM_CONSTANT(LEADERBOARD_FILTER_TYPE_FRIENDS); // 1
@@ -143,6 +158,14 @@ void GDOculusPlatform::_bind_methods() {
 	BIND_ENUM_CONSTANT(MULTIPLAYER_ERR_KEY_TUTORIAL_REQUIRED); // 11
 
 	BIND_ENUM_CONSTANT(MEDIA_CONTENT_TYPE_PHOTO); // 1
+
+	BIND_ENUM_CONSTANT(ACCOUNTAGECATEGORY_UNKNOWN); // 0
+	BIND_ENUM_CONSTANT(ACCOUNTAGECATEGORY_CHILD); // 1
+	BIND_ENUM_CONSTANT(ACCOUNTAGECATEGORY_TEEN); // 2
+	BIND_ENUM_CONSTANT(ACCOUNTAGECATEGORY_ADULT); // 3
+
+	BIND_ENUM_CONSTANT(APPAGECATEGORY_CHILD); // 1
+	BIND_ENUM_CONSTANT(APPAGECATEGORY_NON_CHILD); // 2
 }
 
 GDOculusPlatform *GDOculusPlatform::get_singleton() { return singleton; }
@@ -165,7 +188,7 @@ GDOculusPlatform::~GDOculusPlatform() {
 bool GDOculusPlatform::_try_connecting_process() {
 	if (!progress_connected) {
 		Error resp = Engine::get_singleton()->get_main_loop()->connect("process_frame", Callable(this, "pump_messages"));
-		ERR_FAIL_COND_V_MSG(resp != OK, false, "Unable to connect pump_messages to process_frame signal.");
+		ERR_FAIL_COND_V_MSG(resp != OK, false, "[GDOP] Unable to connect pump_messages to process_frame signal.");
 		progress_connected = true;
 	}
 	return progress_connected;
@@ -180,7 +203,7 @@ bool GDOculusPlatform::_get_promise(uint64_t p_promise_id, Ref<GDOculusPlatformP
 		}
 	}
 
-	ERR_FAIL_V_MSG(false, vformat("Unable to get promise with ID: %s", p_promise_id));
+	ERR_FAIL_V_MSG(false, vformat("[GDOP] Unable to get promise with ID: %s", p_promise_id));
 }
 
 bool GDOculusPlatform::_fulfill_promise(uint64_t p_promise_id, const Array &val) {
@@ -192,7 +215,7 @@ bool GDOculusPlatform::_fulfill_promise(uint64_t p_promise_id, const Array &val)
 		}
 	}
 
-	ERR_FAIL_V_MSG(false, vformat("Unable to fulfill promise with ID: %s", p_promise_id));
+	ERR_FAIL_V_MSG(false, vformat("[GDOP] Unable to fulfill promise with ID: %s", p_promise_id));
 }
 
 bool GDOculusPlatform::_reject_promise(uint64_t p_promise_id, const Array &val) {
@@ -204,7 +227,7 @@ bool GDOculusPlatform::_reject_promise(uint64_t p_promise_id, const Array &val) 
 		}
 	}
 
-	ERR_FAIL_V_MSG(false, vformat("Unable to reject promise with ID: %s", p_promise_id));
+	ERR_FAIL_V_MSG(false, vformat("[GDOP] Unable to reject promise with ID: %s", p_promise_id));
 }
 
 /// Rejects all promises in the rejection queue.
@@ -460,6 +483,22 @@ void GDOculusPlatform::pump_messages() {
 			case ovrMessage_Application_LaunchOtherApp:
 				_process_application_launch_other_app(message);
 				break;
+			
+			case ovrMessage_Application_StartAppDownload:
+				_process_application_start_app_download(message);
+				break;
+			
+			case ovrMessage_Application_CheckAppDownloadProgress:
+				_process_application_check_app_download_progress(message);
+				break;
+			
+			case ovrMessage_Application_CancelAppDownload:
+				_process_application_start_app_download(message);
+				break;
+			
+			case ovrMessage_Application_InstallAppUpdateAndRelaunch:
+				_process_application_start_app_download(message);
+				break;
 
 			case ovrMessage_Notification_ApplicationLifecycle_LaunchIntentChanged:
 				emit_signal("app_launch_intent_changed", String(ovr_Message_GetString(message)));
@@ -576,6 +615,18 @@ void GDOculusPlatform::pump_messages() {
 			case ovrMessage_Media_ShareToFacebook:
 				_process_media_share_to_facebook(message);
 				break;
+			
+			case ovrMessage_UserAgeCategory_Get:
+				_process_useragecategory_get(message);
+				break;
+			
+			case ovrMessage_UserAgeCategory_Report:
+				_process_useragecategory_report(message);
+				break;
+			
+			case ovrMessage_DeviceApplicationIntegrity_GetIntegrityToken:
+				_process_deviceappintegrity_get_integrity_token(message);
+				break;
 
 			default:
 				_handle_unhandled_message(message);
@@ -595,23 +646,51 @@ bool GDOculusPlatform::is_platform_initialized() {
 }
 
 /// Initialize Android Oculus Platform synchronously.
-bool GDOculusPlatform::initialize_android(const String &p_app_id) {
-	if (!ovr_IsPlatformInitialized()) {
+bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictionary &p_initialization_options) {
+	if (ovr_IsPlatformInitialized()) {
+		return true;
+	}
+		
+	// No initialization options defined
+	if (p_initialization_options.is_empty()) {
+		JNIEnv *gdjenv;
+		_get_env(&gdjenv);
+
 		// Try to connect pump_messages to process
 		if (!_try_connecting_process()) {
 			return false;
 		}
 
+		ovrPlatformInitializeResult init_result = ovr_PlatformInitializeAndroid(p_app_id.utf8().get_data(), jactivity, gdjenv);
+
+		ERR_FAIL_COND_V_MSG(init_result != ovrPlatformInitialize_Success, false, vformat("[GDOP] Error initializing platform: %s", ovrPlatformInitializeResult_ToString(init_result)));
+
+		return true;
+	
+	} else {
+		ovrKeyValuePair config_options[1];
+
+		// Make sure initialization options are valid
+		if (p_initialization_options.has("disable_p2p_networking")) {
+			ERR_FAIL_COND_V_MSG(p_initialization_options.get("disable_p2p_networking", 0).get_type() != Variant::BOOL, false, "[GDOP] Invalid initialization options. The disable_p2p_networking key must have a boolean value.");
+
+			config_options[0] = ovr_InitConfigOption_CreateBool(ovrInitConfigOption_DisableP2pNetworking, (bool)p_initialization_options.get("disable_p2p_networking", false));
+		}
+
 		JNIEnv *gdjenv;
 		_get_env(&gdjenv);
 
-		if (ovr_PlatformInitializeAndroid(p_app_id.utf8().get_data(), jactivity, gdjenv) == ovrPlatformInitialize_Success) {
-			return true;
+		// Try to connect pump_messages to process
+		if (!_try_connecting_process()) {
+			return false;
 		}
 
-		return false;
+		size_t config_opts_size = sizeof(config_options) / sizeof(config_options[0]);
 
-	} else {
+		ovrPlatformInitializeResult init_result = ovr_PlatformInitializeAndroidWithOptions(p_app_id.utf8().get_data(), jactivity, gdjenv, config_options, config_opts_size);
+
+		ERR_FAIL_COND_V_MSG(init_result != ovrPlatformInitialize_Success, false, vformat("[GDOP] Error initializing platform: %s", ovrPlatformInitializeResult_ToString(init_result)));
+
 		return true;
 	}
 }
@@ -621,6 +700,9 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id) {
 /// @return Promise to be resolved when the platform finishes initializing
 Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(const String &p_app_id) {
 	if (!ovr_IsPlatformInitialized()) {
+		JNIEnv *gdjenv;
+		_get_env(&gdjenv);
+
 		// Try to connect pump_messages to process
 		if (!_try_connecting_process()) {
 			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
@@ -630,9 +712,6 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(const St
 
 			return return_promise;
 		}
-
-		JNIEnv *gdjenv;
-		_get_env(&gdjenv);
 
 		ovrRequest req = ovr_PlatformInitializeAndroidAsynchronous(p_app_id.utf8().get_data(), jactivity, gdjenv);
 
@@ -1562,6 +1641,132 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(cons
 	}
 }
 
+/// Starts downloading an app update if there is one.
+/// @return Promise that will contain an int with the timestamp of when the download started.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_start_app_download() {
+	ovrRequest req = ovr_Application_StartAppDownload();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests the app update download progress.
+/// @return Promise that will contain a Dictionary with information about the progress of the download.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_check_app_download_progress() {
+	ovrRequest req = ovr_Application_CheckAppDownloadProgress();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests the cancelation of the app download.
+/// @return Promise that will contain an int with the timestamp of when the download was cancelled.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_cancel_app_download() {
+	ovrRequest req = ovr_Application_CancelAppDownload();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests the platform to install the downloaded update and relaunch.
+/// @return Promise that will contain an int with the timestamp of when the install request was initiated.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_and_relaunch(const Dictionary &p_deeplink_options) {
+	ovrApplicationOptionsHandle deeplink_options = ovr_ApplicationOptions_Create();
+
+	if (!p_deeplink_options.is_empty()) {
+		if (p_deeplink_options.has("deeplink_message")) {
+			if (!p_deeplink_options.get("deeplink_message", 0).get_type() != Variant::STRING) {
+				ovr_ApplicationOptions_Destroy(deeplink_options);
+				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+				String rejection_msg = "The deeplink_message value must be a String.";
+				return_promise->saved_rejection_response = Array::make(rejection_msg);
+				_promises_to_reject.push_back(return_promise);
+
+				return return_promise;
+
+			} else {
+				ovr_ApplicationOptions_SetDeeplinkMessage(deeplink_options, ((String)p_deeplink_options["deeplink_message"]).utf8().get_data());
+			}
+
+			if (p_deeplink_options.has("destination_api_name")) {
+				if (!p_deeplink_options.get("destination_api_name", 0).get_type() != Variant::STRING) {
+					ovr_ApplicationOptions_Destroy(deeplink_options);
+					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+					String rejection_msg = "The destination_api_name value must be a String.";
+					return_promise->saved_rejection_response = Array::make(rejection_msg);
+					_promises_to_reject.push_back(return_promise);
+
+					return return_promise;
+				} else {
+					ovr_ApplicationOptions_SetDestinationApiName(deeplink_options, ((String)p_deeplink_options["destination_api_name"]).utf8().get_data());
+				}
+			}
+
+			if (p_deeplink_options.has("lobby_session_id")) {
+				if (!p_deeplink_options.get("lobby_session_id", 0).get_type() != Variant::STRING) {
+					ovr_ApplicationOptions_Destroy(deeplink_options);
+					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+					String rejection_msg = "The destination_api_name value must be a String.";
+					return_promise->saved_rejection_response = Array::make(rejection_msg);
+					_promises_to_reject.push_back(return_promise);
+
+					return return_promise;
+				} else {
+					ovr_ApplicationOptions_SetLobbySessionId(deeplink_options, ((String)p_deeplink_options["lobby_session_id"]).utf8().get_data());
+				}
+			}
+
+			if (p_deeplink_options.has("match_session_id")) {
+				if (!p_deeplink_options.get("match_session_id", 0).get_type() != Variant::STRING) {
+					ovr_ApplicationOptions_Destroy(deeplink_options);
+					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+					String rejection_msg = "The destination_api_name value must be a String.";
+					return_promise->saved_rejection_response = Array::make(rejection_msg);
+					_promises_to_reject.push_back(return_promise);
+
+					return return_promise;
+				} else {
+					ovr_ApplicationOptions_SetMatchSessionId(deeplink_options, ((String)p_deeplink_options["match_session_id"]).utf8().get_data());
+				}
+			}
+
+			ovrRequest req = ovr_Application_InstallAppUpdateAndRelaunch(deeplink_options);
+			ovr_ApplicationOptions_Destroy(deeplink_options);
+
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+			_promises.push_back(return_promise);
+
+			return return_promise;
+
+		} else {
+			ovr_ApplicationOptions_Destroy(deeplink_options);
+			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+			String rejection_msg = "A deeplink_message is required when supplying a non-empty deeplink_options dictionary.";
+			return_promise->saved_rejection_response = Array::make(rejection_msg);
+			_promises_to_reject.push_back(return_promise);
+
+			return return_promise;
+		}
+
+	} else {
+		ovr_ApplicationOptions_SetDeeplinkMessage(deeplink_options, "");
+
+		ovrRequest req = ovr_Application_InstallAppUpdateAndRelaunch(deeplink_options);
+		ovr_ApplicationOptions_Destroy(deeplink_options);
+
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+		_promises.push_back(return_promise);
+
+		return return_promise;
+	}
+}
+
 /// Requests information about the app's launch.
 /// @return A Dictionary with info about the app launch. This can be used to place the player in a specific place inside your app.
 Dictionary GDOculusPlatform::application_get_launch_details() {
@@ -2400,6 +2605,49 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::media_share_to_facebook(const Str
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
+///// USER AGE CATEGORY
+/////////////////////////////////////////////////
+
+/// Requests the user age category
+/// @return Promise that will contain an enum of type AccountAgeCategory
+Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_get() {
+	ovrRequest req = ovr_UserAgeCategory_Get();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Reports the AppAgeCategory to the Oculus backend
+/// @return Promise that will contain a bool (true) if the request was successful
+Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_report(AppAgeCategory p_app_age_category) {
+	ovrRequest req = ovr_UserAgeCategory_Report((ovrAppAgeCategory)p_app_age_category);
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// DEVICE APPLICATION INTEGRITY
+/////////////////////////////////////////////////
+
+/// Requests the integrity token. Ref: https://developer.oculus.com/documentation/native/ps-attestation-api/
+/// @return Promise that will contain a String with the integrity token
+Ref<GDOculusPlatformPromise> GDOculusPlatform::deviceappintegrity_get_integrity_token(const String &p_challenge_nonce) {
+	ovrRequest req = ovr_DeviceApplicationIntegrity_GetIntegrityToken(p_challenge_nonce.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
 ///// INTERNAL PROCESSING METHODS
 /////////////////////////////////////////////////
 
@@ -3128,8 +3376,49 @@ void GDOculusPlatform::_process_application_get_version(ovrMessageHandle p_messa
 		version_info["latest_code"] = ovr_ApplicationVersion_GetLatestCode(version_h);
 		version_info["current_name"] = ovr_ApplicationVersion_GetCurrentName(version_h);
 		version_info["latest_name"] = ovr_ApplicationVersion_GetLatestName(version_h);
+		version_info["release_date"] = (int64_t)ovr_ApplicationVersion_GetReleaseDate(version_h);
+		version_info["update_size"] = ovr_ApplicationVersion_GetSize(version_h);
 
 		_fulfill_promise(msg_id, Array::make(version_info));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+/// Processes the result of starting to download an app update
+/// Also used for the response from cancelling the download as they
+/// return the same data.
+/// Also used for install_app_and_relaunch since it returns the same data.
+void GDOculusPlatform::_process_application_start_app_download(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrAppDownloadResultHandle download_result_h = ovr_Message_GetAppDownloadResult(p_message);
+		int64_t timestamp = ovr_AppDownloadResult_GetTimestamp(download_result_h);
+		_fulfill_promise(msg_id, Array::make(timestamp));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+/// Processes the result of requesting the app download progress
+void GDOculusPlatform::_process_application_check_app_download_progress(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrAppDownloadProgressResultHandle download_progress_h = ovr_Message_GetAppDownloadProgressResult(p_message);
+
+		Dictionary download_progress;
+
+		download_progress["total_bytes"] = (int64_t)ovr_AppDownloadProgressResult_GetDownloadBytes(download_progress_h);
+		download_progress["downloaded_bytes"] = (int64_t)ovr_AppDownloadProgressResult_GetDownloadedBytes(download_progress_h);
+
+		ovrAppStatus status_code = ovr_AppDownloadProgressResult_GetStatusCode(download_progress_h);
+		download_progress["status"] = ovrAppStatus_ToString(status_code);
+
+		_fulfill_promise(msg_id, Array::make(download_progress));
 
 	} else {
 		_handle_default_process_error(p_message, msg_id);
@@ -3330,6 +3619,53 @@ void GDOculusPlatform::_process_media_share_to_facebook(ovrMessageHandle p_messa
 		share_media_resp["share_media_status"] = ovrShareMediaStatus_ToString(share_media_status);
 
 		_fulfill_promise(msg_id, Array::make(share_media_resp));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+///// USER AGE CATEOGRY
+/////////////////////////////////////////////////
+
+/// Processes the result of requesting the user age category
+void GDOculusPlatform::_process_useragecategory_get(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrUserAccountAgeCategoryHandle useragecategory_h = ovr_Message_GetUserAccountAgeCategory(p_message);
+		ovrAccountAgeCategory acc_age_category = ovr_UserAccountAgeCategory_GetAgeCategory(useragecategory_h);
+
+		_fulfill_promise(msg_id, Array::make((AccountAgeCategory)acc_age_category));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+/// Processes the response from reporting the user age category
+void GDOculusPlatform::_process_useragecategory_report(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+///// DEVICE APPLICATION INTEGRITY
+/////////////////////////////////////////////////
+
+/// Processes the result of requesting an integrity token
+void GDOculusPlatform::_process_deviceappintegrity_get_integrity_token(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		String integrity_token = ovr_Message_GetString(p_message);
+
+		_fulfill_promise(msg_id, Array::make(integrity_token));
 
 	} else {
 		_handle_default_process_error(p_message, msg_id);
@@ -3667,19 +4003,19 @@ void GDOculusPlatform::_handle_process_app_invite_array(ovrMessageHandle p_messa
 
 /// Gets the Java environment. Currently only used for platform initialization
 bool GDOculusPlatform::_get_env(JNIEnv **p_env) {
-	ERR_FAIL_NULL_V_MSG(jvm, false, "JVM is null");
+	ERR_FAIL_NULL_V_MSG(jvm, false, "[GDOP] JVM is null");
 	jint res = jvm->GetEnv((void **)p_env, JNI_VERSION_1_6);
 	if (res == JNI_EDETACHED) {
 		res = jvm->AttachCurrentThread(p_env, NULL);
-		if (res == JNI_OK)
+		if (res == JNI_OK) {
 			return true;
-		else {
+		} else {
 			*p_env = NULL;
-			ERR_FAIL_COND_V(res != JNI_OK, false);
 			return false;
 		}
-	} else
+	} else {
 		return false;
+	}
 }
 
 extern "C" {
