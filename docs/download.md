@@ -175,6 +175,7 @@ The interactive list bellow will help you find all of the precompiled releases f
 
             temp_a.href = dl_links[i].url;
             temp_a.innerText = dl_links[i].name;
+            temp_a.target = "_blank";
 
             temp_li.classList.add('version-link');
             temp_li.appendChild(temp_a);

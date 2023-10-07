@@ -16,7 +16,7 @@ The required compilation parameters are:
 - platform: `windows`, `macos`, `linux` or `android`
 - target: `template_debug` or `template_release`
 
-For android, you also have to add: `arch=arm64v8`
+For android, you also have to add: `arch=arm64v8` and you only need to generate the `template_release` since `template_debug` is not used.
 
 You can optionally add `-j<cores>` to use a set number of cores to build this asset. For example: `-j4`
 
