@@ -27,7 +27,7 @@ This plugin also requires an Android plugin to work with the Quest platform. To 
 
 On windows:
 ```
-gradlew.bat build
+.\gradlew.bat build
 ```
 
 On linux:
