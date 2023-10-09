@@ -2,14 +2,14 @@
 An open-source implementation of the Oculus Platform SDK intended to be used with the Quest platform.
 See the [download](https://decacis.github.io/godot_oculus_platform/download/) page of the documentation for a list of supported Godot Engine and Oculus Platform SDK versions.
 
-While you can use this plugin in the editor to get code suggestions, it **only works with the Meta Quest**, not PCVR. If you plan to develop for both the Quest and PCVR, you should add a platform check and only use this plugin when the platform is Android.
+While you can use this plugin in the editor to get code suggestions, it **only works with the Meta Quest**, not PCVR at the moment. If you plan to develop for both the Quest and PCVR, you should add a platform check and only use this plugin when the platform is Android.
 
-**NOTE:** This project is still a work in progress, you should expect usage API changes in the future.
+**NOTE:** While this project is stable, it's still considered to be in beta simply because it hasn't had enough real world testing yet.
 
 Quick links:
 
 - [Downloads](#getting-this-asset)
-- [Documentation](https://decacis.github.io/godot_oculus_platform/)
+- [Documentation for this asset](https://decacis.github.io/godot_oculus_platform/)
 - [Oculus Platform Documentation](https://developer.oculus.com/documentation/native/ps-platform-intro/)
 
 ## Quick start
@@ -63,7 +63,7 @@ The required compilation parameters are:
 - platform: `windows`, `macos`, `linux` or `android`
 - target: `template_debug` or `template_release`
 
-For android, you also have to add: `arch=arm64v8`
+For android, you also have to add: `arch=arm64v8` and you only need to generate the `template_release` since `template_debug` is not used.
 
 You can optionally add `-j<cores>` to use a set number of cores to build this asset. For example: `-j4`
 
@@ -74,7 +74,7 @@ This addon also requires an Android plugin to work with the Quest platform. To b
 
 On windows:
 ```
-gradlew.bat build
+.\gradlew.bat build
 ```
 
 On linux:
