@@ -1,6 +1,6 @@
 ext {
     versions = [
-            pluginVersion: '1.3.0-beta',
+            pluginVersion: '1.3.1-beta',
             gradlePluginVersion: '7.2.1',
             compileSdk         : 32,
             minSdk             : 24,
