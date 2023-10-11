@@ -4,7 +4,9 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-challenges/](https://developer.oculus.com/documentation/native/ps-challenges/)
 
 ------
-## challenges_get
+## Functions
+
+### challenges_get
 //// admonition | challenges_get(challenge_id : `String`)
     type: abstract
 
@@ -85,7 +87,7 @@ GDOculusPlatform.challenges_get("511854451440")\
 ///
 ////
 
-## challenges_get_list
+### challenges_get_list
 //// admonition | challenges_get_list(limit : `int`, challenge_options : `Dictionary`)
     type: abstract
 
@@ -234,7 +236,7 @@ GDOculusPlatform.challenges_get_list(10, challenge_filters)\
 ///
 ////
 
-## challenges_get_entries
+### challenges_get_entries
 //// admonition | challenges_get_entries(challenge_id : `String`, limit : `int`, filter : `LeaderboardFilterType`, start_at : `LeaderboardStartAt`)
     type: abstract
 
@@ -316,7 +318,7 @@ leaderboard_info.start_at\
 ///
 ////
 
-## challenge_get_entries_after_rank
+### challenge_get_entries_after_rank
 //// admonition | challenge_get_entries_after_rank(challenge_id : `String`, limit : `int`, after_rank : `int`)
     type: abstract
 
@@ -368,7 +370,7 @@ challenge_info.after_rank\
 ///
 ////
 
-## challenge_get_entries_by_ids
+### challenge_get_entries_by_ids
 //// admonition | challenge_get_entries_by_ids(challenge_id : `String`, limit : `int`, user_ids : `Array`, start_at : `LeaderboardStartAt`)
     type: abstract
 
@@ -416,7 +418,7 @@ challenge_info.start_at\
 ///
 ////
 
-## challenges_join
+### challenges_join
 //// admonition | challenges_join(challenge_id : `String`)
     type: abstract
 
@@ -440,7 +442,7 @@ GDOculusPlatform.challenges_join("264822651547")\
 ///
 ////
 
-## challenges_leave
+### challenges_leave
 //// admonition | challenges_leave(challenge_id : `String`)
     type: abstract
 
@@ -464,7 +466,7 @@ GDOculusPlatform.challenges_leave("264822651547")\
 ///
 ////
 
-## challenges_decline_invite
+### challenges_decline_invite
 //// admonition | challenges_decline_invite(challenge_id : `String`)
     type: abstract
 

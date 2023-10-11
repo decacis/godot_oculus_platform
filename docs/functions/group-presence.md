@@ -5,7 +5,9 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-multiplayer-overview](https://developer.oculus.com/documentation/native/ps-multiplayer-overview)
 
 ------
-## grouppresence_clear
+## Functions
+
+### grouppresence_clear
 //// admonition | grouppresence_clear()
     type: abstract
 
@@ -27,7 +29,7 @@ GDOculusPlatform.grouppresence_clear()\
 ///
 ////
 
-## grouppresence_send_invites
+### grouppresence_send_invites
 //// admonition | grouppresence_send_invites(user_ids : `Array`)
     type: abstract
 
@@ -101,7 +103,7 @@ GDOculusPlatform.grouppresence_send_invites(user_ids)\
 ///
 ////
 
-## grouppresence_set
+### grouppresence_set
 //// admonition | grouppresence_set(options : `Dictionary`)
     type: abstract
 
@@ -140,7 +142,7 @@ GDOculusPlatform.grouppresence_set(presence_opts)\
 ///
 ////
 
-## grouppresence_set_deeplink_message_override
+### grouppresence_set_deeplink_message_override
 //// admonition | grouppresence_set_deeplink_message_override(deeplink_message : `String`)
     type: abstract
 
@@ -162,7 +164,7 @@ GDOculusPlatform.grouppresence_set_deeplink_message_override("SOME_OVERRIDE_DL")
 ///
 ////
 
-## grouppresence_set_destination
+### grouppresence_set_destination
 //// admonition | grouppresence_set_destination(destination : `String`)
     type: abstract
 
@@ -184,7 +186,7 @@ GDOculusPlatform.grouppresence_set_destination("MISTY_FOREST")\
 ///
 ////
 
-## grouppresence_set_is_joinable
+### grouppresence_set_is_joinable
 //// admonition | grouppresence_set_destination(is_joinable : `bool`)
     type: abstract
 
@@ -206,7 +208,7 @@ GDOculusPlatform.grouppresence_set_is_joinable(false)\
 ///
 ////
 
-## grouppresence_set_lobby_session
+### grouppresence_set_lobby_session
 //// admonition | grouppresence_set_lobby_session(id : `String`)
     type: abstract
 
@@ -228,7 +230,7 @@ GDOculusPlatform.grouppresence_set_lobby_session("354141101")\
 ///
 ////
 
-## grouppresence_set_match_session
+### grouppresence_set_match_session
 //// admonition | grouppresence_set_match_session(id : `String`)
     type: abstract
 
@@ -250,7 +252,7 @@ GDOculusPlatform.grouppresence_set_match_session("my_match_651475")\
 ///
 ////
 
-## grouppresence_get_invitable_users
+### grouppresence_get_invitable_users
 //// admonition | grouppresence_get_invitable_users(options : `Dictionary`)
     type: abstract
 
@@ -288,7 +290,7 @@ GDOculusPlatform.grouppresence_get_invitable_users()\
 ///
 ////
 
-## grouppresence_get_sent_invites
+### grouppresence_get_sent_invites
 //// admonition | grouppresence_get_sent_invites()
     type: abstract
 
@@ -322,7 +324,7 @@ GDOculusPlatform.grouppresence_get_sent_invites()\
 ///
 ////
 
-## grouppresence_launch_invite_panel
+### grouppresence_launch_invite_panel
 //// admonition | grouppresence_launch_invite_panel(options : `Dictionary`)
     type: abstract
 
@@ -357,7 +359,7 @@ GDOculusPlatform.grouppresence_launch_invite_panel(options)\
 ///
 ////
 
-## grouppresence_launch_multiplayer_error_dialog
+### grouppresence_launch_multiplayer_error_dialog
 //// admonition | grouppresence_launch_multiplayer_error_dialog(error_key : `MultiplayerErrorErrorKey`)
     type: abstract
 
@@ -397,7 +399,7 @@ GDOculusPlatform.grouppresence_launch_multiplayer_error_dialog(GDOculusPlatform.
 ///
 ////
 
-## grouppresence_launch_rejoin_dialog
+### grouppresence_launch_rejoin_dialog
 //// admonition | grouppresence_launch_rejoin_dialog(lobby_session_id : `String`, match_session_id : `String`, destination_api_name : `String`)
     type: abstract
 
@@ -420,7 +422,7 @@ GDOculusPlatform.grouppresence_launch_rejoin_dialog("8458441_my_lobby", "", "DES
 ///
 ////
 
-## grouppresence_launch_roster_panel
+### grouppresence_launch_roster_panel
 //// admonition | grouppresence_launch_roster_panel(options : `Dictionary`)
     type: abstract
 

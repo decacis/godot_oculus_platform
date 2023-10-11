@@ -4,7 +4,9 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-achievements/](https://developer.oculus.com/documentation/native/ps-achievements/)
 
 ------
-## achievements_add_count
+## Functions
+
+### achievements_add_count
 //// admonition | achievements_add_count(achievement_name : `String`, count : `int`)
     type: abstract
 
@@ -35,7 +37,7 @@ GDOculusPlatform.achievements_add_count("my_count_achievement", 5)\
 ///
 ////
 
-## achievements_add_fields
+### achievements_add_fields
 //// admonition | achievements_add_fields(achievement_name : `String`, fields : `String`)
     type: abstract
 
@@ -66,7 +68,7 @@ GDOculusPlatform.achievements_add_fields("my_bitfield_achievement", "0011")\
 ///
 ////
 
-## achievements_unlock
+### achievements_unlock
 //// admonition | achievements_unlock(achievement_name : `String`)
     type: abstract
 
@@ -97,7 +99,7 @@ GDOculusPlatform.achievements_unlock("my_simple_achievement")\
 ///
 ////
 
-## achievements_get_all_definitions
+### achievements_get_all_definitions
 //// admonition | achievements_get_all_definitions()
     type: abstract
 
@@ -160,7 +162,7 @@ GDOculusPlatform.achievements_get_all_definitions()\
 ///
 ////
 
-## achievements_get_all_progress
+### achievements_get_all_progress
 //// admonition | achievements_get_all_progress()
     type: abstract
 
@@ -229,7 +231,7 @@ GDOculusPlatform.achievements_get_all_progress()\
 ///
 ////
 
-## achievements_get_definitions_by_name
+### achievements_get_definitions_by_name
 //// admonition | achievements_get_definitions_by_name(achievement_names : `Array`)
     type: abstract
 
@@ -261,7 +263,7 @@ GDOculusPlatform.achievements_get_definitions_by_name(achievements_n)\
 ///
 ////
 
-## achievements_get_progress_by_name
+### achievements_get_progress_by_name
 //// admonition | achievements_get_progress_by_name(achievement_names : `Array`)
     type: abstract
 

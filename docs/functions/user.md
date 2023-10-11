@@ -6,7 +6,9 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-blockingsdk/](https://developer.oculus.com/documentation/native/ps-blockingsdk/)
 
 ------
-## user_get_logged_in_user_id
+## Functions
+
+### user_get_logged_in_user_id
 //// admonition | user_get_logged_in_user_id()
     type: abstract
 
@@ -23,7 +25,7 @@ var user_id : String = user_get_logged_in_user_id()
 ///
 ////
 
-## user_get_logged_in_user_locale
+### user_get_logged_in_user_locale
 //// admonition | user_get_logged_in_user_locale()
     type: abstract
 
@@ -40,7 +42,7 @@ var user_locale : String = user_get_logged_in_user_locale()
 ///
 ////
 
-## user_get_is_viewer_entitled
+### user_get_is_viewer_entitled
 //// admonition | user_get_is_viewer_entitled()
     type: abstract
 
@@ -62,7 +64,7 @@ GDOculusPlatform.user_get_is_viewer_entitled()\
 ///
 ////
 
-## user_get_user
+### user_get_user
 //// admonition | user_get_user(user_id : `String`)
     type: abstract
 
@@ -102,7 +104,7 @@ GDOculusPlatform.user_get_user("31415926535")\
 ///
 ////
 
-## user_get_logged_in_user
+### user_get_logged_in_user
 //// admonition | user_get_logged_in_user()
     type: abstract
 
@@ -147,7 +149,7 @@ GDOculusPlatform.user_get_logged_in_user()\
 ///
 ////
 
-## user_get_user_proof
+### user_get_user_proof
 //// admonition | user_get_user_proof()
     type: abstract
 
@@ -175,7 +177,7 @@ GDOculusPlatform.user_get_user_proof()\
 ///
 ////
 
-## user_get_user_access_token
+### user_get_user_access_token
 //// admonition | user_get_user_access_token()
     type: abstract
 
@@ -197,7 +199,7 @@ GDOculusPlatform.user_get_user_access_token()\
 ///
 ////
 
-## user_get_blocked_users
+### user_get_blocked_users
 //// admonition | user_get_blocked_users()
     type: abstract
 
@@ -250,7 +252,7 @@ GDOculusPlatform.user_get_blocked_users()\
 ///
 ////
 
-## user_get_logged_in_user_friends
+### user_get_logged_in_user_friends
 //// admonition | user_get_logged_in_user_friends()
     type: abstract
 
@@ -280,7 +282,7 @@ GDOculusPlatform.user_get_logged_in_user_friends()\
 ///
 ////
 
-## user_get_org_scoped_id
+### user_get_org_scoped_id
 //// admonition | user_get_org_scoped_id(user_id : `String`)
     type: abstract
 
@@ -302,7 +304,7 @@ GDOculusPlatform.user_get_org_scoped_id("31415926535")\
 ///
 ////
 
-## user_get_sdk_accounts
+### user_get_sdk_accounts
 //// admonition | user_get_sdk_accounts()
     type: abstract
 
@@ -336,7 +338,7 @@ GDOculusPlatform.user_get_sdk_accounts()\
 ///
 ////
 
-## user_launch_block_flow
+### user_launch_block_flow
 //// admonition | user_launch_block_flow(user_id : `String`)
     type: abstract
 
@@ -369,7 +371,7 @@ GDOculusPlatform.user_launch_block_flow("89793238462")\
 ///
 ////
 
-## user_launch_unblock_flow
+### user_launch_unblock_flow
 //// admonition | user_launch_unblock_flow(user_id : `String`)
     type: abstract
 
@@ -402,7 +404,7 @@ GDOculusPlatform.user_launch_unblock_flow("89793238462")\
 ///
 ////
 
-## user_launch_friend_request_flow
+### user_launch_friend_request_flow
 //// admonition | user_launch_friend_request_flow(user_id : `String`)
     type: abstract
 

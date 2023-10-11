@@ -4,8 +4,9 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-age-group-apis/](https://developer.oculus.com/documentation/native/ps-age-group-apis/)
 
 ------
+## Functions
 
-## useragecategory_get
+### useragecategory_get
 //// admonition | useragecategory_get()
     type: abstract
 
@@ -46,7 +47,7 @@ GDOculusPlatform.useragecategory_get()\
 ///
 ////
 
-## useragecategory_report
+### useragecategory_report
 //// admonition | useragecategory_report(app_age_category : `AppAgeCategory`)
     type: abstract
 

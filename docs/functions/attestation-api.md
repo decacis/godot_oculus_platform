@@ -4,8 +4,9 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-attestation-api/](https://developer.oculus.com/documentation/native/ps-attestation-api/)
 
 ------
+## Functions
 
-## deviceappintegrity_get_integrity_token
+### deviceappintegrity_get_integrity_token
 //// admonition | deviceappintegrity_get_integrity_token(challenge_nonce : `String`)
     type: abstract
 

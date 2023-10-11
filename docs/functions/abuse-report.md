@@ -16,7 +16,9 @@ This signal will be emitted when the user presses the abuse report button. You t
 ////
 
 ------
-## abuse_report_request_handled
+## Functions
+
+### abuse_report_request_handled
 //// admonition | abuse_report_request_handled(report_request_response : `ReportRequestResponse`)
     type: abstract
 

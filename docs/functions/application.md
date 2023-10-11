@@ -18,7 +18,9 @@ You should call [application_get_launch_details](#application_get_launch_details
 ////
 
 ------
-## application_get_version
+## Functions
+
+### application_get_version
 //// admonition | application_get_version()
     type: abstract
 
@@ -56,7 +58,7 @@ GDOculusPlatform.application_get_version()\
 ///
 ////
 
-## application_launch_other_app
+### application_launch_other_app
 //// admonition | application_launch_other_app(app_id : `String`, deeplink_options : `Dictionary`)
     type: abstract
 
@@ -94,7 +96,7 @@ GDOculusPlatform.application_launch_other_app("50125468232421", deeplink_options
 ///
 ////
 
-## application_get_launch_details
+### application_get_launch_details
 //// admonition | application_get_launch_details()
     type: abstract
 
@@ -156,7 +158,7 @@ if launch_details.launch_type == "DEEPLINK":
 ///
 ////
 
-## application_start_app_download
+### application_start_app_download
 //// admonition | application_start_app_download()
     type: abstract
 
@@ -178,7 +180,7 @@ GDOculusPlatform.application_start_app_download()\
 ///
 ////
 
-## application_check_app_download_progress
+### application_check_app_download_progress
 //// admonition | application_check_app_download_progress()
     type: abstract
 
@@ -211,7 +213,7 @@ GDOculusPlatform.application_check_app_download_progress()\
 ///
 ////
 
-## application_cancel_app_download
+### application_cancel_app_download
 //// admonition | application_cancel_app_download()
     type: abstract
 
@@ -233,7 +235,7 @@ GDOculusPlatform.application_cancel_app_download()\
 ///
 ////
 
-## application_install_app_update_and_relaunch
+### application_install_app_update_and_relaunch
 //// admonition | application_install_app_update_and_relaunch(deeplink_options : `Dictionary`)
     type: abstract
 

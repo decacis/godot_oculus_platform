@@ -4,7 +4,9 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-iap/](https://developer.oculus.com/documentation/native/ps-iap/)
 
 ------
-## iap_get_viewer_purchases
+## Functions
+
+### iap_get_viewer_purchases
 //// admonition | iap_get_viewer_purchases()
     type: abstract
 
@@ -55,7 +57,7 @@ GDOculusPlatform.iap_get_viewer_purchases()\
 ///
 ////
 
-## iap_get_products_by_sku
+### iap_get_products_by_sku
 //// admonition | iap_get_products_by_sku(sku_list : `Array`)
     type: abstract
 
@@ -108,7 +110,7 @@ GDOculusPlatform.iap_get_products_by_sku(sku_list)\
 ///
 ////
 
-## iap_consume_purchase
+### iap_consume_purchase
 //// admonition | iap_consume_purchase(sku : `String`)
     type: abstract
 
@@ -130,7 +132,7 @@ GDOculusPlatform.iap_consume_purchase("my_product_sku")\
 ///
 ////
 
-## iap_launch_checkout_flow
+### iap_launch_checkout_flow
 //// admonition | iap_launch_checkout_flow(sku : `String`)
     type: abstract
 

@@ -30,7 +30,9 @@ This signal will be emitted once the asset file has finished downloading. It wil
 ////
 
 ------
-## assetfile_get_list
+## Functions
+
+### assetfile_get_list
 //// admonition | assetfile_get_list()
     type: abstract
 
@@ -113,7 +115,7 @@ GDOculusPlatform.assetfile_get_list()\
 ///
 ////
 
-## assetfile_status_by_id
+### assetfile_status_by_id
 //// admonition | assetfile_status_by_id(asset_id : `String`)
     type: abstract
 
@@ -140,7 +142,7 @@ GDOculusPlatform.assetfile_status_by_id("151548188744")\
 ///
 ////
 
-## assetfile_status_by_name
+### assetfile_status_by_name
 //// admonition | assetfile_status_by_name(asset_name : `String`)
     type: abstract
 
@@ -165,7 +167,7 @@ GDOculusPlatform.assetfile_status_by_name("my_asset_file.po")\
 ///
 ////
 
-## assetfile_download_by_id
+### assetfile_download_by_id
 //// admonition | assetfile_download_by_id(asset_id : `String`)
     type: abstract
 
@@ -211,7 +213,7 @@ func call_me_when_finished(asset_file_id : String):
 ///
 ////
 
-## assetfile_download_by_name
+### assetfile_download_by_name
 //// admonition | assetfile_download_by_name(asset_name : `String`)
     type: abstract
 
@@ -240,7 +242,7 @@ func call_me_when_finished(asset_file_id : String):
 ///
 ////
 
-## assetfile_download_cancel_by_id
+### assetfile_download_cancel_by_id
 //// admonition | assetfile_download_cancel_by_id(asset_id : `String`)
     type: abstract
 
@@ -280,7 +282,7 @@ GDOculusPlatform.assetfile_download_cancel_by_id("244752684352")\
 ///
 ////
 
-## assetfile_download_cancel_by_name
+### assetfile_download_cancel_by_name
 //// admonition | assetfile_download_cancel_by_name(asset_name : `String`)
     type: abstract
 
@@ -306,7 +308,7 @@ GDOculusPlatform.assetfile_download_cancel_by_name("my_asset_name.zip")\
 ///
 ////
 
-## assetfile_delete_by_id
+### assetfile_delete_by_id
 //// admonition | assetfile_delete_by_id(asset_id : `String`)
     type: abstract
 
@@ -346,7 +348,7 @@ GDOculusPlatform.assetfile_delete_by_id("774568224174")\
 ///
 ////
 
-## assetfile_delete_by_name
+### assetfile_delete_by_name
 //// admonition | assetfile_delete_by_name(asset_name : `String`)
     type: abstract
 

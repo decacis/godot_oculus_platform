@@ -1,8 +1,9 @@
 # Functions - Initialization
 
 -----
+## Functions
 
-## is_platform_initialized
+### is_platform_initialized
 //// admonition | is_platform_initialized()
     type: abstract
 
@@ -21,7 +22,7 @@ if not GDOculusPlatform.is_platform_initialized():
 ///
 ////
 
-## initialize_android
+### initialize_android
 //// admonition | initialize_android(app_id : `String`, options : `Dictionary`)
     type: abstract
 
@@ -49,7 +50,7 @@ var platform_initialized : bool = GDOculusPlatform.initialize_android("314159265
 ///
 ////
 
-## initialize_android_async
+### initialize_android_async
 //// admonition | initialize_android_async(app_id : `String`)
     type: abstract
 

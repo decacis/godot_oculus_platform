@@ -4,7 +4,9 @@ Related Oculus Platform documentation:
 - [https://developer.oculus.com/documentation/native/ps-leaderboards/](https://developer.oculus.com/documentation/native/ps-leaderboards/)
 
 ------
-## leaderboard_get
+## Functions
+
+### leaderboard_get
 //// admonition | leaderboard_get(leaderboard_name : `String`)
     type: abstract
 
@@ -34,7 +36,7 @@ GDOculusPlatform.leaderboard_get("MY_LEADERBOARD_0")\
 ///
 ////
 
-## leaderboard_get_entries
+### leaderboard_get_entries
 //// admonition | leaderboard_get_entries(leaderboard_name : `String`, limit : `int`, filter : `LeaderboardFilterType`, start_at : `LeaderboardStartAt`)
     type: abstract
 
@@ -146,7 +148,7 @@ leaderboard_info.start_at\
 ///
 ////
 
-## leaderboard_get_entries_after_rank
+### leaderboard_get_entries_after_rank
 //// admonition | leaderboard_get_entries_after_rank(leaderboard_name : `String`, limit : `int`, after_rank : `int`)
     type: abstract
 
@@ -198,7 +200,7 @@ leaderboard_info.after_rank\
 ///
 ////
 
-## leaderboard_get_entries_by_ids
+### leaderboard_get_entries_by_ids
 //// admonition | leaderboard_get_entries_by_ids(leaderboard_name : `String`, limit : `int`, user_ids : `Array`, start_at : `LeaderboardStartAt`)
     type: abstract
 
@@ -248,7 +250,7 @@ leaderboard_info.start_at\
 ///
 ////
 
-## leaderboard_write_entry
+### leaderboard_write_entry
 //// admonition | leaderboard_write_entry(leaderboard_name : `String`, score : `int`, force_update : `bool`, extra : `Dictionary`)
     type: abstract
 

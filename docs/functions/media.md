@@ -1,8 +1,9 @@
 # Functions - Media
 
 ------
+## Functions
 
-## media_share_to_facebook
+### media_share_to_facebook
 //// admonition | media_share_to_facebook(post_text_suggestion : `String`, file_path : `String`, content_type : `MediaContentType`)
     type: abstract
 
