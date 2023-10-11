@@ -25,6 +25,8 @@ nav:
     - Media: 'functions/media.md'
     - User Age Category: 'functions/user-age-category.md'
     - Attestation API: 'functions/attestation-api.md'
+  - Misc:
+    - About previous_page_url and next_page_url: 'misc/about-previous_page_url-and-next_page_url.md'
 theme:
   name: material
   logo: assets/gdop_logo_w.svg

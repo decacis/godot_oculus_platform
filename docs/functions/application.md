@@ -138,13 +138,7 @@ Example response:
 - `launch_source` can be used to distinguish where the deeplink came from. For example, a `DEEPLINK` launch type could be coming from events or rich presence.
 - `users` is a `Dictionary` that could be populated with other users the current user may want to be with.
 
-///// admonition | Note
-    type: warning
-
-The `Dictionary` of the `users` key can theoretically contain a URL as the value of the `next_page_url` key, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
-
-Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
-/////
+More info about [next_page_url](/godot_oculus_platform/misc/about-previous_page_url-and-next_page_url/).
 
 /// details | Example
     type: example

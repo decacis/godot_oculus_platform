@@ -38,13 +38,7 @@ Example response:
 }
 ```
 
-///// admonition | Note
-    type: warning
-
-The `next_page_url` key can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
-
-Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
-/////
+More info about [next_page_url](/godot_oculus_platform/misc/about-previous_page_url-and-next_page_url/).
 
 /// details | Example
     type: example
@@ -91,13 +85,7 @@ Example response:
 }
 ```
 
-///// admonition | Note
-    type: warning
-
-The `next_page_url` key can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
-
-Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
-/////
+More info about [next_page_url](/godot_oculus_platform/misc/about-previous_page_url-and-next_page_url/).
 
 /// details | Example
     type: example

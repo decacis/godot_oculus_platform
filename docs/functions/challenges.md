@@ -146,6 +146,8 @@ Example response:
 }
 ```
 
+More info about [previous_page_url and next_page_url](/godot_oculus_platform/misc/about-previous_page_url-and-next_page_url/).
+
 The `total_count` key is not necessarily the total count of challenges in this block, but the total count of challenges that satisfy this query.
 
 **Default values:**
@@ -197,14 +199,6 @@ By default `challenge_options` is:
 | CHALLENGE_VISIBILITY_INVITE_ONLY |    1    | Will return all challenges that are invite only.                          |
 | CHALLENGE_VISIBILITY_PUBLIC      |    2    | Will return all public challenges.                                        |
 | CHALLENGE_VISIBILITY_PRIVATE     |    3    | Will return all private challenges.                                       |
-
-///// admonition | Note
-    type: warning
-
-The `next_page_url` and `previous_page_url` keys can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
-
-Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
-/////
 
 /// details | Example
     type: example
@@ -282,15 +276,9 @@ You can check the `enums` from [leaderboard_get_entries](/godot_oculus_platform/
 }
 ```
 
-///// admonition | Note
-    type: warning
+More info about [previous_page_url and next_page_url](/godot_oculus_platform/misc/about-previous_page_url-and-next_page_url/).
 
-The `next_page_url` and `previous_page_url` keys can theoretically contain a URL, but in all of our tests with 1000+ entries, it has not happened yet. Nevertheless, you should check if the `String` is empty, and if it's not, make a HTTP GET request to get the rest of the values.
-
-Also, if you happen to get this URL, please report it on the [issues page](https://github.com/decacis/godot_oculus_platform/issues) in GitHub, so we are aware that it can happen and update the docs.
-/////
-
-/// admonition | Another note
+/// admonition | Note
     type: warning
 
 The `total_count` key is not the total count of elements in this page/block, but the total count of entries that satisfy the query/request. They can be the same if there are no more entries, but they don't have to.
