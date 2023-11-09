@@ -29,6 +29,7 @@ Example response:
         "api_name": "MY_LEADERBOARD_0",
         "destination": {
             "display_name": "Rush Mountain",
+            "shareable_uri": "https://example.org/some_uri_to_share",
             "api_name": "MY_DESTINATION_0",
             "deeplink_message": "MY_DESTINATION_0_RUSH"
         }
@@ -113,6 +114,7 @@ Example response:
                 "api_name": "MY_LEADERBOARD_0",
                 "destination": {
                     "display_name": "Rush Mountain",
+                    "shareable_uri": "https://example.org/some_uri_to_share",
                     "api_name": "MY_DESTINATION_0",
                     "deeplink_message": "MY_DESTINATION_0_RUSH"
                 }

@@ -63,6 +63,7 @@ Example response:
             }, 
             "destination": {
                 "display_name": "My Destination",
+                "shareable_uri": "https://example.org/some_uri_to_share",
                 "api_name": "MY_DESTINATION_0",
                 "deep_link_message": "MY_DESTINATION_0_DL"
             }
