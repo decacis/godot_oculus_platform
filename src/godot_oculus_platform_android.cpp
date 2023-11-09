@@ -3939,7 +3939,7 @@ Dictionary GDOculusPlatform::_get_destionation_info(const ovrDestinationHandle &
 	Dictionary destination;
 
 	destination["display_name"] = ovr_Destination_GetDisplayName(p_destination_h);
-	destination["sharable_uri"] = ovr_Destination_GetShareableUri(p_destination_h);
+	destination["shareable_uri"] = ovr_Destination_GetShareableUri(p_destination_h);
 	destination["api_name"] = ovr_Destination_GetApiName(p_destination_h);
 	destination["deep_link_message"] = ovr_Destination_GetDeeplinkMessage(p_destination_h);
 
