@@ -40,10 +40,10 @@ Finally, you have to copy the files into place:
 | Source                              | Destination                |
 |-------------------------------------|----------------------------|
 | `demo/addons/godot_oculus_platform` | Your projet's addon folder |
-| `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` | `android/plugins/godotoculusplatform` |
-| `demo/android/plugins/godotoculusplatform-android-plugin.gdap` | `android/plugins` |
+| `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` | `addons/godot_oculus_platform/android_plugin` |
+| `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-debug.aar` | `addons/godot_oculus_platform/android_plugin` |
 
 /// admonition | Note
     type: warning
-Make sure to enable the `Godot Oculus Platform Android Plugin` in your export template. Also, make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.
+Make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.
 ///
