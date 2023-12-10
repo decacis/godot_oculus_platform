@@ -1,11 +1,11 @@
 ext {
     versions = [
-            pluginVersion: '1.3.3-beta',
-            gradlePluginVersion: '7.2.1',
+            pluginVersion: '1.4.0-beta',
+            gradlePluginVersion: '7.4.0',
             compileSdk         : 32,
             minSdk             : 24,
             targetSdk          : 32,
-            godotLibVersion       : '4.1.3.stable',
-            javaVersion           : JavaVersion.VERSION_11,
+            godotLibVersion       : '4.2.0.stable',
+            javaVersion           : JavaVersion.VERSION_17,
     ]
 }

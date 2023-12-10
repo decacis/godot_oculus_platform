@@ -3,12 +3,11 @@
 
 demo/.godot
 demo/.import
-demo/android/build
-demo/android/.build_version
-demo/android/plugins/*
-!demo/android/plugins/godotoculusplatform-android-plugin.gdap
+demo/android
 demo/dist
 demo/export_presets.cfg
+demo/addons/godotopenxrvendors
+demo/addons/godot_oculus_platform/android_plugin/*.aar
 demo/addons/godot_oculus_platform/bin/*
 !demo/addons/godot_oculus_platform/bin/*.gdextension
 !demo/addons/godot_oculus_platform/bin/android

@@ -2,9 +2,11 @@
 An open-source implementation of the Oculus Platform SDK intended to be used with the Quest platform.
 See the [download](https://decacis.github.io/godot_oculus_platform/download/) page of the documentation for a list of supported Godot Engine and Oculus Platform SDK versions.
 
-While you can use this plugin in the editor to get code suggestions, it **only works with the Meta Quest**, not PCVR (Rift) at the moment. If you plan to develop for both the Quest and Rift, you should add a platform check and only use this plugin when the platform is Android.
+While you can use this plugin in the editor to get code suggestions, it **only works with the Meta Quest, not PCVR (Rift) at the moment**. If you plan to develop for both the Quest and Rift, you should add a platform check and only use this plugin when the platform is Android.
 
 **NOTE:** While this project is stable, it's still considered to be in beta simply because it hasn't had enough real world testing yet.
+
+**Main branch (this branch) works with Godot 4.2+**
 
 Quick links:
 
@@ -87,10 +89,10 @@ Finally, you have to copy the files into place:
 | Source                              | Destination                |
 |-------------------------------------|----------------------------|
 | `demo/addons/godot_oculus_platform` | Your projet's addon folder |
-| `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` | `android/plugins/godotoculusplatform` |
-| `demo/android/plugins/godotoculusplatform-android-plugin.gdap` | `android/plugins` |
+| `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-release.aar` | `addons/godot_oculus_platform/android_plugin` |
+| `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-debug.aar` | `addons/godot_oculus_platform/android_plugin` |
 
-**Make sure to enable the `Godot Oculus Platform Android Plugin` in your export template. Also, make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.**
+**Make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.**
 
 ## License
 Unless specified otherwise, sources in this repository are licensed under MIT, see `LICENSE` for more information.
