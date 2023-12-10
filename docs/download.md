@@ -216,6 +216,11 @@ The interactive list bellow will help you find all of the precompiled releases f
 
 ------
 
+/// admonition | Note
+    type: warning
+Make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.
+///
+
 You can find all the releases in the [GitHub releases page](https://github.com/decacis/godot_oculus_platform/releases).
 
 In-development precompiled versions can be found in the [GitHub actions page](https://github.com/decacis/godot_oculus_platform/actions?query=branch%3Amain).

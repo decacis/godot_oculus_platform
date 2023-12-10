@@ -33,7 +33,7 @@ Depending on what functions you use, you have to request different Data Use Chec
 As long as you are in development (haven't published your app yet), you can request all the permissions you need and they will be approved automatically to ease development. Once you want to publish your app, you will have to re-request these permissions.
 
 ## Using this asset
-First, [download this asset](/godot_oculus_platform/download/) and place the addon inside your addons folder and the android plugin inside your android plugins folder. You should be able to just drag and drop the contents of the ZIP file inside your project.
+First, [download this asset](/godot_oculus_platform/download/) and place the addon inside your addons folder and the android plugin inside your android plugins folder. You should be able to just drag and drop the contents of the ZIP file inside your project. Remember to enable the "Godot Oculus Platform" plugin in your project settings.
 
 You can take a look at the [examples](/godot_oculus_platform/examples/) to get an idea of how to interact with the Oculus Platform.
 
