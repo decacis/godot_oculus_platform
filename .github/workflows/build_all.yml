@@ -189,7 +189,7 @@ jobs:
             mkdir -p addons/godot_oculus_platform/android_plugin
           fi
           if [ -d android-plugin ]; then
-            cp -r demo/addons/godot_oculus_platform/android_plugin/* addons/godot_oculus_platform/android_plugin/
+            cp -r android-plugin/* addons/godot_oculus_platform/android_plugin/
             rm -r android-plugin
           fi
 
