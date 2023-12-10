@@ -88,7 +88,13 @@ jobs:
         with:
           python-version: "3.x"
           architecture: "x64"
-
+      
+      - name: Android dependencies
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r23c
+          link-to-sdk: true
+      
       - name: Set up dependencies (Python, SCons)
         run: python -m pip install scons
 
