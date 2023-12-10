@@ -94,7 +94,7 @@ jobs:
         with:
           ndk-version: r23c
           link-to-sdk: true
-        if: matrix.platform == 'android'
+        if: matrix.api-platform == 'android'
       
       - name: Install Scons
         run: python -m pip install scons
