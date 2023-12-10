@@ -148,7 +148,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: android-plugin
-          path: demo/android
+          path: demo/addons/godot_oculus_platform/android_plugin
 
   upload-addon:
     runs-on: "ubuntu-20.04"
