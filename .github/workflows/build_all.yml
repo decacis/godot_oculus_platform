@@ -43,19 +43,19 @@ jobs:
             artifact-name: windows
 
           - name: macOS
-            os: "macos-11"
+            os: "macos-latest"
             api-platform: mac
             scons-platform: macos
             artifact-name: macos
 
           - name: Linux
-            os: "ubuntu-20.04"
+            os: "ubuntu-latest"
             api-platform: linux
             scons-platform: linux
             artifact-name: linux
 
           - name: Android
-            os: "ubuntu-20.04"
+            os: "ubuntu-latest"
             api-platform: android
             scons-platform: android
             flags: arch=arm64v8
