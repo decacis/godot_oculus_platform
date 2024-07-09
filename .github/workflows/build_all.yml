@@ -97,7 +97,7 @@ jobs:
         if: matrix.api-platform == 'android'
       
       - name: Install Scons
-        run: python -m pip install scons
+        run: python -m pip install scons==4.0.0
 
       - name: Compile Debug library
         shell: bash
