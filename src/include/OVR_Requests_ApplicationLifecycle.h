@@ -53,7 +53,8 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_ApplicationLifecycle_GetRegisteredPIDs();
 OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_ApplicationLifecycle_GetSessionKey();
 
 /// The actual UWP app will be able to register as the original application
-/// using the guid from getSessionKey() .
+/// using the GUID from ovr_ApplicationLifecycle_GetSessionKey().
+/// \param sessionKey The GUID obtained by calling ovr_ApplicationLifecycle_GetSessionKey().
 ///
 /// A message with type ::ovrMessage_ApplicationLifecycle_RegisterSessionKey will be generated in response.
 ///

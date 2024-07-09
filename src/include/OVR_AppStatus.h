@@ -13,6 +13,7 @@ typedef enum ovrAppStatus_ {
   ovrAppStatus_Installing,
   ovrAppStatus_Installed,
   ovrAppStatus_Uninstalling,
+  ovrAppStatus_InstallQueued,
 } ovrAppStatus;
 
 /// Converts an ovrAppStatus enum value to a string

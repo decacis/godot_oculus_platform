@@ -668,13 +668,23 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictiona
 		return true;
 
 	} else {
-		ovrKeyValuePair config_options[1];
+		ovrKeyValuePair config_options[2];
 
 		// Make sure initialization options are valid
 		if (p_initialization_options.has("disable_p2p_networking")) {
 			ERR_FAIL_COND_V_MSG(p_initialization_options.get("disable_p2p_networking", 0).get_type() != Variant::BOOL, false, "[GDOP] Invalid initialization options. The disable_p2p_networking key must have a boolean value.");
 
-			config_options[0] = ovr_InitConfigOption_CreateBool(ovrInitConfigOption_DisableP2pNetworking, (bool)p_initialization_options.get("disable_p2p_networking", false));
+			config_options[0] = ovr_InitConfigOption_CreateBool(ovrInitConfigOption_DisableP2pNetworking, (bool)p_initialization_options.get("disable_p2p_networking", true));
+		} else {
+			config_options[0] = ovr_InitConfigOption_CreateBool(ovrInitConfigOption_DisableP2pNetworking, true);
+		}
+
+		if (p_initialization_options.has("enable_cowatching")) {
+			ERR_FAIL_COND_V_MSG(p_initialization_options.get("enable_cowatching", 0).get_type() != Variant::BOOL, false, "[GDOP] Invalid initialization options. The enable_cowatching key must have a boolean value.");
+
+			config_options[1] = ovr_InitConfigOption_CreateBool(ovrInitConfigOption_EnableCowatching, (bool)p_initialization_options.get("enable_cowatching", false));
+		} else {
+			config_options[1] = ovr_InitConfigOption_CreateBool(ovrInitConfigOption_EnableCowatching, false);
 		}
 
 		JNIEnv *gdjenv;

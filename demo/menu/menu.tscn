@@ -19,7 +19,7 @@ achievements_get_definitions_by_name = Array[String](["TEST_BITFIELD_ACHIEV_0", 
 achievements_get_progress_by_name = Array[String](["TEST_COUNT_ACHIEV_0", "TEST_SIMPLE_ACHIEV_0"])
 IAP_get_products_by_sku = Array[String](["test_consumable_0", "test_durable_0"])
 IAP_consume_purchase = "test_consumable_0"
-IAP_launch_checkout_flow = "test_durable_0"
+IAP_launch_checkout_flow = "test_consumable_0"
 assetfile_status_by_id = "6355075617871935"
 assetfile_status_by_name = "dlc_1.pck"
 assetfile_download_by_id = "6355075617871935"
@@ -843,6 +843,12 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 text = "UserAgeCategoryReport"
+
+[node name="GodotVersionLbl" type="Label" parent="PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "Godot version: "
+horizontal_alignment = 1
 
 [connection signal="pressed" from="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer/ApplicationGetVersion" to="." method="_on_application_get_version_pressed"]
 [connection signal="pressed" from="PanelContainer/TabContainer/Application/VBoxContainer/NoInputFuncs/HFlowContainer/ApplicationStartAppDownload" to="." method="_on_application_start_app_download_pressed"]

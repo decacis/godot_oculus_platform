@@ -187,7 +187,7 @@ GDOculusPlatform::~GDOculusPlatform() {
 void GDOculusPlatform::pump_messages() {}
 
 Ref<GDOculusPlatformPromise> _empty_func_helper() {
-	Ref<GDOculusPlatformPromise> promise;
+	Ref<GDOculusPlatformPromise> promise = memnew(GDOculusPlatformPromise(-1));
 	ERR_FAIL_V_MSG(promise, "Godot Oculus Platform only works with the Meta Quest (android).");
 
 	return promise;
