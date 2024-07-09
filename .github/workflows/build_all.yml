@@ -7,10 +7,10 @@ on:
     branches: [ "main" ]
 
 env:
-  OCULUS_VERSION: 59
+  OCULUS_VERSION: 66
   GODOT_ENGINE_VERSION: "4.2.0"
   GODOT_ENGINE_STAGE: "stable"
-  INTEGRATION_VERSION: "v1.4.0-beta"
+  INTEGRATION_VERSION: "v1.5.0-beta"
 
 jobs:
   lint:
@@ -43,19 +43,19 @@ jobs:
             artifact-name: windows
 
           - name: macOS
-            os: "macos-11"
+            os: "macos-latest"
             api-platform: mac
             scons-platform: macos
             artifact-name: macos
 
           - name: Linux
-            os: "ubuntu-20.04"
+            os: "ubuntu-latest"
             api-platform: linux
             scons-platform: linux
             artifact-name: linux
 
           - name: Android
-            os: "ubuntu-20.04"
+            os: "ubuntu-latest"
             api-platform: android
             scons-platform: android
             flags: arch=arm64v8
@@ -97,7 +97,7 @@ jobs:
         if: matrix.api-platform == 'android'
       
       - name: Install Scons
-        run: python -m pip install scons
+        run: python -m pip install scons==4.0.0
 
       - name: Compile Debug library
         shell: bash

@@ -70,6 +70,8 @@ extends CanvasLayer
 
 func _ready() -> void:
 	
+	$PanelContainer/GodotVersionLbl.text = "Godot version: %s" % Engine.get_version_info().string
+	
 	## SIGNALS
 	GDOculusPlatform.abuse_report_form_requested.connect(_handle_abuse_report_form_request)
 	
