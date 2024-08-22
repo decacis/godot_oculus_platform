@@ -35,6 +35,8 @@ As long as you are in development (haven't published your app yet), you can requ
 ## Using this asset
 First, [download this asset](/godot_oculus_platform/download/) and place the addon inside your addons folder and the android plugin inside your android plugins folder. You should be able to just drag and drop the contents of the ZIP file inside your project. Remember to enable the "Godot Oculus Platform" plugin in your project settings.
 
+Also, most of the methods will require you to enable the `INTERNET` permission in your export settings/add it to your AndroidManifest.xml
+
 You can take a look at the [examples](/godot_oculus_platform/examples/) to get an idea of how to interact with the Oculus Platform.
 
 A concept we use is the use of *promises* or more specifically `GDOculusPlatformPromise`s. These promises basically help you perform actions in an asynchronous manner. Take a look at the following example:

@@ -164,14 +164,31 @@ if launch_details.launch_type == "DEEPLINK":
 
 Starts downloading the latest app update (if there is one).
 
-**Returns:** A `GDOculusPlatformPromise` that will contain an `int` that represents a timestamp in miliseconds of when the request started. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about the request once the operation is finished. The promise will error if the request couldn't be completed.
+
+Example response:
+``` json linenums="1"
+{
+    "install_result": "SUCCESS",
+    "timestamp": 1724284356
+}
+```
+
+- `install_result` can be: `UNKNOWN`, `LOW_STORAGE`, `NETWORK_ERROR`, `DUPLICATE_REQUEST`, `INSTALLER_ERROR`, `USER_CANCELLED`, `AUTHORIZATION_ERROR` or `SUCCESS`.
+
+/// admonition | Notes
+    type: warning
+
+According to the docs, this method will return until a problem occurs or the app finishes downloading.
+///
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.application_start_app_download()\
-.then(func(start_timestamp : int):
-     print("Started downloading app update: ", start_timestamp)
+.then(func(result : Dictionary):
+     if result.install_result == "SUCCESS":
+        GDOculusPlatform.application_install_app_update_and_relaunch()
 )\
 .error(func(app_update_err):
     print("Failed to start downloading app update: ", app_update_err)
@@ -197,7 +214,7 @@ Example response:
 }
 ```
 
-- `status` can be: `UNKNOWN`, `ENTITLED`, `DOWNLOAD_QUEUED`, `DOWNLOADING`, `INSTALLING`, `INSTALLED` or `UNINSTALLED`.
+- `status` can be: `UNKNOWN`, `ENTITLED`, `DOWNLOAD_QUEUED`, `DOWNLOADING`, `INSTALL_QUEUED`, `INSTALLING`, `INSTALLED` or `UNINSTALLED`.
 
 /// details | Example
     type: example
@@ -219,14 +236,24 @@ GDOculusPlatform.application_check_app_download_progress()\
 
 Cancels the current download of the latest app update (if there is one).
 
-**Returns:** A `GDOculusPlatformPromise` that will contain an `int` that represents a timestamp in miliseconds of when the request started. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about the request once the operation is finished. The promise will error if the request couldn't be completed.
+
+Example response:
+``` json linenums="1"
+{
+    "install_result": "SUCCESS",
+    "timestamp": 1724284356
+}
+```
+
+- `install_result` can be: `UNKNOWN`, `LOW_STORAGE`, `NETWORK_ERROR`, `DUPLICATE_REQUEST`, `INSTALLER_ERROR`, `USER_CANCELLED`, `AUTHORIZATION_ERROR` or `SUCCESS`.
 
 /// details | Example
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.application_cancel_app_download()\
-.then(func(cancel_timestamp : int):
-     print("Cancelled download of app update: ", cancel_timestamp)
+.then(func(result : Dictionary):
+     print("Cancelled download of app update at: ", result.timestamp)
 )\
 .error(func(app_update_cancel_err):
     print("Failed to cancel downloading app update: ", app_update_cancel_err)
@@ -239,9 +266,19 @@ GDOculusPlatform.application_cancel_app_download()\
 //// admonition | application_install_app_update_and_relaunch(deeplink_options : `Dictionary`)
     type: abstract
 
-Installs the latest app update (if there is one) and launches the application again. The `deeplink_options` argument is optional.
+Installs the latest app update (if there is one) and launches the application again once the install finishes. The `deeplink_options` argument is optional.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain an `int` that represents a timestamp in miliseconds of when the request started. The promise will error if the request couldn't be completed.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` with information about the request. The promise will error if the request couldn't be completed.
+
+Example response:
+``` json linenums="1"
+{
+    "install_result": "LOW_STORAGE",
+    "timestamp": 1724284356
+}
+```
+
+- `install_result` can be: `UNKNOWN`, `LOW_STORAGE`, `NETWORK_ERROR`, `DUPLICATE_REQUEST`, `INSTALLER_ERROR`, `USER_CANCELLED`, `AUTHORIZATION_ERROR` or `SUCCESS`.
 
 Example of `deeplink_options`:
 ``` json linenums="1"
@@ -259,8 +296,9 @@ If you decide to include `deeplink_options`, the only required field is `deeplin
     type: example
 ``` gdscript linenums="1"
 GDOculusPlatform.application_install_app_update_and_relaunch()\
-.then(func(install_timestamp : int):
-     print("Install app update timestamp: ", install_timestamp)
+.then(func(result : Dictionary):
+    if result.install_result != "SUCCESS":
+        print("[ERROR] %s" % result.install_result)
 )\
 .error(func(app_update_install_err):
     print("Failed to install latest app update: ", app_update_install_err)

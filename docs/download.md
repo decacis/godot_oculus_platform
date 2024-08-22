@@ -115,6 +115,14 @@ The interactive list bellow will help you find all of the precompiled releases f
                     "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v1.4.0-beta_godot-4.2.0-stable_sdk-59.0"
                 }
             ]
+        },
+        "4.2.0+": {
+            "66.0": [
+                {
+                    "name": "v1.5.0",
+                    "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v1.5.0_godot-4.2.0-stable_sdk-66.0"
+                }
+            ]
         }
     }
 
@@ -142,8 +150,11 @@ The interactive list bellow will help you find all of the precompiled releases f
     function renderGDVersions() {
         let gd_versions = Object.keys(gdop_versions);
         gd_versions.sort((a, b) => {
-            let temp_a = Number(a.replace(/[^0-9]+/g, ''));
-            let temp_b = Number(b.replace(/[^0-9]+/g, ''));
+            let a_plus = a.replace(/[^0-9+]+/g, '');
+            let b_plus = b.replace(/[^0-9+]+/g, '');
+
+            let temp_a = Number(a_plus.replace(/\+/g, '.1'));
+            let temp_b = Number(b_plus.replace(/\+/g, '.1'));
 
             return temp_b - temp_a;
         });
@@ -219,6 +230,8 @@ The interactive list bellow will help you find all of the precompiled releases f
 /// admonition | Note
     type: warning
 Make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.
+
+Also, most of the methods will require you to enable the `INTERNET` permission in your export settings/add it to your AndroidManifest.xml
 ///
 
 You can find all the releases in the [GitHub releases page](https://github.com/decacis/godot_oculus_platform/releases).
