@@ -116,6 +116,17 @@ void GDOculusPlatform::_bind_methods() {
 	// DEVICE APPLICATION INTEGRITY
 	ClassDB::bind_method(D_METHOD("deviceappintegrity_get_integrity_token", "challenge_nonce"), &GDOculusPlatform::deviceappintegrity_get_integrity_token);
 
+	// COWATCHING
+	ClassDB::bind_method(D_METHOD("cowatch_get_presenter_data"), &GDOculusPlatform::cowatch_get_presenter_data);
+	ClassDB::bind_method(D_METHOD("cowatch_get_viewers_data"), &GDOculusPlatform::cowatch_get_viewers_data);
+	ClassDB::bind_method(D_METHOD("cowatch_is_in_session"), &GDOculusPlatform::cowatch_is_in_session);
+	ClassDB::bind_method(D_METHOD("cowatch_join_session"), &GDOculusPlatform::cowatch_join_session);
+	ClassDB::bind_method(D_METHOD("cowatch_launch_invite_dialog"), &GDOculusPlatform::cowatch_launch_invite_dialog);
+	ClassDB::bind_method(D_METHOD("cowatch_leave_session"), &GDOculusPlatform::cowatch_leave_session);
+	ClassDB::bind_method(D_METHOD("cowatch_request_to_present"), &GDOculusPlatform::cowatch_request_to_present);
+	ClassDB::bind_method(D_METHOD("cowatch_set_presenter_data", "video_title", "presenter_data"), &GDOculusPlatform::cowatch_set_presenter_data);
+	ClassDB::bind_method(D_METHOD("cowatch_set_viewer_data", "viewer_data"), &GDOculusPlatform::cowatch_set_viewer_data);
+
 	// SIGNALS
 
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
@@ -123,6 +134,13 @@ void GDOculusPlatform::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
 	ADD_SIGNAL(MethodInfo("abuse_report_form_requested"));
 	ADD_SIGNAL(MethodInfo("app_launch_intent_changed", PropertyInfo(Variant::STRING, "intent_type")));
+	ADD_SIGNAL(MethodInfo("cowatch_api_not_ready", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_api_ready", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_initialized", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_presenter_data_changed", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_session_started", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_session_stopped", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_viewers_data_changed", PropertyInfo(Variant::DICTIONARY, "viewer_data_changed")));
 
 	// ENUMS
 
@@ -626,6 +644,74 @@ void GDOculusPlatform::pump_messages() {
 
 			case ovrMessage_DeviceApplicationIntegrity_GetIntegrityToken:
 				_process_deviceappintegrity_get_integrity_token(message);
+				break;
+
+			case ovrMessage_Cowatching_GetPresenterData:
+				_process_cowatch_get_presenter_data(message);
+				break;
+
+			case ovrMessage_Cowatching_GetViewersData:
+				_process_cowatch_get_viewers_data(message);
+				break;
+
+			case ovrMessage_Cowatching_IsInSession:
+				_process_cowatch_is_in_session(message);
+				break;
+
+			case ovrMessage_Cowatching_JoinSession:
+				_process_cowatch_join_session(message);
+				break;
+
+			case ovrMessage_Cowatching_LaunchInviteDialog:
+				_process_cowatch_launch_invite_dialog(message);
+				break;
+
+			case ovrMessage_Cowatching_LeaveSession:
+				_process_cowatch_leave_session(message);
+				break;
+
+			case ovrMessage_Cowatching_RequestToPresent:
+				_process_cowatch_request_to_present(message);
+				break;
+
+			case ovrMessage_Cowatching_ResignFromPresenting:
+				_process_cowatch_resign_from_presenting(message);
+				break;
+
+			case ovrMessage_Cowatching_SetPresenterData:
+				_process_cowatch_set_presenter_data(message);
+				break;
+
+			case ovrMessage_Cowatching_SetViewerData:
+				_process_cowatch_set_viewer_data(message);
+				break;
+
+			case ovrMessage_Notification_Cowatching_ApiNotReady:
+				emit_signal("cowatch_api_not_ready", String(ovr_Message_GetString(message)));
+				break;
+
+			case ovrMessage_Notification_Cowatching_ApiReady:
+				emit_signal("cowatch_api_ready", String(ovr_Message_GetString(message)));
+				break;
+
+			case ovrMessage_Notification_Cowatching_Initialized:
+				emit_signal("cowatch_initialized", String(ovr_Message_GetString(message)));
+				break;
+
+			case ovrMessage_Notification_Cowatching_PresenterDataChanged:
+				emit_signal("cowatch_presenter_data_changed", String(ovr_Message_GetString(message)));
+				break;
+
+			case ovrMessage_Notification_Cowatching_SessionStarted:
+				emit_signal("cowatch_session_started", String(ovr_Message_GetString(message)));
+				break;
+
+			case ovrMessage_Notification_Cowatching_SessionStopped:
+				emit_signal("cowatch_session_stopped", String(ovr_Message_GetString(message)));
+				break;
+
+			case ovrMessage_Notification_Cowatching_ViewersDataChanged:
+				_process_cowatch_viewer_data_changed(message);
 				break;
 
 			default:
@@ -2658,6 +2744,139 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::deviceappintegrity_get_integrity_
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
+///// COWATCHING
+/////////////////////////////////////////////////
+
+/// Requests the presenter data.
+/// @return Promise that will contain a String with the presenter data
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_get_presenter_data() {
+	ovrRequest req = ovr_Cowatching_GetPresenterData();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests the viewer data.
+/// @return Promise that will contain a String with the viewers data
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_get_viewers_data() {
+	ovrRequest req = ovr_Cowatching_GetViewersData();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Queries if the user is in a cowatching session.
+/// @return Promise that will contain a bool that defines if the user in in a cowatching session.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_is_in_session() {
+	ovrRequest req = ovr_Cowatching_IsInSession();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Tries to join the current cowatching session.
+/// @return Promise that will be true if succesful.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_join_session() {
+	ovrRequest req = ovr_Cowatching_JoinSession();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Request cowatching invite dialog.
+/// @return Promise that will be true if succesful.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_launch_invite_dialog() {
+	ovrRequest req = ovr_Cowatching_LaunchInviteDialog();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Tries to leave the current cowatching session.
+/// @return Promise that will be true if succesful.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_leave_session() {
+	ovrRequest req = ovr_Cowatching_LeaveSession();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests presenting in the current cowatching session.
+/// @return Promise that will be true if succesful.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_request_to_present() {
+	ovrRequest req = ovr_Cowatching_RequestToPresent();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests resigning from presenting from the current cowatching session.
+/// @return Promise that will be true if succesful.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_resign_from_presenting() {
+	ovrRequest req = ovr_Cowatching_ResignFromPresenting();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Sets the presenter data (video title and description).
+/// @return Promise that will be true if succesful.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_set_presenter_data(const String &p_video_title, const String &p_presenter_data) {
+	if (p_video_title.length() > 100 || p_presenter_data.length() > 500) {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid presenter data. Video title cannot exceed 100 characters and presenter data is limited to 500 characters.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+
+	ovrRequest req = ovr_Cowatching_SetPresenterData(p_video_title.utf8().get_data(), p_presenter_data.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Sets the viewer data.
+/// @return Promise that will be true if succesful.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_set_viewer_data(const String &p_viewer_data) {
+	if (p_viewer_data.length() > 500) {
+		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
+		String rejection_msg = "Invalid viewer data. Viewer data is limited to 500 characters.";
+		return_promise->saved_rejection_response = Array::make(rejection_msg);
+		_promises_to_reject.push_back(return_promise);
+
+		return return_promise;
+	}
+
+	ovrRequest req = ovr_Cowatching_SetViewerData(p_viewer_data.utf8().get_data());
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
 ///// INTERNAL PROCESSING METHODS
 /////////////////////////////////////////////////
 
@@ -3405,8 +3624,16 @@ void GDOculusPlatform::_process_application_start_app_download(ovrMessageHandle 
 
 	if (!ovr_Message_IsError(p_message)) {
 		ovrAppDownloadResultHandle download_result_h = ovr_Message_GetAppDownloadResult(p_message);
+
+		Dictionary download_result_info;
+
+		ovrAppInstallResult download_result = ovr_AppDownloadResult_GetAppInstallResult(download_result_h);
 		int64_t timestamp = ovr_AppDownloadResult_GetTimestamp(download_result_h);
-		_fulfill_promise(msg_id, Array::make(timestamp));
+
+		download_result_info["install_result"] = ovrAppInstallResult_ToString(download_result);
+		download_result_info["timestamp"] = timestamp;
+
+		_fulfill_promise(msg_id, Array::make(download_result_info));
 
 	} else {
 		_handle_default_process_error(p_message, msg_id);
@@ -3680,6 +3907,157 @@ void GDOculusPlatform::_process_deviceappintegrity_get_integrity_token(ovrMessag
 	} else {
 		_handle_default_process_error(p_message, msg_id);
 	}
+}
+
+///// COWATCHING
+/////////////////////////////////////////////////
+
+// Processes the retult of requesting the presenter data.
+void GDOculusPlatform::_process_cowatch_get_presenter_data(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		String msg = ovr_Message_GetString(p_message);
+		_fulfill_promise(msg_id, Array::make(msg));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of requesting the viewer data.
+void GDOculusPlatform::_process_cowatch_get_viewers_data(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrCowatchViewerArrayHandle viewer_data_arr_h = ovr_Message_GetCowatchViewerArray(p_message);
+
+		Dictionary viewer_data_result = _get_cowatching_viewers_data(viewer_data_arr_h);
+
+		_fulfill_promise(msg_id, Array::make(viewer_data_result));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of quering if the user is in a cowatching session.
+void GDOculusPlatform::_process_cowatch_is_in_session(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		ovrCowatchingStateHandle cowatching_state_h = ovr_Message_GetCowatchingState(p_message);
+		bool is_in_session = ovr_CowatchingState_GetInSession(cowatching_state_h);
+
+		_fulfill_promise(msg_id, Array::make(is_in_session));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of requesting to join a cowatching session.
+void GDOculusPlatform::_process_cowatch_join_session(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of requesting to launch an invite dialog for a cowatching session.
+void GDOculusPlatform::_process_cowatch_launch_invite_dialog(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of requesting to leave the current cowatching session.
+void GDOculusPlatform::_process_cowatch_leave_session(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of requesting to present in the current cowatching session.
+void GDOculusPlatform::_process_cowatch_request_to_present(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of requesting to stop presenting in the current cowatching session.
+void GDOculusPlatform::_process_cowatch_resign_from_presenting(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of setting the presenter data.
+void GDOculusPlatform::_process_cowatch_set_presenter_data(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of setting the viewer data.
+void GDOculusPlatform::_process_cowatch_set_viewer_data(ovrMessageHandle p_message) {
+	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
+
+	if (!ovr_Message_IsError(p_message)) {
+		_fulfill_promise(msg_id, Array::make(true));
+
+	} else {
+		_handle_default_process_error(p_message, msg_id);
+	}
+}
+
+// Processes the retult of a notification when a viewer changes its data.
+void GDOculusPlatform::_process_cowatch_viewer_data_changed(ovrMessageHandle p_message) {
+	Dictionary viewer_data_changed_result;
+
+	ovrCowatchViewerUpdateHandle viewer_update_h = ovr_Message_GetCowatchViewerUpdate(p_message);
+
+	ovrCowatchViewerArrayHandle participants_data_arr_h = ovr_CowatchViewerUpdate_GetDataList(viewer_update_h);
+
+	ovrID viewer_id = ovr_CowatchViewerUpdate_GetId(viewer_update_h);
+	char native_id[OVRID_SIZE];
+	ovrID_ToString(native_id, OVRID_SIZE, viewer_id);
+
+	Dictionary viewers_data_dict = _get_cowatching_viewers_data(participants_data_arr_h);
+
+	viewer_data_changed_result["updated_viewer_id"] = String(native_id);
+	viewer_data_changed_result["all_viewers_data"] = viewers_data_dict;
+
+	emit_signal("cowatch_viewers_data_changed", viewer_data_changed_result);
 }
 
 ///// PROCESSING HELPERS
@@ -4005,6 +4383,34 @@ void GDOculusPlatform::_handle_process_app_invite_array(ovrMessageHandle p_messa
 	} else {
 		_handle_default_process_error(p_message, msg_id);
 	}
+}
+
+Dictionary GDOculusPlatform::_get_cowatching_viewers_data(const ovrCowatchViewerArrayHandle &p_viewer_array_handle) {
+	Dictionary viewer_data_resp;
+	size_t viewers_count = ovr_CowatchViewerArray_GetSize(p_viewer_array_handle);
+
+	Array viewers_data_array = Array();
+	for (size_t i = 0; i < viewers_count; i++) {
+		Dictionary viewer_data;
+
+		ovrCowatchViewerHandle viewer_h = ovr_CowatchViewerArray_GetElement(p_viewer_array_handle, i);
+
+		ovrID viewer_id = ovr_CowatchViewer_GetId(viewer_h);
+		char native_id[OVRID_SIZE];
+		ovrID_ToString(native_id, OVRID_SIZE, viewer_id);
+
+		String viewer_data_str = ovr_CowatchViewer_GetData(viewer_h);
+
+		viewer_data["id"] = String(native_id);
+		viewer_data["data"] = viewer_data_str;
+
+		viewers_data_array.push_back(viewer_data);
+	}
+
+	viewer_data_resp["data"] = viewers_data_array;
+	viewer_data_resp["next_page_url"] = ovr_CowatchViewerArray_GetNextUrl(p_viewer_array_handle);
+
+	return viewer_data_resp;
 }
 
 /////////////////////////////////////////////////

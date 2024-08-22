@@ -207,7 +207,7 @@ func _on_application_start_app_download_pressed():
 	print("-------------------------------------")
 	print("application_start_app_download CALLED")
 	GDOculusPlatform.application_start_app_download()\
-	.then(func(app_download_resp : int):
+	.then(func(app_download_resp : Dictionary):
 		print("[application_start_app_download] RESPONSE: ", app_download_resp)
 	)\
 	.error(func(app_download_err):
@@ -229,7 +229,7 @@ func _on_application_cancel_app_download_pressed():
 	print("-------------------------------------")
 	print("application_cancel_app_download CALLED")
 	GDOculusPlatform.application_cancel_app_download()\
-	.then(func(app_download_cancel_resp : int):
+	.then(func(app_download_cancel_resp : Dictionary):
 		print("[application_cancel_app_download] RESPONSE: ", app_download_cancel_resp)
 	)\
 	.error(func(app_download_cancel_err):
@@ -242,7 +242,7 @@ func _on_application_install_app_update_and_relaunch_pressed():
 	print("application_install_app_update_and_relaunch CALLED")
 	print("INPUT: ", application_install_app_update_and_relaunch)
 	GDOculusPlatform.application_install_app_update_and_relaunch(application_install_app_update_and_relaunch)\
-	.then(func(install_app_and_relaunch_resp : int):
+	.then(func(install_app_and_relaunch_resp : Dictionary):
 		print("[application_install_app_update_and_relaunch] RESPONSE: ", install_app_and_relaunch_resp)
 	)\
 	.error(func(install_app_and_relaunch_err):

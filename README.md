@@ -2,9 +2,7 @@
 An open-source implementation of the Oculus Platform SDK intended to be used with the Quest platform.
 See the [download](https://decacis.github.io/godot_oculus_platform/download/) page of the documentation for a list of supported Godot Engine and Oculus Platform SDK versions.
 
-While you can use this plugin in the editor to get code suggestions, it **only works with the Meta Quest, not PCVR (Rift) at the moment**. If you plan to develop for both the Quest and Rift, you should add a platform check and only use this plugin when the platform is Android.
-
-**NOTE:** While this project is stable, it's still considered to be in beta simply because it hasn't had enough real world testing yet.
+While you can use this plugin in the editor to get code suggestions, it **only works with the Meta Quest (Android), not PCVR (Rift) at the moment**. If you plan to develop for both the Quest and Rift, you should add a platform check and only use this plugin when the platform is Android.
 
 **Main branch (this branch) works with Godot 4.2+**
 
@@ -93,6 +91,9 @@ Finally, you have to copy the files into place:
 | `tools/godotoculusplatform-android-plugin/godotoculusplatform-android-plugin/build/outputs/aar/godotoculusplatform-android-plugin-debug.aar` | `addons/godot_oculus_platform/android_plugin` |
 
 **Make sure to enable the `Godot Oculus Platform` plugin in your Project Settings.**
+
+## Common issues
+- **Most methods don't work or return an error:** usually this is because the `INTERNET` permission is missing from the manifest.
 
 ## License
 Unless specified otherwise, sources in this repository are licensed under MIT, see `LICENSE` for more information.

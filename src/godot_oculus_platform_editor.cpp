@@ -120,6 +120,17 @@ void GDOculusPlatform::_bind_methods() {
 	// DEVICE APPLICATION INTEGRITY
 	ClassDB::bind_method(D_METHOD("deviceappintegrity_get_integrity_token", "challenge_nonce"), &GDOculusPlatform::deviceappintegrity_get_integrity_token);
 
+	// COWATCHING
+	ClassDB::bind_method(D_METHOD("cowatch_get_presenter_data"), &GDOculusPlatform::cowatch_get_presenter_data);
+	ClassDB::bind_method(D_METHOD("cowatch_get_viewers_data"), &GDOculusPlatform::cowatch_get_viewers_data);
+	ClassDB::bind_method(D_METHOD("cowatch_is_in_session"), &GDOculusPlatform::cowatch_is_in_session);
+	ClassDB::bind_method(D_METHOD("cowatch_join_session"), &GDOculusPlatform::cowatch_join_session);
+	ClassDB::bind_method(D_METHOD("cowatch_launch_invite_dialog"), &GDOculusPlatform::cowatch_launch_invite_dialog);
+	ClassDB::bind_method(D_METHOD("cowatch_leave_session"), &GDOculusPlatform::cowatch_leave_session);
+	ClassDB::bind_method(D_METHOD("cowatch_request_to_present"), &GDOculusPlatform::cowatch_request_to_present);
+	ClassDB::bind_method(D_METHOD("cowatch_set_presenter_data", "video_title", "presenter_data"), &GDOculusPlatform::cowatch_set_presenter_data);
+	ClassDB::bind_method(D_METHOD("cowatch_set_viewer_data", "viewer_data"), &GDOculusPlatform::cowatch_set_viewer_data);
+
 	// SIGNALS
 
 	ADD_SIGNAL(MethodInfo("unhandled_message", PropertyInfo(Variant::DICTIONARY, "message")));
@@ -127,6 +138,13 @@ void GDOculusPlatform::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("assetfile_download_finished", PropertyInfo(Variant::STRING, "asset_id")));
 	ADD_SIGNAL(MethodInfo("abuse_report_form_requested"));
 	ADD_SIGNAL(MethodInfo("app_launch_intent_changed", PropertyInfo(Variant::STRING, "intent_type")));
+	ADD_SIGNAL(MethodInfo("cowatch_api_not_ready", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_api_ready", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_initialized", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_presenter_data_changed", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_session_started", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_session_stopped", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("cowatch_viewers_data_changed", PropertyInfo(Variant::DICTIONARY, "viewer_data_changed")));
 
 	// ENUMS
 
@@ -187,7 +205,7 @@ GDOculusPlatform::~GDOculusPlatform() {
 void GDOculusPlatform::pump_messages() {}
 
 Ref<GDOculusPlatformPromise> _empty_func_helper() {
-	Ref<GDOculusPlatformPromise> promise = memnew(GDOculusPlatformPromise(-1));
+	Ref<GDOculusPlatformPromise> promise = memnew(GDOculusPlatformPromise(0));
 	ERR_FAIL_V_MSG(promise, "Godot Oculus Platform only works with the Meta Quest (android).");
 
 	return promise;
@@ -561,5 +579,50 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_report(AppAgeCate
 /////////////////////////////////////////////////
 
 Ref<GDOculusPlatformPromise> GDOculusPlatform::deviceappintegrity_get_integrity_token(const String &p_challenge_nonce) {
+	return _empty_func_helper();
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+///// COWATCHING
+/////////////////////////////////////////////////
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_get_presenter_data() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_get_viewers_data() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_is_in_session() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_join_session() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_launch_invite_dialog() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_leave_session() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_request_to_present() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_resign_from_presenting() {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_set_presenter_data(const String &p_video_title, const String &p_presenter_data) {
+	return _empty_func_helper();
+}
+
+Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_set_viewer_data(const String &p_viewer_data) {
 	return _empty_func_helper();
 }

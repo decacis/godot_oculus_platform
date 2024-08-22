@@ -115,6 +115,19 @@ private:
 	// DEVICE APPLICATION INTEGRITY
 	void _process_deviceappintegrity_get_integrity_token(ovrMessageHandle p_message);
 
+	// COWATCHING
+	void _process_cowatch_get_presenter_data(ovrMessageHandle p_message);
+	void _process_cowatch_get_viewers_data(ovrMessageHandle p_message);
+	void _process_cowatch_is_in_session(ovrMessageHandle p_message);
+	void _process_cowatch_join_session(ovrMessageHandle p_message);
+	void _process_cowatch_launch_invite_dialog(ovrMessageHandle p_message);
+	void _process_cowatch_leave_session(ovrMessageHandle p_message);
+	void _process_cowatch_request_to_present(ovrMessageHandle p_message);
+	void _process_cowatch_resign_from_presenting(ovrMessageHandle p_message);
+	void _process_cowatch_set_presenter_data(ovrMessageHandle p_message);
+	void _process_cowatch_set_viewer_data(ovrMessageHandle p_message);
+	void _process_cowatch_viewer_data_changed(ovrMessageHandle p_message);
+
 	// LEADERBOARD HELPERS
 	Array _handle_leaderboard_entries(const ovrLeaderboardEntryArrayHandle &p_entries_arr_h);
 
@@ -133,6 +146,9 @@ private:
 
 	// GROUP PRESENCE HELPERS
 	void _handle_process_app_invite_array(ovrMessageHandle p_message);
+
+	// COWATCHING HELPERS
+	Dictionary _get_cowatching_viewers_data(const ovrCowatchViewerArrayHandle &p_viewer_array_handle);
 
 	void _handle_unhandled_message(ovrMessageHandle p_message);
 	void _process_user_get_next_array_page(ovrMessageHandle p_message);
@@ -303,6 +319,18 @@ public:
 
 	// DEVICE APPLICATION INTEGRITY
 	Ref<GDOculusPlatformPromise> deviceappintegrity_get_integrity_token(const String &p_challenge_nonce);
+
+	// COWATCHING
+	Ref<GDOculusPlatformPromise> cowatch_get_presenter_data();
+	Ref<GDOculusPlatformPromise> cowatch_get_viewers_data();
+	Ref<GDOculusPlatformPromise> cowatch_is_in_session();
+	Ref<GDOculusPlatformPromise> cowatch_join_session();
+	Ref<GDOculusPlatformPromise> cowatch_launch_invite_dialog();
+	Ref<GDOculusPlatformPromise> cowatch_leave_session();
+	Ref<GDOculusPlatformPromise> cowatch_request_to_present();
+	Ref<GDOculusPlatformPromise> cowatch_resign_from_presenting();
+	Ref<GDOculusPlatformPromise> cowatch_set_presenter_data(const String &p_video_title, const String &p_presenter_data);
+	Ref<GDOculusPlatformPromise> cowatch_set_viewer_data(const String &p_viewer_data);
 
 	void pump_messages();
 };
