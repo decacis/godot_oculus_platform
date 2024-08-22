@@ -35,6 +35,7 @@ Options (optional):
 | Key                    |   Value type  | Description                                                        |
 |------------------------|:-------------:|--------------------------------------------------------------------|
 | disable_p2p_networking |     bool      | Disables/enables the initialization of the WebRTC networking stack, only used for VoIP & Networking (both deprecated). |
+| enable_cowatching      |     bool      | Disables/enables the initialization of the cowatching stack. |
 
 /// details | Example
     type: example
