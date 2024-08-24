@@ -5,9 +5,14 @@
 
 #include "OVR_Platform_Defs.h"
 
+/// Age category for developers to send to Meta. The values are used in
+/// ovr_UserAgeCategory_Report() API.
 typedef enum ovrAppAgeCategory_ {
   ovrAppAgeCategory_Unknown,
+  /// Child age group for users between the ages of 10-12 (age may vary by
+  /// region)
   ovrAppAgeCategory_Ch,
+  /// Non-child age group for users ages 13 and up (age may vary by region)
   ovrAppAgeCategory_Nch,
 } ovrAppAgeCategory;
 

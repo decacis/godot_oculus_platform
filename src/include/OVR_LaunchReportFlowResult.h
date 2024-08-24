@@ -12,6 +12,8 @@ typedef struct ovrLaunchReportFlowResult *ovrLaunchReportFlowResultHandle;
 /// Whether the viewer chose to cancel the report flow.
 OVRP_PUBLIC_FUNCTION(bool) ovr_LaunchReportFlowResult_GetDidCancel(const ovrLaunchReportFlowResultHandle obj);
 
+/// ID of the report created by the user.
 OVRP_PUBLIC_FUNCTION(ovrID) ovr_LaunchReportFlowResult_GetUserReportId(const ovrLaunchReportFlowResultHandle obj);
+
 
 #endif
