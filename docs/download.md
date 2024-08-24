@@ -122,6 +122,12 @@ The interactive list bellow will help you find all of the precompiled releases f
                     "name": "v1.5.0",
                     "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v1.5.0_godot-4.2.0-stable_sdk-66.0"
                 }
+            ],
+            "67.0": [
+                {
+                    "name": "v1.5.0",
+                    "url": "https://github.com/decacis/godot_oculus_platform/releases/tag/v1.5.1_godot-4.2.0-stable_sdk-67.0"
+                }
             ]
         }
     }
