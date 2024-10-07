@@ -9,10 +9,11 @@
 /// ovr_UserAgeCategory_Report() API.
 typedef enum ovrAppAgeCategory_ {
   ovrAppAgeCategory_Unknown,
-  /// Child age group for users between the ages of 10-12 (age may vary by
-  /// region)
+  /// Child age group for users between the ages of 10-12 (or applicable age in
+  /// user's region)
   ovrAppAgeCategory_Ch,
-  /// Non-child age group for users ages 13 and up (age may vary by region)
+  /// Non-child age group for users ages 13 and up (or applicable age in user's
+  /// region)
   ovrAppAgeCategory_Nch,
 } ovrAppAgeCategory;
 

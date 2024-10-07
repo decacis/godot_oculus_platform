@@ -60,6 +60,8 @@
 /// achievement. The largest number that is supported by this method is the max
 /// value of a signed 64-bit integer. If the number is larger than that, it is
 /// clamped to that max value before being passed to the servers.
+/// \param name The api_name of the achievement that will be adding count.
+/// \param count The value of count that will be added to the achievement.
 ///
 /// A message with type ::ovrMessage_Achievements_AddCount will be generated in response.
 ///
@@ -102,6 +104,8 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Achievements_GetAllDefinitions();
 OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Achievements_GetAllProgress();
 
 /// Request the achievement definitions that match the specified names.
+/// \param names The api_names(ovr_AchievementDefinition_GetName()) of the achievements used to retrieve the definition information.
+/// \param count The number of specified achievements names.
 ///
 /// A message with type ::ovrMessage_Achievements_GetDefinitionsByName will be generated in response.
 ///
@@ -132,6 +136,8 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Achievements_GetNextAchievementDefinitionAr
 OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Achievements_GetNextAchievementProgressArrayPage(ovrAchievementProgressArrayHandle handle);
 
 /// Request the user's progress on the specified achievements.
+/// \param names The api_names(ovr_AchievementDefinition_GetName()) of the achievements used to retrieve the progress information.
+/// \param count The number of specified achievements names.
 ///
 /// A message with type ::ovrMessage_Achievements_GetProgressByName will be generated in response.
 ///
@@ -143,6 +149,7 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Achievements_GetProgressByName(const char *
 
 /// Unlock the achievement with the given name. This can be of any achievement
 /// type.
+/// \param name The api_name of the achievement that will be unlocked.
 ///
 /// A message with type ::ovrMessage_Achievements_Unlock will be generated in response.
 ///

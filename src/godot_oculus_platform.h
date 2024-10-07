@@ -253,6 +253,7 @@ public:
 
 	// IAP
 	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases();
+	Ref<GDOculusPlatformPromise> iap_get_viewer_purchases_durable_cache();
 	Ref<GDOculusPlatformPromise> iap_get_products_by_sku(const Array &p_sku_list);
 	Ref<GDOculusPlatformPromise> iap_consume_purchase(const String &p_sku);
 	Ref<GDOculusPlatformPromise> iap_launch_checkout_flow(const String &p_sku);

@@ -77,6 +77,9 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_GroupPresence_LaunchMultiplayerErrorDialog(
 /// Launch the dialog which will allow the user to rejoin a previous
 /// lobby/match. Either the lobby_session_id or the match_session_id, or both,
 /// must be populated.
+/// \param lobby_session_id The unique identifier of the lobby session to rejoin.
+/// \param match_session_id The unique identifier of the match session to rejoin.
+/// \param destination_api_name The unique name of the in-app destination to rejoin.
 ///
 /// A message with type ::ovrMessage_GroupPresence_LaunchRejoinDialog will be generated in response.
 ///
@@ -98,6 +101,8 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_GroupPresence_LaunchRejoinDialog(const char
 OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_GroupPresence_LaunchRosterPanel(ovrRosterOptionsHandle options);
 
 /// Send application invites to the passed in userIDs.
+/// \param userIDs Defines a list of user ids to get entries for.
+/// \param userIDLength The number of user IDs provided.
 ///
 /// A message with type ::ovrMessage_GroupPresence_SendInvites will be generated in response.
 ///
@@ -119,6 +124,7 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_GroupPresence_Set(ovrGroupPresenceOptionsHa
 /// Set the user's deeplink message while keeping the other group presence
 /// parameters the same. If the destination of the user is not set, the
 /// deeplink message cannot be set as there's no deeplink message to override.
+/// \param deeplink_message The new deeplink message to set for the user, overriding the current deeplink message.
 ///
 /// A message with type ::ovrMessage_GroupPresence_SetDeeplinkMessageOverride will be generated in response.
 ///
@@ -129,6 +135,7 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_GroupPresence_SetDeeplinkMessageOverride(co
 
 /// Replaces the user's current destination for the provided one. All other
 /// existing group presence parameters will remain the same.
+/// \param api_name The unique name of the in-app destination to set, replacing the user's current destination.
 ///
 /// A message with type ::ovrMessage_GroupPresence_SetDestination will be generated in response.
 ///
@@ -140,6 +147,7 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_GroupPresence_SetDestination(const char *ap
 /// Set if the current user's destination and session is joinable while keeping
 /// the other group presence parameters the same. If the destination or session
 /// ids of the user is not set, they cannot be set to joinable.
+/// \param is_joinable If true, the user can invite others to join them. If false, other users cannot join this user, for example, if the current session is full or only the host can invite others and the current user is not the host.
 ///
 /// A message with type ::ovrMessage_GroupPresence_SetIsJoinable will be generated in response.
 ///
@@ -150,6 +158,7 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_GroupPresence_SetIsJoinable(bool is_joinabl
 
 /// Replaces the user's current lobby session id for the provided one. All
 /// other existing group presence parameters will remain the same.
+/// \param id The unique identifier of the lobby session to set, replacing the user's current lobby session id.
 ///
 /// A message with type ::ovrMessage_GroupPresence_SetLobbySession will be generated in response.
 ///
@@ -160,6 +169,7 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_GroupPresence_SetLobbySession(const char *i
 
 /// Replaces the user's current match session id for the provided one. All
 /// other existing group presence parameters will remain the same.
+/// \param id The unique identifier of the match session to set, replacing the user's current match session id.
 ///
 /// A message with type ::ovrMessage_GroupPresence_SetMatchSession will be generated in response.
 ///

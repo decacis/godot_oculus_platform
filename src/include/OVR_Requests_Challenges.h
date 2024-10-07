@@ -24,6 +24,7 @@
 OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Challenges_Create(const char *leaderboardName, ovrChallengeOptionsHandle challengeOptions);
 
 /// If the current user has an invite to the challenge, decline the invite
+/// \param challengeID The ID of challenge that the user is going to decline. It can be retrieved by ovr_Challenge_GetID().
 ///
 /// A message with type ::ovrMessage_Challenges_DeclineInvite will be generated in response.
 ///
@@ -97,6 +98,8 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Challenges_GetEntriesAfterRank(ovrID challe
 OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Challenges_GetEntriesByIds(ovrID challengeID, int limit, ovrLeaderboardStartAt startAt, ovrID *userIDs, unsigned int userIDLength);
 
 /// Requests for a list of challenge
+/// \param challengeOptions This indicates the options of the challenge and it can be retrieved by ovr_ChallengeOptions_Create.
+/// \param limit Limits the maximum number of challenges to be fetched.
 ///
 /// A message with type ::ovrMessage_Challenges_GetList will be generated in response.
 ///
@@ -151,6 +154,7 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Challenges_GetPreviousChallenges(const ovrC
 OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Challenges_GetPreviousEntries(const ovrChallengeEntryArrayHandle handle);
 
 /// If the current user has permission, join the challenge
+/// \param challengeID The ID of challenge that the user is going to join. It can be retrieved by ovr_Challenge_GetID().
 ///
 /// A message with type ::ovrMessage_Challenges_Join will be generated in response.
 ///
@@ -161,6 +165,7 @@ OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Challenges_GetPreviousEntries(const ovrChal
 OVRP_PUBLIC_FUNCTION(ovrRequest) ovr_Challenges_Join(ovrID challengeID);
 
 /// If the current user has permission, leave the challenge
+/// \param challengeID The ID of challenge that the user is going to leave. It can be retrieved by ovr_Challenge_GetID().
 ///
 /// A message with type ::ovrMessage_Challenges_Leave will be generated in response.
 ///

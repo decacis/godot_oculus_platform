@@ -333,6 +333,10 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases() {
 	return _empty_func_helper();
 }
 
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases_durable_cache() {
+	return _empty_func_helper();
+}
+
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_products_by_sku(const Array &p_sku_list) {
 	return _empty_func_helper();
 }
