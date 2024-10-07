@@ -57,6 +57,31 @@ GDOculusPlatform.iap_get_viewer_purchases()\
 ///
 ////
 
+### iap_get_viewer_purchases_durable_cache
+//// admonition | iap_get_viewer_purchases_durable_cache()
+    type: abstract
+
+Requests all of the logged-in user purchases.
+
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` - the `data` key will contain information about durable purchases from the device cache. It is recommended to use [iap_get_viewer_purchases](#iap_get_viewer_purchases) first and only check the cache if that fails. The promise will error if the request couldn't be fulfilled.
+
+Example response: see the response from [iap_get_viewer_purchases](#iap_get_viewer_purchases)
+
+/// details | Example
+    type: example
+``` gdscript linenums="1"
+GDOculusPlatform.iap_get_viewer_purchases_durable_cache()\
+.then(func(user_durable_purchases : Dictionary):
+    for durable_purchase in user_durable_purchases.data:
+        print("Purchased at: ", durable_purchase.grant_time)
+)\
+.error(func(user_durable_purchases_err):
+    print("Unable to retrieve user purchases from cache: ", user_durable_purchases_err)
+)
+```
+///
+////
+
 ### iap_get_products_by_sku
 //// admonition | iap_get_products_by_sku(sku_list : `Array`)
     type: abstract
