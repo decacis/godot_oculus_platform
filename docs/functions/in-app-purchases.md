@@ -61,9 +61,9 @@ GDOculusPlatform.iap_get_viewer_purchases()\
 //// admonition | iap_get_viewer_purchases_durable_cache()
     type: abstract
 
-Requests all of the logged-in user purchases.
+Requests durable purchases of the logged-in user from the device cache. It is recommended to use [iap_get_viewer_purchases](#iap_get_viewer_purchases) first and only check the cache if that fails.
 
-**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` - the `data` key will contain information about durable purchases from the device cache. It is recommended to use [iap_get_viewer_purchases](#iap_get_viewer_purchases) first and only check the cache if that fails. The promise will error if the request couldn't be fulfilled.
+**Returns:** A `GDOculusPlatformPromise` that will contain a `Dictionary` - the `data` key will contain information about durable purchases from the device cache. The promise will error if the request couldn't be fulfilled.
 
 Example response: see the response from [iap_get_viewer_purchases](#iap_get_viewer_purchases)
 
