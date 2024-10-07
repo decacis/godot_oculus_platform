@@ -390,6 +390,10 @@ void GDOculusPlatform::pump_messages() {
 				_process_iap_viewer_purchases(message);
 				break;
 
+			case ovrMessage_IAP_GetViewerPurchasesDurableCache:
+				_process_iap_viewer_purchases(message);
+				break;
+
 			case ovrMessage_IAP_GetNextPurchaseArrayPage:
 				_process_iap_viewer_purchases(message);
 				break;
@@ -1214,6 +1218,17 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 /// @return Promise that contains an Array of Dictionaries with information about each purchase.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases() {
 	ovrRequest req = ovr_IAP_GetViewerPurchases();
+
+	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
+	_promises.push_back(return_promise);
+
+	return return_promise;
+}
+
+/// Requests the current user's purchases (only durable) from the device's cache.
+/// @return Promise that contains an Array of Dictionaries with information about each purchase.
+Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases_durable_cache() {
+	ovrRequest req = ovr_IAP_GetViewerPurchasesDurableCache();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 	_promises.push_back(return_promise);

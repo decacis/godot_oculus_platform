@@ -9,13 +9,14 @@
 /// ovr_UserAgeCategory_Get() API.
 typedef enum ovrAccountAgeCategory_ {
   ovrAccountAgeCategory_Unknown,
-  /// Child age group for users between the ages of 10-12 (age may vary by
-  /// region)
+  /// Child age group for users between the ages of 10-12 (or applicable age in
+  /// user's region)
   ovrAccountAgeCategory_Ch,
-  /// Teenage age group for users between the ages of 13-17 (age may vary by
-  /// region)
+  /// Teenage age group for users between the ages of 13-17 (or applicable age in
+  /// user's region)
   ovrAccountAgeCategory_Tn,
-  /// Adult age group for users ages 18 and up (age may vary by region)
+  /// Adult age group for users ages 18 and up (or applicable age in user's
+  /// region)
   ovrAccountAgeCategory_Ad,
 } ovrAccountAgeCategory;
 
