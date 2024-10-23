@@ -1656,7 +1656,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(cons
 	if (ovrID_FromString(&app_id, p_app_id.utf8().get_data())) {
 		if (!p_deeplink_options.is_empty()) {
 			if (p_deeplink_options.has("deeplink_message")) {
-				if (!p_deeplink_options.get("deeplink_message", 0).get_type() != Variant::STRING) {
+				if (p_deeplink_options.get("deeplink_message", 0).get_type() != Variant::STRING) {
 					ovr_ApplicationOptions_Destroy(deeplink_options);
 					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 					String rejection_msg = "The deeplink_message value must be a String.";
@@ -1670,7 +1670,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(cons
 				}
 
 				if (p_deeplink_options.has("destination_api_name")) {
-					if (!p_deeplink_options.get("destination_api_name", 0).get_type() != Variant::STRING) {
+					if (p_deeplink_options.get("destination_api_name", 0).get_type() != Variant::STRING) {
 						ovr_ApplicationOptions_Destroy(deeplink_options);
 						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 						String rejection_msg = "The destination_api_name value must be a String.";
@@ -1684,7 +1684,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(cons
 				}
 
 				if (p_deeplink_options.has("lobby_session_id")) {
-					if (!p_deeplink_options.get("lobby_session_id", 0).get_type() != Variant::STRING) {
+					if (p_deeplink_options.get("lobby_session_id", 0).get_type() != Variant::STRING) {
 						ovr_ApplicationOptions_Destroy(deeplink_options);
 						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 						String rejection_msg = "The destination_api_name value must be a String.";
@@ -1698,7 +1698,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(cons
 				}
 
 				if (p_deeplink_options.has("match_session_id")) {
-					if (!p_deeplink_options.get("match_session_id", 0).get_type() != Variant::STRING) {
+					if (p_deeplink_options.get("match_session_id", 0).get_type() != Variant::STRING) {
 						ovr_ApplicationOptions_Destroy(deeplink_options);
 						Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 						String rejection_msg = "The destination_api_name value must be a String.";
@@ -1792,7 +1792,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_an
 
 	if (!p_deeplink_options.is_empty()) {
 		if (p_deeplink_options.has("deeplink_message")) {
-			if (!p_deeplink_options.get("deeplink_message", 0).get_type() != Variant::STRING) {
+			if (p_deeplink_options.get("deeplink_message", 0).get_type() != Variant::STRING) {
 				ovr_ApplicationOptions_Destroy(deeplink_options);
 				Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 				String rejection_msg = "The deeplink_message value must be a String.";
@@ -1806,7 +1806,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_an
 			}
 
 			if (p_deeplink_options.has("destination_api_name")) {
-				if (!p_deeplink_options.get("destination_api_name", 0).get_type() != Variant::STRING) {
+				if (p_deeplink_options.get("destination_api_name", 0).get_type() != Variant::STRING) {
 					ovr_ApplicationOptions_Destroy(deeplink_options);
 					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 					String rejection_msg = "The destination_api_name value must be a String.";
@@ -1820,7 +1820,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_an
 			}
 
 			if (p_deeplink_options.has("lobby_session_id")) {
-				if (!p_deeplink_options.get("lobby_session_id", 0).get_type() != Variant::STRING) {
+				if (p_deeplink_options.get("lobby_session_id", 0).get_type() != Variant::STRING) {
 					ovr_ApplicationOptions_Destroy(deeplink_options);
 					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 					String rejection_msg = "The destination_api_name value must be a String.";
@@ -1834,7 +1834,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_an
 			}
 
 			if (p_deeplink_options.has("match_session_id")) {
-				if (!p_deeplink_options.get("match_session_id", 0).get_type() != Variant::STRING) {
+				if (p_deeplink_options.get("match_session_id", 0).get_type() != Variant::STRING) {
 					ovr_ApplicationOptions_Destroy(deeplink_options);
 					Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 					String rejection_msg = "The destination_api_name value must be a String.";
