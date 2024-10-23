@@ -7,6 +7,8 @@
 #include "OVR_Types.h"
 #include <stdbool.h>
 
+/// This object contains information about the status of the request to update
+/// the leaderboard.
 typedef struct ovrLeaderboardUpdateStatus *ovrLeaderboardUpdateStatusHandle;
 
 /// Whether the leaderboard was updated.

@@ -23,7 +23,7 @@ typedef enum ovrPlatformInitializeResult_ {
   /// signed certificate.
   ovrPlatformInitialize_SignatureInvalid = -4,
   /// Oculus Platform SDK failed to verify the application's signature during
-  /// initialization
+  /// initialization.
   ovrPlatformInitialize_UnableToVerify = -5,
   /// There was a mismatch between the version of Oculus Platform SDK used by the
   /// application and the version installed on the Oculus user's device.

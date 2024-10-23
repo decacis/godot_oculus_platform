@@ -30,7 +30,8 @@
 /// The second application will now be able to communicate with the runtime.
 
 /// Return a list of all the pids that we know are registered to your
-/// application.
+/// application. This method is useful for tracking and managing the registered
+/// PIDs associated with your application.
 ///
 /// A message with type ::ovrMessage_ApplicationLifecycle_GetRegisteredPIDs will be generated in response.
 ///
