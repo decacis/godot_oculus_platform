@@ -18,3 +18,5 @@ demo/addons/godot_oculus_platform/bin/*
 src/**/*.o
 src/**/*.os
 src/**/*.obj
+/compileAll.cmd
+/vc140.pdb

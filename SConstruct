@@ -16,7 +16,7 @@ env = SConscript("godot-cpp/SConstruct")
 env.Append(CPPPATH=["src/", "src/include/"])
 
 if env["platform"] == "android":
-    sources = Glob("src/*.cpp", exclude=["src/*editor.cpp"])
+    sources = Glob("src/*.cpp", exclude=["src/OVR_PlatformLoader*.cpp"])
 
     env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/android/libs/arm64-v8a/"])
     env.Append(LIBS=["libovrplatformloader"])
@@ -34,7 +34,10 @@ if env["platform"] == "android":
         )
 
 else:
-    sources = Glob("src/*.cpp", exclude=["src/*android.cpp"])
+    sources = Glob("src/*.cpp")
+
+    env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/windows/"])
+    env.Append(LIBS=["LibOVRPlatformImpl64_1"])
 
     if env["platform"] == "macos":
         if env["target"] != "template_debug":
