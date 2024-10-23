@@ -1,11 +1,17 @@
+#ifndef __ANDROID__
+#define OVRP_PUBLIC_FUNCTION OVRPL_PUBLIC_FUNCTION
+#endif
+
 #include <godot_oculus_platform.h>
 #include <godot_cpp/classes/json.hpp>
 #include <godot_cpp/core/class_db.hpp>
 
 #define OVRID_SIZE 21
 
+#ifdef __ANDROID__
 static JavaVM *jvm;
 static jobject jactivity;
+#endif
 
 using namespace godot;
 
@@ -198,6 +204,16 @@ GDOculusPlatform::~GDOculusPlatform() {
 	singleton = nullptr;
 }
 
+///////////////////////////////////////////////////
+// TODO: remove it if all functions are available
+///////////////////////////////////////////////////
+Ref<GDOculusPlatformPromise> _empty_func_helper() {
+	Ref<GDOculusPlatformPromise> promise = memnew(GDOculusPlatformPromise(0));
+	ERR_FAIL_V_MSG(promise, "Godot Oculus Platform only works with the Meta Quest (android).");
+
+	return promise;
+}
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 ///// INTERNAL METHODS
@@ -291,6 +307,7 @@ void GDOculusPlatform::pump_messages() {
 	while ((message = ovr_PopMessage()) != nullptr) {
 		switch (ovr_Message_GetType(message)) {
 			case ovrMessage_PlatformInitializeAndroidAsynchronous:
+			case ovrMessage_PlatformInitializeWindowsAsynchronous:
 				_process_initialize_android_async(message);
 				break;
 
@@ -299,9 +316,6 @@ void GDOculusPlatform::pump_messages() {
 				break;
 
 			case ovrMessage_User_GetLoggedInUser:
-				_process_user_get_logged_in_user(message);
-				break;
-
 			case ovrMessage_User_Get:
 				_process_user_get_logged_in_user(message);
 				break;
@@ -458,9 +472,9 @@ void GDOculusPlatform::pump_messages() {
 				_process_leaderboard_get(message);
 				break;
 
-				// case ovrMessage_Leaderboard_GetNextLeaderboardArrayPage:
-				// 	_process_leaderboard_get(message);
-				// 	break;
+			case ovrMessage_Leaderboard_GetNextLeaderboardArrayPage:
+				_process_leaderboard_get(message);
+				break;
 
 			case ovrMessage_Leaderboard_GetEntries:
 				_process_leaderboard_get_entries(message);
@@ -740,7 +754,7 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictiona
 	if (ovr_IsPlatformInitialized()) {
 		return true;
 	}
-
+#ifdef __ANDROID__
 	// No initialization options defined
 	if (p_initialization_options.is_empty()) {
 		JNIEnv *gdjenv;
@@ -793,16 +807,25 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictiona
 
 		return true;
 	}
+#else
+	// Initialization options (p_initialization_options) not supported for windows
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+	ovrPlatformInitializeResult init_result = ovr_PlatformInitializeWindows(p_app_id.utf8().get_data());
+	ERR_FAIL_COND_V_MSG(init_result != ovrPlatformInitialize_Success, false, vformat("[GDOP] Error initializing windows platform: %s", ovrPlatformInitializeResult_ToString(init_result)));
+	return true;
+#endif
 }
 
-/// Initialize Android Oculus Platform asynchronously.
-/// @param p_app_id App ID
-/// @return Promise to be resolved when the platform finishes initializing
+ovrPlatformInitializeResult initOutResult;
 Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(const String &p_app_id) {
 	if (!ovr_IsPlatformInitialized()) {
+#ifdef __ANDROID__
 		JNIEnv *gdjenv;
 		_get_env(&gdjenv);
-
+#endif
 		// Try to connect pump_messages to process
 		if (!_try_connecting_process()) {
 			Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
@@ -813,8 +836,11 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(const St
 			return return_promise;
 		}
 
+#ifdef __ANDROID__
 		ovrRequest req = ovr_PlatformInitializeAndroidAsynchronous(p_app_id.utf8().get_data(), jactivity, gdjenv);
-
+#else
+		ovrRequest req = ovr_PlatformInitializeWindowsAsynchronous(p_app_id.utf8().get_data(), &initOutResult);
+#endif
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
 		_promises.push_back(return_promise);
 
@@ -854,6 +880,12 @@ String GDOculusPlatform::user_get_logged_in_user_locale() {
 /// Checks if the user is entitled to the current application.
 /// @return Promise that will be fulfilled if the user is entitled to the app. It will be rejected (error) if the user is not entitled
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_is_viewer_entitled() {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrRequest req = ovr_Entitlement_GetIsViewerEntitled();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -865,6 +897,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_is_viewer_entitled() {
 /// Requests information about the current user.
 /// @return Promise that will be fulfilled with the user's id, oculus_id, display_name, image_url, small_image_url and various Presence related information.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_logged_in_user() {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrRequest req = ovr_User_GetLoggedInUser();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -876,6 +914,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_logged_in_user() {
 /// Requests information about an user from its ID.
 /// @return Promise that will be fulfilled with the user's id, oculus_id, display_name, image_url, small_image_url and various Presence related information.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user(const String &p_user_id) {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_Get(u_id);
@@ -898,6 +942,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user(const String &p_use
 /// Requests a nonce used to verify the user.
 /// @return Promise that will be fulfilled with the a nonce that can be used to verify the user.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user_proof() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_User_GetUserProof();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -909,6 +956,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user_proof() {
 /// Requests the user access token suitable to make REST calls against graph.oculus.com.
 /// @return Promise that will be contain a String token if fulfilled
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user_access_token() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_User_GetAccessToken();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -920,6 +970,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_user_access_token() {
 /// Requests the user IDs of users blocked by the current user.
 /// @return Promise that will contain user IDs as an Array of Strings if fulfilled
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_blocked_users() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_User_GetBlockedUsers();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -931,6 +984,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_blocked_users() {
 /// Requests the user IDs of the current user's friends.
 /// @return Promise that will contain an Array of Dictionaries with information about each friend. Same format as the Dictionary returned by get_user()
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_logged_in_user_friends() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_User_GetLoggedInUserFriends();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -942,6 +998,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_logged_in_user_friends()
 /// Requests the scoped org ID of a given user
 /// @return Promise that will contain the org scoped ID of the given user as a String if fulfilled
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_org_scoped_id(const String &p_user_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_GetOrgScopedID(u_id);
@@ -964,6 +1023,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_org_scoped_id(const Stri
 /// Requests all the accounts belonging to this user.
 /// @return Promise that will contain an Array of Dictionaries with the type of account and its ID, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_sdk_accounts() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_User_GetSdkAccounts();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -975,6 +1037,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_get_sdk_accounts() {
 /// Requests a block flow to block an user by its ID.
 /// @return Promise that will contain a Dictionary with information if the user blocked or cancelled the request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_block_flow(const String &p_user_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_LaunchBlockFlow(u_id);
@@ -997,6 +1062,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_block_flow(const Stri
 /// Requests an unblock flow to unblock an user by its ID.
 /// @return Promise that will contain a Dictionary with information if the user unblocked or cancelled the request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_unblock_flow(const String &p_user_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_LaunchUnblockFlow(u_id);
@@ -1019,6 +1087,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_unblock_flow(const St
 /// Requests a friend request flow to send a friend request to a user with a given ID.
 /// @return Promise that will contain a Dictionary with information if the user sent the friend request or cancelled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_friend_request_flow(const String &p_user_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID u_id;
 	if (ovrID_FromString(&u_id, p_user_id.utf8().get_data())) {
 		ovrRequest req = ovr_User_LaunchFriendRequestFlow(u_id);
@@ -1217,6 +1288,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name
 /// Requests the current user's purchases. They include consumable items and durable items.
 /// @return Promise that contains an Array of Dictionaries with information about each purchase.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_IAP_GetViewerPurchases();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1228,6 +1302,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases() {
 /// Requests the current user's purchases (only durable) from the device's cache.
 /// @return Promise that contains an Array of Dictionaries with information about each purchase.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases_durable_cache() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_IAP_GetViewerPurchasesDurableCache();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1239,6 +1316,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_viewer_purchases_durable_
 /// Requests a list of products by their SKU
 /// @return Promise that contains an Array of Dictionaries with information about each product
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_products_by_sku(const Array &p_sku_list) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	int64_t skus_arr_s = p_sku_list.size();
 
 	if (skus_arr_s > 0 && skus_arr_s <= INT_MAX) {
@@ -1294,6 +1374,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_get_products_by_sku(const Arr
 /// Consumes a consumable item
 /// @return Promise that contains true if the request was successful. It will error if unable to consume
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_consume_purchase(const String &p_sku) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_IAP_ConsumePurchase(p_sku.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1305,6 +1388,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_consume_purchase(const String
 /// Launches the checkout flow
 /// @return Promise that contains a Dictionary with information about the product. purchase_str_id will be empty if the user did not complete the purchase
 Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_launch_checkout_flow(const String &p_sku) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_IAP_LaunchCheckoutFlow(p_sku.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1321,6 +1407,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::iap_launch_checkout_flow(const St
 /// Requests a list of asset files associated with the app.
 /// @return Promise that contains an Array of Dictionaries with information about each assetfile. Language packs have extra information.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_get_list() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_AssetFile_GetList();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1332,6 +1421,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_get_list() {
 /// Requests information about a single asset file by ID.
 /// @return Promise that contains a Dictionary with information about the assetfile. Language packs have extra information.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_id(const String &p_asset_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID n_asset_id;
 	if (ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data())) {
 		ovrRequest req = ovr_AssetFile_StatusById(n_asset_id);
@@ -1354,6 +1446,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_id(const Stri
 /// Requests information about a single asset file by name.
 /// @return Promise that contains a Dictionary with information about the assetfile. Language packs have extra information.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_name(const String &p_asset_name) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_AssetFile_StatusByName(p_asset_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1365,6 +1460,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_status_by_name(const St
 /// Requests to download an asset file by ID.
 /// @return Promise that contains the result of the request as a Dictionary.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_id(const String &p_asset_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID n_asset_id;
 	if (ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data())) {
 		ovrRequest req = ovr_AssetFile_DownloadById(n_asset_id);
@@ -1387,6 +1485,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_id(const St
 /// Requests to download an asset file by name.
 /// @return Promise that contains the result of the request as a Dictionary.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_name(const String &p_asset_name) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_AssetFile_DownloadByName(p_asset_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1398,6 +1499,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_by_name(const 
 /// Requests to cancel a download of an assetfile by ID.
 /// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_id(const String &p_asset_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID n_asset_id;
 	if (ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data())) {
 		ovrRequest req = ovr_AssetFile_DownloadCancelById(n_asset_id);
@@ -1420,6 +1524,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_id(c
 /// Requests to cancel a download of an assetfile by name.
 /// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_name(const String &p_asset_name) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_AssetFile_DownloadCancelByName(p_asset_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1431,6 +1538,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_download_cancel_by_name
 /// Requests to delete an assetfile by ID.
 /// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_id(const String &p_asset_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID n_asset_id;
 	if (ovrID_FromString(&n_asset_id, p_asset_id.utf8().get_data())) {
 		ovrRequest req = ovr_AssetFile_DeleteById(n_asset_id);
@@ -1453,6 +1563,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_id(const Stri
 /// Requests to delete an assetfile by name.
 /// @return Promise that contains the result of the request as a Dictionary. The dictionary includes a "success" key to indicate if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_name(const String &p_asset_name) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_AssetFile_DeleteByName(p_asset_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1469,6 +1582,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::assetfile_delete_by_name(const St
 /// Requests information about a single leaderboard.
 /// @return Promise that contains a Dictionary with the ID and API name of the leaderboard, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get(const String &p_leaderboard_name) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Leaderboard_Get(p_leaderboard_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1480,6 +1596,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get(const String &p_l
 /// Requests entries of a given leaderboard. Several filters can be applied to narrow down the result.
 /// @return Promise that contains an Array of Dictionaries as entries of the leaderboard, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries(const String &p_leaderboard_name, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_limit < 0) {
 		p_limit = 0;
 	} else if (p_limit > INT32_MAX) {
@@ -1497,6 +1616,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries(const Str
 /// Requests entries after a rank of a given leaderboard. No other filters can be applied.
 /// @return Promise that contains an Array of Dictionaries as entries of the leaderboard, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_after_rank(const String &p_leaderboard_name, uint64_t p_limit, uint64_t p_after_rank) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_limit < 0) {
 		p_limit = 0;
 	} else if (p_limit > INT32_MAX) {
@@ -1514,6 +1636,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_after_ran
 /// Requests entries of a given leaderboard. Only returns entries that match the given IDs.
 /// @return Promise that contains an Array of Dictionaries as entries of the leaderboard, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(const String &p_leaderboard_name, uint64_t p_limit, const Array &p_user_ids, LeaderboardStartAt p_start_at) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_limit < 0) {
 		p_limit = 0;
 	} else if (p_limit > INT32_MAX) {
@@ -1557,6 +1682,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_get_entries_by_ids(co
 /// Sends a request to write an entry to a leaderboard. Several options such as supplementary metrics and extra data can be specified.
 /// @return Promise that contains a Dictionary with info about the request status, if fulfilled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(const String &p_leaderboard_name, uint64_t p_score, bool p_force_update, const Dictionary &p_extra) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_score < 0) {
 		p_score = 0;
 	}
@@ -1623,6 +1751,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::leaderboard_write_entry(const Str
 /// Informs the platform whether the app handled or not the report request.
 /// @return Promise that will contain a true bool if the request was successful.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::abuse_report_request_handled(ReportRequestResponse p_report_req_resp) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_AbuseReport_ReportRequestHandled((ovrReportRequestResponse)p_report_req_resp);
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1639,6 +1770,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::abuse_report_request_handled(Repo
 /// Requests information about the app, including current installed version and latest version.
 /// @return Promise that will contain a Dictionary with information about the app.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::application_get_version() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Application_GetVersion();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1650,6 +1784,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_get_version() {
 /// Requests the platform to launch another app.
 /// @return Promise that will contain a message with information about the request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(const String &p_app_id, const Dictionary &p_deeplink_options) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrApplicationOptionsHandle deeplink_options = ovr_ApplicationOptions_Create();
 	ovrID app_id;
 
@@ -1755,6 +1892,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_launch_other_app(cons
 /// Starts downloading an app update if there is one.
 /// @return Promise that will contain an int with the timestamp of when the download started.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::application_start_app_download() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Application_StartAppDownload();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1766,6 +1906,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_start_app_download() 
 /// Requests the app update download progress.
 /// @return Promise that will contain a Dictionary with information about the progress of the download.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::application_check_app_download_progress() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Application_CheckAppDownloadProgress();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1777,6 +1920,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_check_app_download_pr
 /// Requests the cancelation of the app download.
 /// @return Promise that will contain an int with the timestamp of when the download was cancelled.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::application_cancel_app_download() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Application_CancelAppDownload();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1788,6 +1934,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_cancel_app_download()
 /// Requests the platform to install the downloaded update and relaunch.
 /// @return Promise that will contain an int with the timestamp of when the install request was initiated.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_and_relaunch(const Dictionary &p_deeplink_options) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrApplicationOptionsHandle deeplink_options = ovr_ApplicationOptions_Create();
 
 	if (!p_deeplink_options.is_empty()) {
@@ -1881,6 +2030,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_an
 /// Requests information about the app's launch.
 /// @return A Dictionary with info about the app launch. This can be used to place the player in a specific place inside your app.
 Dictionary GDOculusPlatform::application_get_launch_details() {
+#ifndef __ANDROID__
+	return Dictionary();
+#endif
 	ovrLaunchDetailsHandle launch_details_h = ovr_ApplicationLifecycle_GetLaunchDetails();
 
 	Dictionary resp;
@@ -1931,6 +2083,9 @@ Dictionary GDOculusPlatform::application_get_launch_details() {
 /// Requests information about a single challenge.
 /// @return A Dictionary with info about the challenge.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get(const String &p_challenge_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID challenge_id;
 	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
 		ovrRequest req = ovr_Challenges_Get(challenge_id);
@@ -1953,6 +2108,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get(const String &p_ch
 /// Requests information about a list challenges. Several filters can be applied.
 /// @return A Dictionary with info about the challenges.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_list(uint64_t p_limit, const Dictionary &p_challenge_options) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_limit < 0) {
 		p_limit = 0;
 	} else if (p_limit > INT32_MAX) {
@@ -2121,6 +2279,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_list(uint64_t p_li
 /// Requests the entries from a challenge. Several filters can be applied.
 /// @return A Dictionary that contains an array of entries.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries(const String &p_challenge_id, uint64_t p_limit, LeaderboardFilterType p_filter, LeaderboardStartAt p_start_at) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_limit < 0) {
 		p_limit = 0;
 	} else if (p_limit > INT32_MAX) {
@@ -2149,6 +2310,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries(const Stri
 /// Requests the entries from a challenge after a given rank.
 /// @return A Dictionary that contains an array of entries.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_after_rank(const String &p_challenge_id, uint64_t p_limit, uint64_t p_after_rank) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_limit < 0) {
 		p_limit = 0;
 	} else if (p_limit > INT32_MAX) {
@@ -2177,6 +2341,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_after_rank
 /// Requests the entries from a challenge, but only including entries of the given user ids.
 /// @return A Dictionary that contains an array of entries.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_by_ids(const String &p_challenge_id, uint64_t p_limit, const Array &p_user_ids, LeaderboardStartAt p_start_at) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_limit < 0) {
 		p_limit = 0;
 	} else if (p_limit > INT32_MAX) {
@@ -2231,6 +2398,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_get_entries_by_ids(con
 /// Tries to join the user to a challenge.
 /// @return A Dictionary with info about the challenge.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_join(const String &p_challenge_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID challenge_id;
 	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
 		ovrRequest req = ovr_Challenges_Join(challenge_id);
@@ -2253,6 +2423,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_join(const String &p_c
 /// Requests the user withdrawal from a challenge.
 /// @return A Dictionary with info about the challenge.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_leave(const String &p_challenge_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID challenge_id;
 	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
 		ovrRequest req = ovr_Challenges_Leave(challenge_id);
@@ -2275,6 +2448,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_leave(const String &p_
 /// Declines an invite to join a challenge.
 /// @return A Dictionary with info about the challenge.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_decline_invite(const String &p_challenge_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrID challenge_id;
 	if (ovrID_FromString(&challenge_id, p_challenge_id.utf8().get_data())) {
 		ovrRequest req = ovr_Challenges_DeclineInvite(challenge_id);
@@ -2302,6 +2478,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::challenges_decline_invite(const S
 /// Ckears the group presence information.
 /// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_clear() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_GroupPresence_Clear();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2313,6 +2492,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_clear() {
 /// Sends invites to join the current user to an array of users by their IDs
 /// @returns A promise that will contain a Dictionary with the invites that were sent
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_send_invites(const Array &p_user_ids) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	int64_t ids_arr_size = p_user_ids.size();
 
 	ovrID *ovr_ids = memnew_arr(ovrID, ids_arr_size);
@@ -2350,6 +2532,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_send_invites(const 
 /// Sets the group presence.
 /// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set(const Dictionary &p_group_presence_options) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrGroupPresenceOptionsHandle presence_opts = ovr_GroupPresenceOptions_Create();
 	if (p_group_presence_options.is_empty()) {
 		ovr_GroupPresenceOptions_Destroy(presence_opts);
@@ -2444,6 +2629,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set(const Dictionar
 /// Overrides the deeplink message. The user must have a destination, otherwise there will be no deeplink message to override
 /// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_deeplink_message_override(const String &p_deeplink_message) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_GroupPresence_SetDeeplinkMessageOverride(p_deeplink_message.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2455,6 +2643,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_deeplink_messag
 /// Sets the destination from a given API name
 /// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_destination(const String &p_api_name) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_GroupPresence_SetDestination(p_api_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2466,6 +2657,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_destination(con
 /// Sets whether the current match/lobby is joinable
 /// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_is_joinable(bool p_is_joinable) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_GroupPresence_SetIsJoinable(p_is_joinable);
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2477,6 +2671,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_is_joinable(boo
 /// Sets the lobby session from an ID
 /// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_lobby_session(const String &p_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_GroupPresence_SetLobbySession(p_id.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2488,6 +2685,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_lobby_session(c
 /// Sets the match session from an ID
 /// @returns A promise that will alway contain a bool as true if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_match_session(const String &p_id) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_GroupPresence_SetMatchSession(p_id.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2499,6 +2699,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_set_match_session(c
 /// Requests a list of users that can be invited to the current lobby/match.
 /// @returns A promise that will contain a Dictionary with the users.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_invitable_users(const Dictionary &p_options) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrInviteOptionsHandle invite_opts_h = ovr_InviteOptions_Create();
 
 	if (p_options.has("suggested_users")) {
@@ -2554,6 +2757,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_invitable_users
 /// Sends a request to get the invites sent by the user
 /// @returns A promise that will contain a Dictionary with the invites sent
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_sent_invites() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_GroupPresence_GetSentInvites();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2565,6 +2771,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_get_sent_invites() 
 /// Sends a request to launch an invite flow panel to invite other users to join the current user in their session.
 /// @returns A promise that will contain a bool indicating whether the user did send invites or not
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_invite_panel(const Dictionary &p_options) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrInviteOptionsHandle invite_opts_h = ovr_InviteOptions_Create();
 
 	if (p_options.has("suggested_users")) {
@@ -2620,6 +2829,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_invite_panel
 /// Sends a request to launch an error dialog with predefined messages.
 /// @returns A promise that will contain a bool that will always be true in the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_multiplayer_error_dialog(MultiplayerErrorErrorKey p_error_key) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrMultiplayerErrorOptionsHandle mult_err_opts_h = ovr_MultiplayerErrorOptions_Create();
 	ovr_MultiplayerErrorOptions_SetErrorKey(mult_err_opts_h, (ovrMultiplayerErrorErrorKey)p_error_key);
 
@@ -2635,6 +2847,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_multiplayer_
 /// Sends a request to launch a panel that lets the user rejoin a previous lobby/match
 /// @returns A promise that will contain a bool indicating whether the user did rejoin or not
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_rejoin_dialog(const String &p_lobby_session_id, const String &p_match_session_id, const String &p_destination_api_name) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_GroupPresence_LaunchRejoinDialog(p_lobby_session_id.utf8().get_data(), p_match_session_id.utf8().get_data(), p_destination_api_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2646,6 +2861,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_rejoin_dialo
 /// Sends a request to launch a panel that displays the current users in the roster.
 /// @returns A promise that will contain a bool that will always be true in the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_roster_panel(const Dictionary &p_options) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRosterOptionsHandle roster_opts_h = ovr_RosterOptions_Create();
 
 	if (p_options.has("suggested_users")) {
@@ -2706,6 +2924,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::grouppresence_launch_roster_panel
 /// Sends a request to share a photo to facebook.
 /// @returns A promise that will contain a Dictionary with information about the request to share media to facebook.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::media_share_to_facebook(const String &p_post_text_suggestion, const String &p_file_path, MediaContentType p_content_type) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Media_ShareToFacebook(p_post_text_suggestion.utf8().get_data(), p_file_path.utf8().get_data(), (ovrMediaContentType)p_content_type);
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2722,6 +2943,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::media_share_to_facebook(const Str
 /// Requests the user age category
 /// @return Promise that will contain an enum of type AccountAgeCategory
 Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_get() {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrRequest req = ovr_UserAgeCategory_Get();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2733,6 +2960,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_get() {
 /// Reports the AppAgeCategory to the Oculus backend
 /// @return Promise that will contain a bool (true) if the request was successful
 Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_report(AppAgeCategory p_app_age_category) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_UserAgeCategory_Report((ovrAppAgeCategory)p_app_age_category);
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2749,6 +2979,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::useragecategory_report(AppAgeCate
 /// Requests the integrity token. Ref: https://developer.oculus.com/documentation/native/ps-attestation-api/
 /// @return Promise that will contain a String with the integrity token
 Ref<GDOculusPlatformPromise> GDOculusPlatform::deviceappintegrity_get_integrity_token(const String &p_challenge_nonce) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_DeviceApplicationIntegrity_GetIntegrityToken(p_challenge_nonce.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2765,6 +2998,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::deviceappintegrity_get_integrity_
 /// Requests the presenter data.
 /// @return Promise that will contain a String with the presenter data
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_get_presenter_data() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Cowatching_GetPresenterData();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2776,6 +3012,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_get_presenter_data() {
 /// Requests the viewer data.
 /// @return Promise that will contain a String with the viewers data
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_get_viewers_data() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Cowatching_GetViewersData();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2787,6 +3026,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_get_viewers_data() {
 /// Queries if the user is in a cowatching session.
 /// @return Promise that will contain a bool that defines if the user in in a cowatching session.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_is_in_session() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Cowatching_IsInSession();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2798,6 +3040,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_is_in_session() {
 /// Tries to join the current cowatching session.
 /// @return Promise that will be true if succesful.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_join_session() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Cowatching_JoinSession();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2809,6 +3054,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_join_session() {
 /// Request cowatching invite dialog.
 /// @return Promise that will be true if succesful.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_launch_invite_dialog() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Cowatching_LaunchInviteDialog();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2820,6 +3068,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_launch_invite_dialog() {
 /// Tries to leave the current cowatching session.
 /// @return Promise that will be true if succesful.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_leave_session() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Cowatching_LeaveSession();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2831,6 +3082,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_leave_session() {
 /// Requests presenting in the current cowatching session.
 /// @return Promise that will be true if succesful.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_request_to_present() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Cowatching_RequestToPresent();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2842,6 +3096,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_request_to_present() {
 /// Requests resigning from presenting from the current cowatching session.
 /// @return Promise that will be true if succesful.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_resign_from_presenting() {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	ovrRequest req = ovr_Cowatching_ResignFromPresenting();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -2853,6 +3110,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_resign_from_presenting() 
 /// Sets the presenter data (video title and description).
 /// @return Promise that will be true if succesful.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_set_presenter_data(const String &p_video_title, const String &p_presenter_data) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_video_title.length() > 100 || p_presenter_data.length() > 500) {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 		String rejection_msg = "Invalid presenter data. Video title cannot exceed 100 characters and presenter data is limited to 500 characters.";
@@ -2873,6 +3133,9 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_set_presenter_data(const 
 /// Sets the viewer data.
 /// @return Promise that will be true if succesful.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_set_viewer_data(const String &p_viewer_data) {
+#ifndef __ANDROID__
+	return _empty_func_helper();
+#endif
 	if (p_viewer_data.length() > 500) {
 		Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(_get_reject_promise_id()));
 		String rejection_msg = "Invalid viewer data. Viewer data is limited to 500 characters.";
@@ -2908,7 +3171,6 @@ void GDOculusPlatform::_process_initialize_android_async(ovrMessageHandle p_mess
 
 		if (platform_init_result == ovrPlatformInitialize_Success) {
 			_fulfill_promise(msg_id, Array::make(true));
-
 		} else {
 			String gd_message = ovrPlatformInitializeResult_ToString(platform_init_result);
 
@@ -2926,7 +3188,6 @@ void GDOculusPlatform::_process_user_get_is_viewer_entitled(ovrMessageHandle p_m
 
 	if (!ovr_Message_IsError(p_message)) {
 		_fulfill_promise(msg_id, Array::make(true));
-
 	} else {
 		_handle_default_process_error(p_message, msg_id);
 	}
@@ -2949,6 +3210,9 @@ void GDOculusPlatform::_process_user_get_logged_in_user(ovrMessageHandle p_messa
 
 /// Processes the response from the user's nonce request
 void GDOculusPlatform::_process_user_get_user_proof(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -2964,6 +3228,9 @@ void GDOculusPlatform::_process_user_get_user_proof(ovrMessageHandle p_message) 
 
 /// Processes an access token of the current user.
 void GDOculusPlatform::_process_user_get_user_access_token(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -2978,6 +3245,9 @@ void GDOculusPlatform::_process_user_get_user_access_token(ovrMessageHandle p_me
 
 /// Processes blocked user ids from current user. Paginated
 void GDOculusPlatform::_process_user_get_blocked_users(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3008,6 +3278,9 @@ void GDOculusPlatform::_process_user_get_blocked_users(ovrMessageHandle p_messag
 /// Processes user information about an array of users. Paginated
 /// Used by: user_get_logged_in_user_friends
 void GDOculusPlatform::_process_user_get_next_array_page(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3035,6 +3308,9 @@ void GDOculusPlatform::_process_user_get_next_array_page(ovrMessageHandle p_mess
 
 /// Processes the org scoped id of a given user
 void GDOculusPlatform::_process_user_get_org_scoped_id(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3053,6 +3329,9 @@ void GDOculusPlatform::_process_user_get_org_scoped_id(ovrMessageHandle p_messag
 
 /// Processes sdk accounts (accounts in the headset) of the current user
 void GDOculusPlatform::_process_user_get_sdk_accounts(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3085,6 +3364,9 @@ void GDOculusPlatform::_process_user_get_sdk_accounts(ovrMessageHandle p_message
 
 /// Processes the result of the block flow. Returns a Dictionary.
 void GDOculusPlatform::_process_user_launch_block_flow(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3103,6 +3385,9 @@ void GDOculusPlatform::_process_user_launch_block_flow(ovrMessageHandle p_messag
 
 /// Processes the result of the unblock flow. Returns a Dictionary.
 void GDOculusPlatform::_process_user_launch_unblock_flow(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3121,6 +3406,9 @@ void GDOculusPlatform::_process_user_launch_unblock_flow(ovrMessageHandle p_mess
 
 /// Processes the result of the friend request flow. Returns a Dictionary.
 void GDOculusPlatform::_process_user_launch_friend_request_flow(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3231,6 +3519,9 @@ void GDOculusPlatform::_process_achievements_progress(ovrMessageHandle p_message
 
 /// Processes the response from a request to get the viewer purchases. Used for both durable cache only and all purchases
 void GDOculusPlatform::_process_iap_viewer_purchases(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3265,6 +3556,9 @@ void GDOculusPlatform::_process_iap_viewer_purchases(ovrMessageHandle p_message)
 
 /// Processes the response from a request to get products by SKU
 void GDOculusPlatform::_process_iap_products(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3298,6 +3592,9 @@ void GDOculusPlatform::_process_iap_products(ovrMessageHandle p_message) {
 
 /// Processes the result of a request to consume a consumable item
 void GDOculusPlatform::_process_iap_consume_purchase(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3310,6 +3607,9 @@ void GDOculusPlatform::_process_iap_consume_purchase(ovrMessageHandle p_message)
 
 /// Processes the result of the block flow. Returns a Dictionary with purchase_str_id empty if the user did not complete the purchase.
 void GDOculusPlatform::_process_iap_launch_checkout_flow(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3336,6 +3636,9 @@ void GDOculusPlatform::_process_iap_launch_checkout_flow(ovrMessageHandle p_mess
 
 /// Processes the response from a request to get a list of asset files
 void GDOculusPlatform::_process_assetfile_get_list(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3388,6 +3691,9 @@ void GDOculusPlatform::_process_assetfile_get_list(ovrMessageHandle p_message) {
 
 /// Processes the response from a request to get the status of a single asset file
 void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3427,6 +3733,9 @@ void GDOculusPlatform::_process_assetfile_get_status(ovrMessageHandle p_message)
 
 /// Processes the response from a request to download a single asset file
 void GDOculusPlatform::_process_assetfile_download(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3449,6 +3758,9 @@ void GDOculusPlatform::_process_assetfile_download(ovrMessageHandle p_message) {
 
 /// Processes the response from a request to cancel a download of a single asset file
 void GDOculusPlatform::_process_assetfile_download_cancel(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3472,6 +3784,9 @@ void GDOculusPlatform::_process_assetfile_download_cancel(ovrMessageHandle p_mes
 
 /// Processes the response from a request to delete a single asset file
 void GDOculusPlatform::_process_assetfile_delete(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3498,6 +3813,9 @@ void GDOculusPlatform::_process_assetfile_delete(ovrMessageHandle p_message) {
 
 /// Processes the response from a request to get a single leaderboard
 void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3529,6 +3847,9 @@ void GDOculusPlatform::_process_leaderboard_get(ovrMessageHandle p_message) {
 
 /// Processes the response from a request to get entries of a leaderboard. This function automatically paginates through the data
 void GDOculusPlatform::_process_leaderboard_get_entries(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3550,6 +3871,9 @@ void GDOculusPlatform::_process_leaderboard_get_entries(ovrMessageHandle p_messa
 
 /// Processes the response from a request to write an entry to a leaderboard
 void GDOculusPlatform::_process_leaderboard_write_entry(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3581,6 +3905,9 @@ void GDOculusPlatform::_process_leaderboard_write_entry(ovrMessageHandle p_messa
 
 /// Processes report request handled [response]
 void GDOculusPlatform::_process_abuse_report_handled(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3596,6 +3923,9 @@ void GDOculusPlatform::_process_abuse_report_handled(ovrMessageHandle p_message)
 
 /// Processes the result of launching another app from the current app
 void GDOculusPlatform::_process_application_launch_other_app(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3609,6 +3939,9 @@ void GDOculusPlatform::_process_application_launch_other_app(ovrMessageHandle p_
 
 /// Processes the result of the version launch request
 void GDOculusPlatform::_process_application_get_version(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3635,6 +3968,9 @@ void GDOculusPlatform::_process_application_get_version(ovrMessageHandle p_messa
 /// return the same data.
 /// Also used for install_app_and_relaunch since it returns the same data.
 void GDOculusPlatform::_process_application_start_app_download(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3657,6 +3993,9 @@ void GDOculusPlatform::_process_application_start_app_download(ovrMessageHandle 
 
 /// Processes the result of requesting the app download progress
 void GDOculusPlatform::_process_application_check_app_download_progress(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3683,6 +4022,9 @@ void GDOculusPlatform::_process_application_check_app_download_progress(ovrMessa
 /// Processes the response from a request to get a single challenge.
 /// Used by: challenges_get, challenges_join, challenges_leave, challenges_decline_invite
 void GDOculusPlatform::_process_challenges_get(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3700,6 +4042,9 @@ void GDOculusPlatform::_process_challenges_get(ovrMessageHandle p_message) {
 /// Processes the response from a request to get a a list of challenges
 /// Used by: challenges_get_list
 void GDOculusPlatform::_process_challenges_get_list(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3730,6 +4075,9 @@ void GDOculusPlatform::_process_challenges_get_list(ovrMessageHandle p_message) 
 /// Processes the response from a request to get a a list of challenge entries
 /// Used by: challenges_get_entries, challenges_get_entries_after_rank, challenges_get_entries_by_ids
 void GDOculusPlatform::_process_challenges_get_entries(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3762,6 +4110,9 @@ void GDOculusPlatform::_process_challenges_get_entries(ovrMessageHandle p_messag
 
 // Used to handle a request that has no payload, but could have an error.
 void GDOculusPlatform::_process_groupresence_no_payload(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3774,6 +4125,9 @@ void GDOculusPlatform::_process_groupresence_no_payload(ovrMessageHandle p_messa
 
 // Processes the response from a send_invites request. Will return a Dictionary with the invites that were created
 void GDOculusPlatform::_process_groupresence_send_invites(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3826,6 +4180,9 @@ void GDOculusPlatform::_process_groupresence_send_invites(ovrMessageHandle p_mes
 
 // Processes the response from a invite panel launch request. Will inform if the user did send the invites
 void GDOculusPlatform::_process_groupresence_launch_invite_panel(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3841,6 +4198,9 @@ void GDOculusPlatform::_process_groupresence_launch_invite_panel(ovrMessageHandl
 
 // Processes the response from a rejoin panel launch request. Will inform if the user did rejoin
 void GDOculusPlatform::_process_groupresence_launch_rejoin_panel(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3859,6 +4219,9 @@ void GDOculusPlatform::_process_groupresence_launch_rejoin_panel(ovrMessageHandl
 
 // Processes the response from a request to share media to facebook
 void GDOculusPlatform::_process_media_share_to_facebook(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3897,6 +4260,9 @@ void GDOculusPlatform::_process_useragecategory_get(ovrMessageHandle p_message) 
 
 /// Processes the response from reporting the user age category
 void GDOculusPlatform::_process_useragecategory_report(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3912,6 +4278,9 @@ void GDOculusPlatform::_process_useragecategory_report(ovrMessageHandle p_messag
 
 /// Processes the result of requesting an integrity token
 void GDOculusPlatform::_process_deviceappintegrity_get_integrity_token(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3929,6 +4298,9 @@ void GDOculusPlatform::_process_deviceappintegrity_get_integrity_token(ovrMessag
 
 // Processes the retult of requesting the presenter data.
 void GDOculusPlatform::_process_cowatch_get_presenter_data(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3942,6 +4314,9 @@ void GDOculusPlatform::_process_cowatch_get_presenter_data(ovrMessageHandle p_me
 
 // Processes the retult of requesting the viewer data.
 void GDOculusPlatform::_process_cowatch_get_viewers_data(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3958,6 +4333,9 @@ void GDOculusPlatform::_process_cowatch_get_viewers_data(ovrMessageHandle p_mess
 
 // Processes the retult of quering if the user is in a cowatching session.
 void GDOculusPlatform::_process_cowatch_is_in_session(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3973,6 +4351,9 @@ void GDOculusPlatform::_process_cowatch_is_in_session(ovrMessageHandle p_message
 
 // Processes the retult of requesting to join a cowatching session.
 void GDOculusPlatform::_process_cowatch_join_session(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3985,6 +4366,9 @@ void GDOculusPlatform::_process_cowatch_join_session(ovrMessageHandle p_message)
 
 // Processes the retult of requesting to launch an invite dialog for a cowatching session.
 void GDOculusPlatform::_process_cowatch_launch_invite_dialog(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3997,6 +4381,9 @@ void GDOculusPlatform::_process_cowatch_launch_invite_dialog(ovrMessageHandle p_
 
 // Processes the retult of requesting to leave the current cowatching session.
 void GDOculusPlatform::_process_cowatch_leave_session(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -4009,6 +4396,9 @@ void GDOculusPlatform::_process_cowatch_leave_session(ovrMessageHandle p_message
 
 // Processes the retult of requesting to present in the current cowatching session.
 void GDOculusPlatform::_process_cowatch_request_to_present(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -4021,6 +4411,9 @@ void GDOculusPlatform::_process_cowatch_request_to_present(ovrMessageHandle p_me
 
 // Processes the retult of requesting to stop presenting in the current cowatching session.
 void GDOculusPlatform::_process_cowatch_resign_from_presenting(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -4033,6 +4426,9 @@ void GDOculusPlatform::_process_cowatch_resign_from_presenting(ovrMessageHandle 
 
 // Processes the retult of setting the presenter data.
 void GDOculusPlatform::_process_cowatch_set_presenter_data(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -4045,6 +4441,9 @@ void GDOculusPlatform::_process_cowatch_set_presenter_data(ovrMessageHandle p_me
 
 // Processes the retult of setting the viewer data.
 void GDOculusPlatform::_process_cowatch_set_viewer_data(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -4057,6 +4456,9 @@ void GDOculusPlatform::_process_cowatch_set_viewer_data(ovrMessageHandle p_messa
 
 // Processes the retult of a notification when a viewer changes its data.
 void GDOculusPlatform::_process_cowatch_viewer_data_changed(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	Dictionary viewer_data_changed_result;
 
 	ovrCowatchViewerUpdateHandle viewer_update_h = ovr_Message_GetCowatchViewerUpdate(p_message);
@@ -4124,11 +4526,13 @@ Dictionary GDOculusPlatform::_get_user_information(const ovrUserHandle &p_user_h
 	user_info_resp["small_image_url"] = ovr_User_GetSmallImageUrl(p_user_h);
 
 	user_info_resp["presence"] = user_info_presence;
+#ifdef MIC
 	user_info_presence["presence_status"] = ovrUserPresenceStatus_ToString(ovr_User_GetPresenceStatus(p_user_h));
 	user_info_presence["presence_deeplink_message"] = ovr_User_GetPresenceDeeplinkMessage(p_user_h);
 	user_info_presence["presence_destination_api_name"] = ovr_User_GetPresenceDestinationApiName(p_user_h);
 	user_info_presence["presence_lobby_session_id"] = ovr_User_GetPresenceLobbySessionId(p_user_h);
 	user_info_presence["presence_match_session_id"] = ovr_User_GetPresenceMatchSessionId(p_user_h);
+#endif
 
 	return user_info_resp;
 }
@@ -4251,6 +4655,9 @@ Dictionary GDOculusPlatform::_get_challenge_entry_information(const ovrChallenge
 }
 
 void GDOculusPlatform::_handle_download_update(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	if (!ovr_Message_IsError(p_message)) {
 		ovrAssetFileDownloadUpdateHandle download_update_handle = ovr_Message_GetAssetFileDownloadUpdate(p_message);
 
@@ -4351,6 +4758,9 @@ Dictionary GDOculusPlatform::_get_destionation_info(const ovrDestinationHandle &
 
 // Processes the result mainly from a next_page request of a application invite array handle
 void GDOculusPlatform::_handle_process_app_invite_array(ovrMessageHandle p_message) {
+#ifndef __ANDROID__
+	return;
+#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -4434,6 +4844,7 @@ Dictionary GDOculusPlatform::_get_cowatching_viewers_data(const ovrCowatchViewer
 /////////////////////////////////////////////////
 
 /// Gets the Java environment. Currently only used for platform initialization
+#ifdef __ANDROID__
 bool GDOculusPlatform::_get_env(JNIEnv **p_env) {
 	ERR_FAIL_NULL_V_MSG(jvm, false, "[GDOP] JVM is null");
 	jint res = jvm->GetEnv((void **)p_env, JNI_VERSION_1_6);
@@ -4449,7 +4860,9 @@ bool GDOculusPlatform::_get_env(JNIEnv **p_env) {
 		return false;
 	}
 }
+#endif
 
+#ifdef __ANDROID__
 extern "C" {
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 	JNIEnv *env;
@@ -4463,3 +4876,4 @@ JNIEXPORT void JNICALL Java_org_godot_godotoculusplatform_GodotOculusPlatform_in
 	jactivity = reinterpret_cast<jobject>(env->NewGlobalRef(activity));
 }
 }
+#endif

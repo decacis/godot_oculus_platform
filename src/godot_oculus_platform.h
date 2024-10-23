@@ -4,6 +4,7 @@
 #include <include/OVR_Platform.h>
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/object.hpp>
+#include <godot_cpp/classes/project_settings.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
@@ -19,7 +20,6 @@ protected:
 	static GDOculusPlatform *singleton;
 	static void _bind_methods();
 
-#ifdef __ANDROID__
 private:
 	bool progress_connected = false;
 
@@ -41,7 +41,9 @@ private:
 	uint64_t _last_promise_rejected_id = 0;
 	uint64_t _last_promise_fulfilled_id = 0;
 
+#ifdef __ANDROID__
 	bool _get_env(JNIEnv **p_env);
+#endif
 
 	void _handle_default_process_error(ovrMessageHandle p_message, ovrRequest p_msg_id);
 
@@ -152,7 +154,6 @@ private:
 
 	void _handle_unhandled_message(ovrMessageHandle p_message);
 	void _process_user_get_next_array_page(ovrMessageHandle p_message);
-#endif
 
 public:
 	static GDOculusPlatform *get_singleton();
