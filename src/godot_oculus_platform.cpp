@@ -22,8 +22,8 @@ void GDOculusPlatform::_bind_methods() {
 
 	// INITIALIZATION
 	ClassDB::bind_method(D_METHOD("is_platform_initialized"), &GDOculusPlatform::is_platform_initialized);
-	ClassDB::bind_method(D_METHOD("initialize_android", "app_id", "options"), &GDOculusPlatform::initialize_android, DEFVAL(Dictionary()));
-	ClassDB::bind_method(D_METHOD("initialize_android_async", "app_id"), &GDOculusPlatform::initialize_android_async);
+	ClassDB::bind_method(D_METHOD("initialize_platform", "app_id", "options"), &GDOculusPlatform::initialize_platform, DEFVAL(Dictionary()));
+	ClassDB::bind_method(D_METHOD("initialize_platform_async", "app_id"), &GDOculusPlatform::initialize_platform_async);
 
 	// USER
 	ClassDB::bind_method(D_METHOD("user_get_logged_in_user_id"), &GDOculusPlatform::user_get_logged_in_user_id);
@@ -308,7 +308,7 @@ void GDOculusPlatform::pump_messages() {
 		switch (ovr_Message_GetType(message)) {
 			case ovrMessage_PlatformInitializeAndroidAsynchronous:
 			case ovrMessage_PlatformInitializeWindowsAsynchronous:
-				_process_initialize_android_async(message);
+				_process_initialize_platform_async(message);
 				break;
 
 			case ovrMessage_Entitlement_GetIsViewerEntitled:
@@ -750,7 +750,7 @@ bool GDOculusPlatform::is_platform_initialized() {
 }
 
 /// Initialize Android Oculus Platform synchronously.
-bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictionary &p_initialization_options) {
+bool GDOculusPlatform::initialize_platform(const String &p_app_id, const Dictionary &p_initialization_options) {
 	if (ovr_IsPlatformInitialized()) {
 		return true;
 	}
@@ -820,7 +820,7 @@ bool GDOculusPlatform::initialize_android(const String &p_app_id, const Dictiona
 }
 
 ovrPlatformInitializeResult initOutResult;
-Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_android_async(const String &p_app_id) {
+Ref<GDOculusPlatformPromise> GDOculusPlatform::initialize_platform_async(const String &p_app_id) {
 	if (!ovr_IsPlatformInitialized()) {
 #ifdef __ANDROID__
 		JNIEnv *gdjenv;
@@ -1117,6 +1117,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::user_launch_friend_request_flow(c
 /// Requests an update for an achievement of type COUNT.
 /// @return Promise that will contain a Dictionary with info about the result of the update request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_count(const String &p_achievement_name, uint64_t p_count) {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrRequest req = ovr_Achievements_AddCount(p_achievement_name.utf8().get_data(), p_count);
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1128,6 +1134,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_count(const Stri
 /// Requests an update for an achievement of type BITFIELD.
 /// @return Promise that will contain a Dictionary with info about the result of the update request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_fields(const String &p_achievement_name, const String &p_fields) {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrRequest req = ovr_Achievements_AddFields(p_achievement_name.utf8().get_data(), p_fields.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1139,6 +1151,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_add_fields(const Str
 /// Requests an update (to unlock) for an achievement of any type.
 /// @return Promise that will contain a Dictionary with info about the result of the update request.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_unlock(const String &p_achievement_name) {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrRequest req = ovr_Achievements_Unlock(p_achievement_name.utf8().get_data());
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1150,6 +1168,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_unlock(const String 
 /// Requests all the achievement definitions.
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_definitions() {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrRequest req = ovr_Achievements_GetAllDefinitions();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1161,6 +1185,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_definitions(
 /// Requests all the achievement progress.
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_progress() {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	ovrRequest req = ovr_Achievements_GetAllProgress();
 
 	Ref<GDOculusPlatformPromise> return_promise = memnew(GDOculusPlatformPromise(req));
@@ -1172,6 +1202,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_all_progress() {
 /// Requests achievements definitions by name
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_name(const Array &p_achievement_names) {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	int achiev_arr_s = p_achievement_names.size();
 
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
@@ -1228,6 +1264,12 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_definitions_by_n
 /// Requests achievements progress by name.
 /// @return Promise that will contain an Array of Dictionaries with info about each achievement.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::achievements_get_progress_by_name(const Array &p_achievement_names) {
+#ifndef __ANDROID__
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
+#endif
 	int64_t achiev_arr_s = p_achievement_names.size();
 
 	if (achiev_arr_s > 0 && achiev_arr_s <= INT_MAX) {
@@ -1771,7 +1813,10 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::abuse_report_request_handled(Repo
 /// @return Promise that will contain a Dictionary with information about the app.
 Ref<GDOculusPlatformPromise> GDOculusPlatform::application_get_version() {
 #ifndef __ANDROID__
-	return _empty_func_helper();
+	// Try to connect pump_messages to process
+	if (!_try_connecting_process()) {
+		return false;
+	}
 #endif
 	ovrRequest req = ovr_Application_GetVersion();
 
@@ -2030,9 +2075,6 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::application_install_app_update_an
 /// Requests information about the app's launch.
 /// @return A Dictionary with info about the app launch. This can be used to place the player in a specific place inside your app.
 Dictionary GDOculusPlatform::application_get_launch_details() {
-#ifndef __ANDROID__
-	return Dictionary();
-#endif
 	ovrLaunchDetailsHandle launch_details_h = ovr_ApplicationLifecycle_GetLaunchDetails();
 
 	Dictionary resp;
@@ -3162,7 +3204,7 @@ Ref<GDOculusPlatformPromise> GDOculusPlatform::cowatch_set_viewer_data(const Str
 /////////////////////////////////////////////////
 
 /// Processes android asynchronous initialization
-void GDOculusPlatform::_process_initialize_android_async(ovrMessageHandle p_message) {
+void GDOculusPlatform::_process_initialize_platform_async(ovrMessageHandle p_message) {
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {
@@ -3939,9 +3981,6 @@ void GDOculusPlatform::_process_application_launch_other_app(ovrMessageHandle p_
 
 /// Processes the result of the version launch request
 void GDOculusPlatform::_process_application_get_version(ovrMessageHandle p_message) {
-#ifndef __ANDROID__
-	return;
-#endif
 	ovrRequest msg_id = ovr_Message_GetRequestID(p_message);
 
 	if (!ovr_Message_IsError(p_message)) {

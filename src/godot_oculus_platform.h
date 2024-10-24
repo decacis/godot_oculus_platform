@@ -47,7 +47,7 @@ private:
 
 	void _handle_default_process_error(ovrMessageHandle p_message, ovrRequest p_msg_id);
 
-	void _process_initialize_android_async(ovrMessageHandle p_message);
+	void _process_initialize_platform_async(ovrMessageHandle p_message);
 
 	bool _try_connecting_process();
 
@@ -221,8 +221,8 @@ public:
 
 	// INITIALIZATION
 	bool is_platform_initialized();
-	bool initialize_android(const String &p_app_id, const Dictionary &p_initialization_options);
-	Ref<GDOculusPlatformPromise> initialize_android_async(const String &p_app_id);
+	bool initialize_platform(const String &p_app_id, const Dictionary &p_initialization_options);
+	Ref<GDOculusPlatformPromise> initialize_platform_async(const String &p_app_id);
 
 	// ABUSE REPORT
 	Ref<GDOculusPlatformPromise> abuse_report_request_handled(ReportRequestResponse p_report_req_resp);
