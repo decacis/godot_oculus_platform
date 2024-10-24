@@ -579,6 +579,31 @@ OVRPL_DECLARE_IMPORT(ovrAchievementType, ovrAchievementType_FromString, (const c
 OVRPL_DECLARE_IMPORT(unsigned long long, ovr_AchievementDefinition_GetTarget, (const ovrAchievementDefinitionHandle obj));
 OVRPL_DECLARE_IMPORT(ovrRequest, ovr_Achievements_GetNextAchievementProgressArrayPage, (ovrAchievementProgressArrayHandle handle));
 
+OVRPL_DECLARE_IMPORT(ovrLaunchDetailsHandle, ovr_ApplicationLifecycle_GetLaunchDetails, ());
+OVRPL_DECLARE_IMPORT(void, ovr_ApplicationLifecycle_LogDeeplinkResult, (const char *trackingID, ovrLaunchResult result));
+OVRPL_DECLARE_IMPORT(const char *, ovr_LaunchDetails_GetDeeplinkMessage, (const ovrLaunchDetailsHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovr_LaunchDetails_GetDestinationApiName, (const ovrLaunchDetailsHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovr_LaunchDetails_GetLaunchSource, (const ovrLaunchDetailsHandle obj));
+OVRPL_DECLARE_IMPORT(ovrLaunchType, ovr_LaunchDetails_GetLaunchType, (const ovrLaunchDetailsHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovr_LaunchDetails_GetLobbySessionID, (const ovrLaunchDetailsHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovr_LaunchDetails_GetMatchSessionID, (const ovrLaunchDetailsHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovr_LaunchDetails_GetTrackingID, (const ovrLaunchDetailsHandle obj));
+OVRPL_DECLARE_IMPORT(ovrUserArrayHandle, ovr_LaunchDetails_GetUsers, (const ovrLaunchDetailsHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovrLaunchType_ToString, (ovrLaunchType value));
+OVRPL_DECLARE_IMPORT(ovrLaunchType, ovrLaunchType_FromString, (const char *str));
+OVRPL_DECLARE_IMPORT(ovrUserHandle, ovr_UserArray_GetElement, (const ovrUserArrayHandle obj, size_t index));
+OVRPL_DECLARE_IMPORT(const char *, ovr_UserArray_GetNextUrl, (const ovrUserArrayHandle obj));
+OVRPL_DECLARE_IMPORT(size_t, ovr_UserArray_GetSize, (const ovrUserArrayHandle obj));
+OVRPL_DECLARE_IMPORT(bool, ovr_UserArray_HasNextPage, (const ovrUserArrayHandle obj));
+OVRPL_DECLARE_IMPORT(ovrRequest, ovr_Application_GetVersion, ());
+OVRPL_DECLARE_IMPORT(ovrApplicationVersionHandle, ovr_Message_GetApplicationVersion, (const ovrMessageHandle obj));
+OVRPL_DECLARE_IMPORT(int, ovr_ApplicationVersion_GetCurrentCode, (const ovrApplicationVersionHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovr_ApplicationVersion_GetCurrentName, (const ovrApplicationVersionHandle obj));
+OVRPL_DECLARE_IMPORT(int, ovr_ApplicationVersion_GetLatestCode, (const ovrApplicationVersionHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovr_ApplicationVersion_GetLatestName, (const ovrApplicationVersionHandle obj));
+OVRPL_DECLARE_IMPORT(long long, ovr_ApplicationVersion_GetReleaseDate, (const ovrApplicationVersionHandle obj));
+OVRPL_DECLARE_IMPORT(const char *, ovr_ApplicationVersion_GetSize, (const ovrApplicationVersionHandle obj));
+
 void LoadFunctionsOther(ModuleHandleType hModule) {
 	OVRPL_GETFUNCTION(hModule, ovr_IsPlatformInitialized);
 	OVRPL_GETFUNCTION(hModule, ovrPlatformInitializeResult_ToString);
@@ -641,6 +666,31 @@ void LoadFunctionsOther(ModuleHandleType hModule) {
 	OVRPL_GETFUNCTION(hModule, ovrAchievementType_FromString);
 	OVRPL_GETFUNCTION(hModule, ovr_AchievementDefinition_GetTarget);
 	OVRPL_GETFUNCTION(hModule, ovr_Achievements_GetNextAchievementProgressArrayPage);
+
+	OVRPL_GETFUNCTION(hModule, ovr_ApplicationLifecycle_GetLaunchDetails);
+	OVRPL_GETFUNCTION(hModule, ovr_ApplicationLifecycle_LogDeeplinkResult);
+	OVRPL_GETFUNCTION(hModule, ovr_LaunchDetails_GetDeeplinkMessage);
+	OVRPL_GETFUNCTION(hModule, ovr_LaunchDetails_GetDestinationApiName);
+	OVRPL_GETFUNCTION(hModule, ovr_LaunchDetails_GetLaunchSource);
+	OVRPL_GETFUNCTION(hModule, ovr_LaunchDetails_GetLaunchType);
+	OVRPL_GETFUNCTION(hModule, ovr_LaunchDetails_GetLobbySessionID);
+	OVRPL_GETFUNCTION(hModule, ovr_LaunchDetails_GetMatchSessionID);
+	OVRPL_GETFUNCTION(hModule, ovr_LaunchDetails_GetTrackingID);
+	OVRPL_GETFUNCTION(hModule, ovr_LaunchDetails_GetUsers);
+	OVRPL_GETFUNCTION(hModule, ovrLaunchType_ToString);
+	OVRPL_GETFUNCTION(hModule, ovrLaunchType_FromString);
+	OVRPL_GETFUNCTION(hModule, ovr_UserArray_GetElement);
+	OVRPL_GETFUNCTION(hModule, ovr_UserArray_GetNextUrl);
+	OVRPL_GETFUNCTION(hModule, ovr_UserArray_GetSize);
+	OVRPL_GETFUNCTION(hModule, ovr_UserArray_HasNextPage);
+	OVRPL_GETFUNCTION(hModule, ovr_Application_GetVersion);
+	OVRPL_GETFUNCTION(hModule, ovr_Message_GetApplicationVersion);
+	OVRPL_GETFUNCTION(hModule, ovr_ApplicationVersion_GetCurrentCode);
+	OVRPL_GETFUNCTION(hModule, ovr_ApplicationVersion_GetCurrentName);
+	OVRPL_GETFUNCTION(hModule, ovr_ApplicationVersion_GetLatestCode);
+	OVRPL_GETFUNCTION(hModule, ovr_ApplicationVersion_GetLatestName);
+	OVRPL_GETFUNCTION(hModule, ovr_ApplicationVersion_GetReleaseDate);
+	OVRPL_GETFUNCTION(hModule, ovr_ApplicationVersion_GetSize);
 }
 
 OVRPL_PUBLIC_FUNCTION(bool)
@@ -940,7 +990,7 @@ ovr_Message_GetAchievementProgressArray(const ovrMessageHandle obj) {
 	}
 	return nullptr;
 }
-OVRP_PUBLIC_FUNCTION(ovrAchievementProgressHandle)
+OVRPL_PUBLIC_FUNCTION(ovrAchievementProgressHandle)
 ovr_AchievementProgressArray_GetElement(const ovrAchievementProgressArrayHandle obj, size_t index) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -948,7 +998,7 @@ ovr_AchievementProgressArray_GetElement(const ovrAchievementProgressArrayHandle 
 	}
 	return nullptr;
 }
-OVRP_PUBLIC_FUNCTION(const char *)
+OVRPL_PUBLIC_FUNCTION(const char *)
 ovr_AchievementProgressArray_GetNextUrl(const ovrAchievementProgressArrayHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -956,7 +1006,7 @@ ovr_AchievementProgressArray_GetNextUrl(const ovrAchievementProgressArrayHandle 
 	}
 	return "";
 }
-OVRP_PUBLIC_FUNCTION(size_t)
+OVRPL_PUBLIC_FUNCTION(size_t)
 ovr_AchievementProgressArray_GetSize(const ovrAchievementProgressArrayHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -964,7 +1014,7 @@ ovr_AchievementProgressArray_GetSize(const ovrAchievementProgressArrayHandle obj
 	}
 	return 0;
 }
-OVRP_PUBLIC_FUNCTION(bool)
+OVRPL_PUBLIC_FUNCTION(bool)
 ovr_AchievementProgressArray_HasNextPage(const ovrAchievementProgressArrayHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -972,7 +1022,7 @@ ovr_AchievementProgressArray_HasNextPage(const ovrAchievementProgressArrayHandle
 	}
 	return false;
 }
-OVRP_PUBLIC_FUNCTION(const char *)
+OVRPL_PUBLIC_FUNCTION(const char *)
 ovr_AchievementProgress_GetBitfield(const ovrAchievementProgressHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -980,7 +1030,7 @@ ovr_AchievementProgress_GetBitfield(const ovrAchievementProgressHandle obj) {
 	}
 	return "";
 }
-OVRP_PUBLIC_FUNCTION(unsigned long long)
+OVRPL_PUBLIC_FUNCTION(unsigned long long)
 ovr_AchievementProgress_GetCount(const ovrAchievementProgressHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -988,7 +1038,7 @@ ovr_AchievementProgress_GetCount(const ovrAchievementProgressHandle obj) {
 	}
 	return 0LL;
 }
-OVRP_PUBLIC_FUNCTION(bool)
+OVRPL_PUBLIC_FUNCTION(bool)
 ovr_AchievementProgress_GetIsUnlocked(const ovrAchievementProgressHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -996,7 +1046,7 @@ ovr_AchievementProgress_GetIsUnlocked(const ovrAchievementProgressHandle obj) {
 	}
 	return false;
 }
-OVRP_PUBLIC_FUNCTION(const char *)
+OVRPL_PUBLIC_FUNCTION(const char *)
 ovr_AchievementProgress_GetName(const ovrAchievementProgressHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -1004,7 +1054,7 @@ ovr_AchievementProgress_GetName(const ovrAchievementProgressHandle obj) {
 	}
 	return "";
 }
-OVRP_PUBLIC_FUNCTION(unsigned long long)
+OVRPL_PUBLIC_FUNCTION(unsigned long long)
 ovr_AchievementProgress_GetUnlockTime(const ovrAchievementProgressHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -1076,7 +1126,7 @@ ovr_Achievements_GetNextAchievementDefinitionArrayPage(ovrAchievementDefinitionA
 	}
 	return 0;
 }
-OVRP_PUBLIC_FUNCTION(unsigned int)
+OVRPL_PUBLIC_FUNCTION(unsigned int)
 ovr_AchievementDefinition_GetBitfieldLength(const ovrAchievementDefinitionHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -1084,7 +1134,7 @@ ovr_AchievementDefinition_GetBitfieldLength(const ovrAchievementDefinitionHandle
 	}
 	return 0;
 }
-OVRP_PUBLIC_FUNCTION(const char *)
+OVRPL_PUBLIC_FUNCTION(const char *)
 ovr_AchievementDefinition_GetName(const ovrAchievementDefinitionHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -1092,7 +1142,7 @@ ovr_AchievementDefinition_GetName(const ovrAchievementDefinitionHandle obj) {
 	}
 	return "";
 }
-OVRP_PUBLIC_FUNCTION(ovrAchievementType)
+OVRPL_PUBLIC_FUNCTION(ovrAchievementType)
 ovr_AchievementDefinition_GetType(const ovrAchievementDefinitionHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -1116,7 +1166,7 @@ ovrAchievementType_FromString(const char *str) {
 	}
 	return ovrAchievement_TypeUnknown;
 }
-OVRP_PUBLIC_FUNCTION(unsigned long long)
+OVRPL_PUBLIC_FUNCTION(unsigned long long)
 ovr_AchievementDefinition_GetTarget(const ovrAchievementDefinitionHandle obj) {
 	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
 	if (result == ovrPlatformInitialize_Success) {
@@ -1131,5 +1181,197 @@ ovr_Achievements_GetNextAchievementProgressArrayPage(ovrAchievementProgressArray
 		return ovr_Achievements_GetNextAchievementProgressArrayPagePLPtr(obj);
 	}
 	return 0;
+}
+OVRPL_PUBLIC_FUNCTION(ovrLaunchDetailsHandle)
+ovr_ApplicationLifecycle_GetLaunchDetails() {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_ApplicationLifecycle_GetLaunchDetailsPLPtr();
+	}
+	return nullptr;
+}
+OVRPL_PUBLIC_FUNCTION(void)
+ovr_ApplicationLifecycle_LogDeeplinkResult(const char *trackingID, ovrLaunchResult launchResult) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_ApplicationLifecycle_LogDeeplinkResultPLPtr(trackingID, launchResult);
+	}
+	return;
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_LaunchDetails_GetDeeplinkMessage(const ovrLaunchDetailsHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_LaunchDetails_GetDeeplinkMessagePLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_LaunchDetails_GetDestinationApiName(const ovrLaunchDetailsHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_LaunchDetails_GetDestinationApiNamePLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_LaunchDetails_GetLaunchSource(const ovrLaunchDetailsHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_LaunchDetails_GetLaunchSourcePLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(ovrLaunchType)
+ovr_LaunchDetails_GetLaunchType(const ovrLaunchDetailsHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_LaunchDetails_GetLaunchTypePLPtr(obj);
+	}
+	return ovrLaunchType_Unknown;
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_LaunchDetails_GetLobbySessionID(const ovrLaunchDetailsHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_LaunchDetails_GetLobbySessionIDPLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_LaunchDetails_GetMatchSessionID(const ovrLaunchDetailsHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_LaunchDetails_GetMatchSessionIDPLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_LaunchDetails_GetTrackingID(const ovrLaunchDetailsHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_LaunchDetails_GetTrackingIDPLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(ovrUserArrayHandle)
+ovr_LaunchDetails_GetUsers(const ovrLaunchDetailsHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_LaunchDetails_GetUsersPLPtr(obj);
+	}
+	return nullptr;
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovrLaunchType_ToString(ovrLaunchType value) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovrLaunchType_ToStringPLPtr(value);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(ovrLaunchType)
+ovrLaunchType_FromString(const char *str) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovrLaunchType_FromStringPLPtr(str);
+	}
+	return ovrLaunchType_Unknown;
+}
+OVRPL_PUBLIC_FUNCTION(ovrUserHandle)
+ovr_UserArray_GetElement(const ovrUserArrayHandle obj, size_t index) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_UserArray_GetElementPLPtr(obj, index);
+	}
+	return nullptr;
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_UserArray_GetNextUrl(const ovrUserArrayHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_UserArray_GetNextUrlPLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(size_t)
+ovr_UserArray_GetSize(const ovrUserArrayHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_UserArray_GetSizePLPtr(obj);
+	}
+	return 0;
+}
+OVRPL_PUBLIC_FUNCTION(bool)
+ovr_UserArray_HasNextPage(const ovrUserArrayHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_UserArray_HasNextPagePLPtr(obj);
+	}
+	return false;
+}
+OVRPL_PUBLIC_FUNCTION(ovrRequest)
+ovr_Application_GetVersion() {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_Application_GetVersionPLPtr();
+	}
+	return 0;
+}
+OVRPL_PUBLIC_FUNCTION(ovrApplicationVersionHandle)
+ovr_Message_GetApplicationVersion(const ovrMessageHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_Message_GetApplicationVersionPLPtr(obj);
+	}
+	return nullptr;
+}
+OVRPL_PUBLIC_FUNCTION(int)
+ovr_ApplicationVersion_GetCurrentCode(const ovrApplicationVersionHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_ApplicationVersion_GetCurrentCodePLPtr(obj);
+	}
+	return 0;
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_ApplicationVersion_GetCurrentName(const ovrApplicationVersionHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_ApplicationVersion_GetCurrentNamePLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(int)
+ovr_ApplicationVersion_GetLatestCode(const ovrApplicationVersionHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_ApplicationVersion_GetLatestCodePLPtr(obj);
+	}
+	return 0;
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_ApplicationVersion_GetLatestName(const ovrApplicationVersionHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_ApplicationVersion_GetLatestNamePLPtr(obj);
+	}
+	return "";
+}
+OVRPL_PUBLIC_FUNCTION(long long)
+ovr_ApplicationVersion_GetReleaseDate(const ovrApplicationVersionHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_ApplicationVersion_GetReleaseDatePLPtr(obj);
+	}
+	return 0LL;
+}
+OVRPL_PUBLIC_FUNCTION(const char *)
+ovr_ApplicationVersion_GetSize(const ovrApplicationVersionHandle obj) {
+	ovrPlatformInitializeResult result = loaderInitHelper(PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION);
+	if (result == ovrPlatformInitialize_Success) {
+		return ovr_ApplicationVersion_GetSizePLPtr(obj);
+	}
+	return "";
 }
 #endif
