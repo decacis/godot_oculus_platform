@@ -69,6 +69,7 @@
 #include "OVR_LivestreamingStartResult.h"
 #include "OVR_LivestreamingStatus.h"
 #include "OVR_LivestreamingVideoStats.h"
+#include "OVR_ManagedInfo.h"
 #include "OVR_Message.h"
 #include "OVR_Microphone.h"
 #include "OVR_MicrophoneAvailabilityState.h"
@@ -87,6 +88,7 @@
 #include "OVR_Pid.h"
 #include "OVR_PidArray.h"
 #include "OVR_PlatformInitialize.h"
+#include "OVR_Price.h"
 #include "OVR_Product.h"
 #include "OVR_ProductArray.h"
 #include "OVR_Purchase.h"
@@ -342,7 +344,7 @@ OVRPL_PUBLIC_FUNCTION(ovrPlatformInitializeResult) ovr_PlatformInitializeWindows
 /// information as defined in this header package. This is used to ensure that the version
 /// in your headers matches the version of the static library.
 #define ovr_PlatformInitializeWindows(appId) ovr_PlatformInitializeWindowsEx((appId), PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION)
-
+#define ovr_PlatformInitializeWindows(appId) ovr_PlatformInitializeWindowsEx((appId), PLATFORM_PRODUCT_VERSION, PLATFORM_MAJOR_VERSION)
 
 /// Performs the initialization of the platform for use on Windows. Requires your app
 /// ID (not access token). This call may fail for a variety of reasons, and will return
@@ -373,7 +375,7 @@ OVRPL_PUBLIC_FUNCTION(ovrRequest) ovr_PlatformInitializeWindowsAsynchronousEx(co
 
 /// Returns the id of the currently logged in user, or a 0 id if there
 /// is none.
-OVRP_PUBLIC_FUNCTION(ovrID) ovr_GetLoggedInUserID();
+OVRPL_PUBLIC_FUNCTION(ovrID) ovr_GetLoggedInUserID();//MIC: OVRP_ => OVRPL_
 
 /// Returns the currently logged-in user's locale as a string, or empty string on error.
 /// Return value format conforms to BCP47: https://tools.ietf.org/html/bcp47

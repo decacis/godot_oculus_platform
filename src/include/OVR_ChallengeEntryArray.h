@@ -8,6 +8,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+/// A paginated array of ovrChallengeEntryHandle which can be retrieved by
+/// ovr_Challenges_GetEntries().
 typedef struct ovrChallengeEntryArray *ovrChallengeEntryArrayHandle;
 
 /// The element of this array and the element type is ovrChallengeEntryHandle.

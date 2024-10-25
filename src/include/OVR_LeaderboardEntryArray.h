@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+/// An array of paginated leaderboard entries.
 typedef struct ovrLeaderboardEntryArray *ovrLeaderboardEntryArrayHandle;
 
 /// The url of the next page of leaderboard entries

@@ -21,7 +21,7 @@ typedef enum ovrAppInstallResult_ {
   ovrAppInstallResult_DuplicateRequest,
   /// Install of the app failed due to an internal installer error
   ovrAppInstallResult_InstallerError,
-  /// Install of the app failed because the user cancelled the install operation
+  /// Install of the app failed because the user canceled the install operation
   ovrAppInstallResult_UserCancelled,
   /// Install of the app failed due to a user authorization error
   ovrAppInstallResult_AuthorizationError,

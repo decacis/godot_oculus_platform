@@ -7,10 +7,15 @@
 #include "OVR_PartyUpdateAction.h"
 #include "OVR_Types.h"
 
+/// The notification about updating a party status information to a
+/// participating user. Party Notifications are intended to update the user on
+/// various actions that are occurring in the user's party. This is primarily
+/// used in {'party_update': 'ovrNotification_Party_PartyUpdate'}.
 typedef struct ovrPartyUpdateNotification *ovrPartyUpdateNotificationHandle;
 
 /// An enum that specifies the type of action related to the party and user
-/// that this notification holds.
+/// that this notification holds. It can be retrieved by using
+/// ovr_PartyUpdateNotification_GetAction().
 ///
 /// ovrPartyUpdateAction_Join: The user is going to join the party.
 ///
@@ -21,7 +26,7 @@ typedef struct ovrPartyUpdateNotification *ovrPartyUpdateNotificationHandle;
 /// ovrPartyUpdateAction_Uninvite: The user is uninvited from the party.
 OVRP_PUBLIC_FUNCTION(ovrPartyUpdateAction) ovr_PartyUpdateNotification_GetAction(const ovrPartyUpdateNotificationHandle obj);
 
-/// The Id of the party that will be updated. This can be retrieved with
+/// The ID of the party that will be updated. This can be retrieved with
 /// ovrPartyIDHandle.
 OVRP_PUBLIC_FUNCTION(ovrID) ovr_PartyUpdateNotification_GetPartyId(const ovrPartyUpdateNotificationHandle obj);
 
@@ -30,14 +35,16 @@ OVRP_PUBLIC_FUNCTION(ovrID) ovr_PartyUpdateNotification_GetPartyId(const ovrPart
 /// ovr_User_GetID() for this user.
 OVRP_PUBLIC_FUNCTION(ovrID) ovr_PartyUpdateNotification_GetSenderId(const ovrPartyUpdateNotificationHandle obj);
 
-/// A timestamp denoting when the action happened that this status update
+/// A timestamp denoting when the party action occurred that this status update
 /// notification refers to.
 OVRP_PUBLIC_FUNCTION(const char *) ovr_PartyUpdateNotification_GetUpdateTimestamp(const ovrPartyUpdateNotificationHandle obj);
 
-/// The alias of the ovrUserHandle whose party status has changed.
+/// The alias of the ovrUserHandle whose party status has changed. This is an
+/// alias that is set by the user.
 OVRP_PUBLIC_FUNCTION(const char *) ovr_PartyUpdateNotification_GetUserAlias(const ovrPartyUpdateNotificationHandle obj);
 
-/// The ID of the user whose party status has changed.
+/// The ID of the user, ovr_User_GetID(), whose party status has changed. This
+/// is a unique value for every ovrUserHandle.
 OVRP_PUBLIC_FUNCTION(ovrID) ovr_PartyUpdateNotification_GetUserId(const ovrPartyUpdateNotificationHandle obj);
 
 /// The displayable name of the ovrUserHandle whose party status has changed.

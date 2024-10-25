@@ -14,7 +14,10 @@ demo/addons/godot_oculus_platform/bin/*
 !demo/addons/godot_oculus_platform/bin/android
 !demo/addons/godot_oculus_platform/bin/android/libs/
 !demo/addons/godot_oculus_platform/bin/android/libs/arm64-v8a
+!demo/addons/godot_oculus_platform/bin/windows
 
 src/**/*.o
 src/**/*.os
 src/**/*.obj
+/compileAll.cmd
+/vc140.pdb

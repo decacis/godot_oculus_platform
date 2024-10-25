@@ -104,7 +104,7 @@ OVRP_PUBLIC_FUNCTION(ovrCowatchViewerUpdateHandle)                ovr_Message_Ge
 OVRP_PUBLIC_FUNCTION(ovrCowatchingStateHandle)                    ovr_Message_GetCowatchingState(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrDataStoreHandle)                          ovr_Message_GetDataStore(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrDestinationArrayHandle)                   ovr_Message_GetDestinationArray(const ovrMessageHandle obj);
-OVRP_PUBLIC_FUNCTION(ovrErrorHandle)                              ovr_Message_GetError(const ovrMessageHandle obj);
+OVRP_PUBLIC_FUNCTION(ovrErrorHandle)                              ovr_Message_GetError(const ovrMessageHandle obj);//MIC: OVRP_ => OVRPL_
 OVRP_PUBLIC_FUNCTION(ovrGroupPresenceJoinIntentHandle)            ovr_Message_GetGroupPresenceJoinIntent(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrGroupPresenceLeaveIntentHandle)           ovr_Message_GetGroupPresenceLeaveIntent(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrHttpTransferUpdateHandle)                 ovr_Message_GetHttpTransferUpdate(const ovrMessageHandle obj);
@@ -135,18 +135,18 @@ OVRP_PUBLIC_FUNCTION(ovrPartyHandle)                              ovr_Message_Ge
 OVRP_PUBLIC_FUNCTION(ovrPartyIDHandle)                            ovr_Message_GetPartyID(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrPartyUpdateNotificationHandle)            ovr_Message_GetPartyUpdateNotification(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrPidArrayHandle)                           ovr_Message_GetPidArray(const ovrMessageHandle obj);
-OVRP_PUBLIC_FUNCTION(ovrPlatformInitializeHandle)                 ovr_Message_GetPlatformInitialize(const ovrMessageHandle obj);
+OVRP_PUBLIC_FUNCTION(ovrPlatformInitializeHandle)                 ovr_Message_GetPlatformInitialize(const ovrMessageHandle obj);//MIC: OVRP_ => OVRPL_
 OVRP_PUBLIC_FUNCTION(ovrProductArrayHandle)                       ovr_Message_GetProductArray(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrPurchaseHandle)                           ovr_Message_GetPurchase(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrPurchaseArrayHandle)                      ovr_Message_GetPurchaseArray(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrRejoinDialogResultHandle)                 ovr_Message_GetRejoinDialogResult(const ovrMessageHandle obj);
-OVRP_PUBLIC_FUNCTION(ovrRequest)                                  ovr_Message_GetRequestID(const ovrMessageHandle obj);
+OVRP_PUBLIC_FUNCTION(ovrRequest)                                  ovr_Message_GetRequestID(const ovrMessageHandle obj);//MIC: OVRP_ => OVRPL_
 OVRP_PUBLIC_FUNCTION(ovrSdkAccountArrayHandle)                    ovr_Message_GetSdkAccountArray(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrSendInvitesResultHandle)                  ovr_Message_GetSendInvitesResult(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrShareMediaResultHandle)                   ovr_Message_GetShareMediaResult(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(const char *)                                ovr_Message_GetString(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrSystemVoipStateHandle)                    ovr_Message_GetSystemVoipState(const ovrMessageHandle obj);
-OVRP_PUBLIC_FUNCTION(ovrMessageType)                              ovr_Message_GetType(const ovrMessageHandle obj);
+OVRP_PUBLIC_FUNCTION(ovrMessageType)                              ovr_Message_GetType(const ovrMessageHandle obj);//MIC: OVRP_ => OVRPL_
 OVRP_PUBLIC_FUNCTION(ovrUserHandle)                               ovr_Message_GetUser(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrUserAccountAgeCategoryHandle)             ovr_Message_GetUserAccountAgeCategory(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrUserArrayHandle)                          ovr_Message_GetUserArray(const ovrMessageHandle obj);
@@ -154,6 +154,6 @@ OVRP_PUBLIC_FUNCTION(ovrUserCapabilityArrayHandle)                ovr_Message_Ge
 OVRP_PUBLIC_FUNCTION(ovrUserDataStoreUpdateResponseHandle)        ovr_Message_GetUserDataStoreUpdateResponse(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrUserProofHandle)                          ovr_Message_GetUserProof(const ovrMessageHandle obj);
 OVRP_PUBLIC_FUNCTION(ovrUserReportIDHandle)                       ovr_Message_GetUserReportID(const ovrMessageHandle obj);
-OVRP_PUBLIC_FUNCTION(bool)                                        ovr_Message_IsError(const ovrMessageHandle obj);
+OVRP_PUBLIC_FUNCTION(bool)                                        ovr_Message_IsError(const ovrMessageHandle obj);//MIC: OVRP_ => OVRPL_
 
 #endif
