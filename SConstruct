@@ -16,7 +16,7 @@ env = SConscript("godot-cpp/SConstruct")
 env.Append(CPPPATH=["src/", "src/include/"])
 
 if env["platform"] == "android":
-    sources = Glob("src/*.cpp", exclude=["src/OVR_PlatformLoader*.cpp"])
+    sources = Glob("src/*.cpp", exclude=["src/OVR_PlatformLoader_windows.cpp"])
 
     env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/android/libs/arm64-v8a/"])
     env.Append(LIBS=["libovrplatformloader"])
@@ -36,9 +36,6 @@ if env["platform"] == "android":
 else:
     sources = Glob("src/*.cpp")
 
-    env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/windows/"])
-    env.Append(LIBS=["LibOVRPlatformImpl64_1"])
-
     if env["platform"] == "macos":
         if env["target"] != "template_debug":
             library = env.SharedLibrary(
@@ -52,6 +49,16 @@ else:
             )
     
     elif env["platform"] == "windows":
+        script_dict = {
+            'static void LoadFunctions(ModuleHandleType hModule) {': 
+            'extern void LoadFunctionsOther(ModuleHandleType hModule);\n\nstatic void LoadFunctions(ModuleHandleType hModule) {\n  LoadFunctionsOther(hModule);\n\n'
+        }
+        sub = env.Substfile(source='demo/addons/godot_oculus_platform/bin/windows/OVR_PlatformLoader.cpp', target='src/OVR_PlatformLoader.os', SUBST_DICT = script_dict)
+        sources = Glob("src/*.cpp")
+
+        env.Append(LIBPATH=["demo/addons/godot_oculus_platform/bin/windows/"])
+        env.Append(LIBS=["LibOVRPlatformImpl64_1"])
+
         if env["target"] != "template_debug":
             library = env.SharedLibrary(
                 "demo/addons/godot_oculus_platform/bin/libgodotoculusplatformW",
