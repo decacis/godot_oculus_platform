@@ -1,4 +1,8 @@
 # Godot Oculus Platform
+
+> [!WARNING]
+> **DEPRECATED. Please use the [Godot Meta Toolkit](https://github.com/godot-sdk-integrations/godot-meta-toolkit) instead.**
+
 An open-source implementation of the Oculus Platform SDK intended to be used with the Quest platform.
 See the [download](https://decacis.github.io/godot_oculus_platform/download/) page of the documentation for a list of supported Godot Engine and Oculus Platform SDK versions.
 
